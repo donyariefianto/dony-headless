@@ -1,0 +1,12 @@
+[{
+  "_id": {
+    "$oid": "6866596385966244c4a965b8"
+  },
+  "name": "admin",
+  "username": "admin",
+  "password": "$scrypt$n=16384,r=8,p=1$DHMNblFitlLAosjaYWK9/A$4pnnZ8B/qcqwQ56A9ctwej7vI8ShZwBkDtQEZ1o9vow9WBek7V265ly6YNdWwcZstgSiV0OwQQc4FJr41R5+uw",
+  "role": "admin",
+  "created_at": "2025-07-03T10:20:19+00:00",
+  "updated_at": "2025-07-03T10:20:19+00:00",
+  "status": true
+}]
