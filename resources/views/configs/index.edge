@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>
+      CMS Koleksi Profesional
+    </title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/resources/configs/index.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js">
+      
+    </script>
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <div class="logo">
+          <h2>
+            CMS Koleksi
+          </h2>
+        </div>
+        <div class="header-actions">
+          <button id="toggle-dark-mode" class="btn btn-secondary">
+            Mode Gelap
+          </button>
+          <button id="logout-btn" class="btn btn-secondary">Logout</button>
+          <div class="user-info">
+            <span id="user-display"></span>
+          </div>
+        </div>
+      </header>
+
+      <main class="main-layout">
+
+        <aside class="left-sidebar">
+          <nav class="main-nav">
+            <ul>
+              <li class="nav-item active" data-menu="dashboard">
+                <span>Dashboard</span>
+              </li>
+              <li class="nav-item" data-menu="collections">
+                <span>Koleksi</span>
+              </li>
+              <li class="nav-item" data-menu="settings">
+                <span>Pengaturan</span>
+              </li>
+            </ul>
+          </nav>
+        </aside>
+
+        <section class="content-area">
+          <div id="collections-view" class="content-view">
+            <div class="content-header">
+              <h3>
+                Daftar Koleksi
+              </h3>
+              <button id="add-collection-btn" class="btn btn-primary">
+                Tambah Koleksi
+                        </button>
+            </div>
+
+            <div class="collections-main-content">
+              <div class="collection-list-cards">
+                <div class="collections-controls">
+                  <div class="search-container">
+                    <input type="text" id="collection-search-input" placeholder="Cari koleksi..." class="form-control" />
+                    <i class="fas fa-search search-icon"></i>
+                  </div>
+                </div>
+
+                <div id="collections-list" class="collections-grid">
+                  <div class="placeholder-card">
+                    <p>
+                      Memuat koleksi...
+                    </p>
+                  </div>
+                </div>
+
+                <div class="pagination-controls">
+                  <button
+                    id="prev-page-btn"
+                    class="btn btn-secondary"
+                    disabled
+                    aria-label="Halaman Sebelumnya"
+                    title="Pindah ke halaman sebelumnya"
+                  >
+                    <i class="fas fa-chevron-left"></i>Sebelumnya
+                  </button>
+                  <span id="page-info">Halaman 1 dari 1</span>
+                  <button
+                    id="next-page-btn"
+                    class="btn btn-secondary"
+                    disabled
+                    aria-label="Halaman Selanjutnya"
+                    title="Pindah ke halaman selanjutnya"
+                  >
+                    Selanjutnya <i class="fas fa-chevron-right"></i>
+                  </button>
+                </div>
+              </div>
+
+              <div class="collection-detail-wrapper">
+                <div id="no-collection-selected" class="info-message">
+                  <p>
+                    Silakan pilih koleksi dari daftar di samping, atau buat
+                    koleksi baru.
+                  </p>
+                </div>
+
+                <div id="collection-detail-view" class="detail-panel" style="display: none">
+                  <div class="detail-header">
+                    <h2 id="detail-collection-name">
+                    </h2>
+                    <div class="detail-actions">
+                      <button id="edit-collection-btn" class="btn btn-outline-info">
+                        Edit Koleksi
+                      </button>
+                      <button id="delete-collection-btn" class="btn btn-outline-danger">
+                        Hapus Koleksi
+                      </button>
+                    </div>
+                  </div>
+                  <div class="detail-content">
+                    <p>
+                      <strong>Nama Internal:</strong>
+                      <span id="detail-collection-internal-name"></span>
+                    </p>
+                    <p>
+                      <strong>Deskripsi:</strong>
+                      <span id="detail-collection-description"></span>
+                    </p>
+                    <p>
+                      <strong>Dibuat Pada:</strong>
+                      <span id="detail-collection-createdAt"></span>
+                    </p>
+                    <p>
+                      <strong>Diperbarui Pada:</strong>
+                      <span id="detail-collection-updatedAt"></span>
+                    </p>
+                  </div>
+
+                  <div class="data-items-section">
+                    <div class="data-items-header">
+                      <h4>
+                        Item Data
+                        <span id="data-items-collection-name-title"></span>
+                      </h4>
+                      <button id="add-data-item-btn" class="btn btn-primary">
+                        Tambah Data Baru
+                      </button>
+                    </div>
+                    <div class="search-container data-items-search-container">
+                      <input type="text" id="data-items-search-input" placeholder="Cari data item..." class="form-control" />
+                      <i class="fas fa-search search-icon"></i>
+                    </div>
+                    <div id="data-items-list-container" class="data-items-list-container">
+                      <div class="placeholder-card" id="data-items-placeholder">
+                        <p>
+                          Belum ada data untuk koleksi ini.
+                        </p>
+                      </div>
+                      <table id="data-items-table" class="data-table" style="display: none">
+                        <thead>
+                          <tr id="data-table-header-row">
+                          </tr>
+                        </thead>
+                        <tbody id="data-table-body">
+                        </tbody>
+                      </table>
+                    </div>
+                    <div class="pagination-controls data-items-pagination-controls">
+                      <button
+                        id="data-items-prev-page-btn"
+                        class="btn btn-secondary"
+                        disabled
+                        aria-label="Halaman Sebelumnya Data Item"
+                        title="Pindah ke halaman sebelumnya data item"
+                      >
+                        <i class="fas fa-chevron-left"></i>Sebelumnya
+                      </button>
+                      <span id="data-items-page-info">Halaman 1 dari 1</span>
+                      <button
+                        id="data-items-next-page-btn"
+                        class="btn btn-secondary"
+                        disabled
+                        aria-label="Halaman Selanjutnya Data Item"
+                        title="Pindah ke halaman selanjutnya data item"
+                      >
+                        Selanjutnya <i class="fas fa-chevron-right"></i>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div id="settings-view" class="content-view">
+            <div class="content-header">
+              <h3>
+                Pengaturan Umum
+              </h3>
+            </div>
+            <div class="settings-content">
+              <p>
+                Di sini akan ada pengaturan untuk CMS Anda. (Fitur ini belum diimplementasikan).
+              </p>
+            </div>
+          </div>
+
+          <div id="dashboard-view" class="content-view active-view">
+            <div class="content-header">
+              <h3>
+                Dashboard Kustom Anda
+              </h3>
+            </div>
+            <div class="dashboard-content">
+              <div class="dashboard-grid">
+                <div class="dashboard-card">
+                  <h4>Ringkasan Pengguna</h4>
+                  <p>Total Pengguna: <strong>1,245</strong></p>
+                  <p>Pengguna Aktif Bulan Ini: <strong>789</strong></p>
+                </div>
+                <div class="dashboard-card wide-card">
+                  <h4>Penjualan Bulanan</h4>
+                  <div id="monthly-sales-chart" class="chart-container"></div>
+                </div>
+                <div class="dashboard-card wide-card">
+                  <h4>Aktivitas Terbaru</h4>
+                  <ul>
+                    <li>Pengguna 'John Doe' terdaftar.</li>
+                    <li>Pesanan #1001 telah dibayar.</li>
+                    <li>Koleksi 'Produk' diperbarui.</li>
+                  </ul>
+                </div>
+                <div class="dashboard-card">
+                  <h4>Koleksi Paling Aktif</h4>
+                  <p>Produk: 2,500 data item</p>
+                  <p>Artikel: 1,200 data item</p>
+                </div>
+                <div class="dashboard-card">
+                  <h4>Peringatan Sistem</h4>
+                  <p class="text-danger"><i class="fas fa-exclamation-triangle"></i> Database hampir penuh!</p>
+                  <p class="text-info"><i class="fas fa-info-circle"></i> Perbarui CMS ke versi terbaru.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div id="loading-indicator" class="loading-spinner" style="display: none;">
+          </div>
+          <div id="notification-area">
+            <div id="error-message" class="notification error" style="display: none;">
+            </div>
+            <div id="success-message" class="notification success" style="display: none;">
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <aside id="right-form-sidebar" class="right-form-sidebar">
+      <div class="sidebar-header">
+        <h3 id="sidebar-form-title">
+        </h3>        <button class="close-sidebar-btn">&times;</button>
+      </div>
+      <div class="sidebar-content">
+        <form id="collection-form" class="active-form">
+          <input type="hidden" id="collection-id" />
+          <div class="form-section">
+            <h4>
+              Info Dasar Koleksi
+            </h4>
+            <div class="form-group">
+              <label for="collection-display-name">Nama Tampilan Koleksi <span class="required">*</span></label>
+              <input type="text" id="collection-display-name" placeholder="Contoh: Pengguna" required />
+            </div>
+            <div class="form-group">
+              <label for="collection-name">Nama Internal (Slug) <span class="required">*</span></label>
+              <input type="text" id="collection-name" placeholder="Contoh: users" required />
+              <small class="help-text">Nama internal digunakan dalam URL atau kode. Tidak boleh ada spasi atau karakter khusus. Otomatis terisi dari Nama Tampilan.</small>
+            </div>
+            <div class="form-group">
+              <label for="collection-description">Deskripsi Koleksi</label>
+              <textarea
+                id="collection-description"
+                rows="4"
+                placeholder="Deskripsi singkat tentang koleksi ini (Opsional)"
+              ></textarea>
+            </div>
+          </div>
+          <div class="form-section">
+            <h4>
+              Field Koleksi
+            </h4>
+            <div id="fields-container" class="sortable-list">
+            </div>
+            <button type="button" id="add-field-btn" class="btn btn-outline-primary btn-add-item">
+              Tambah Field
+                    </button>
+            <small class="help-text">Secara otomatis akan ditambahkan field 'id' bawaan jika tidak ada.</small>
+          </div>
+          <div class="form-section">
+            <h4>
+              Relasi Koleksi
+            </h4>
+            <div id="relations-container" class="sortable-list">
+            </div>
+            <button type="button" id="add-relation-btn" class="btn btn-outline-primary btn-add-item">
+              Tambah Relasi
+                    </button>
+          </div>
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Simpan Koleksi</button>
+            <button type="button" class="btn btn-secondary close-sidebar-btn">Batal</button>
+          </div>
+        </form>
+
+        <form id="data-item-form" class="active-form">
+          <input type="hidden" id="data-item-id" />
+          <input type="hidden" id="data-item-collection-name" />
+          <div id="data-item-fields-container" class="form-sections-data-item">
+          </div>
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary" id="save-data-item-btn">Simpan Data</button>
+            <button type="button" class="btn btn-secondary close-sidebar-btn">Batal</button>
+          </div>
+        </form>
+      </div>
+    </aside>
+
+    <div id="delete-confirm-modal" class="modal">
+      <div class="modal-content small-modal">
+        <span class="close-modal-btn">&times;</span>
+        <h3>
+          Konfirmasi Hapus
+        </h3>
+        <p>
+          Apakah Anda yakin ingin menghapus <strong id="delete-confirm-name"></strong>? Tindakan ini tidak dapat dibatalkan.
+        </p>
+        <div class="modal-actions">
+          <button id="confirm-delete-btn" class="btn btn-danger">Hapus Sekarang</button>
+          <button id="cancel-delete-btn" class="btn btn-secondary">Batal</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="overlay" class="overlay" style="display: none;">
+    </div>
+
+    <script src="/resources/configs/index.js">
+      
+    </script>
+    
+  </body>
+</html>

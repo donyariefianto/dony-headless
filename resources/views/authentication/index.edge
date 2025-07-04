@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>
+      Login - Admin Panel
+    </title>
+    <link rel="stylesheet" href="/resources/configs/index.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
+    />
+    <style>
+      /* CSS khusus untuk halaman login yang mungkin tidak ada di index.css */
+      
+      /* Anda bisa menambahkan ini jika ada styling spesifik yang tidak bisa dihandle oleh kelas yang ada */
+      
+      body.login-page {
+        /* Tambahkan class ini ke <body> di login.html */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        margin: 0;
+        background-color: var(--bg-color);
+        /* Ambil dari variabel CSS */
+        color: var(--text-color);
+      }
+      
+      .login-container {
+        background-color: var(--card-bg);
+        /* Menggunakan card-bg dari index.css */
+        padding: 40px;
+        border-radius: var(--border-radius);
+        box-shadow: 0 4px 15px var(--shadow-medium);
+        /* Menggunakan shadow-medium */
+        width: 100%;
+        max-width: 400px;
+        text-align: center;
+        border: 1px solid var(--border-color);
+        /* Tambahkan border konsisten */
+      }
+      
+      .login-container h2 {
+        margin-bottom: 30px;
+        color: var(--primary-color);
+        /* Menggunakan primary-color */
+        font-size: 1.8rem;
+      }
+      
+      .input-group {
+        margin-bottom: 20px;
+        text-align: left;
+      }
+      
+      .input-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+        /* Font weight konsisten dengan form group di index.css */
+        color: var(--dark-color);
+        /* Warna teks untuk label */
+      }
+      
+      /* Dark mode untuk label */
+      
+      body.dark-mode .input-group label {
+        color: var(--text-color);
+      }
+      
+      .input-group input[type="text"],
+      .input-group input[type="password"] {
+        /* Menggunakan style input dari index.css yang ada di .form-group */
+        width: 100%;
+        padding: 12px 15px;
+        border: 1px solid var(--border-color);
+        border-radius: var(--border-radius);
+        background-color: var(--bg-color);
+        color: var(--text-color);
+        font-size: 1rem;
+        transition: border-color var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
+      }
+      
+      .input-group input:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary-color) 30%, transparent);
+        outline: none;
+      }
+      
+      .error-message {
+        color: var(--danger-color);
+        /* Menggunakan danger-color dari index.css */
+        margin-top: 20px;
+        font-size: 0.95rem;
+        font-weight: bold;
+      }
+    </style>
+  </head>
+  <body class="login-page">
+    <div class="login-container">
+      <h2>
+        Login Admin Panel
+      </h2>
+      <form id="login-form">
+        <div class="input-group">
+          <label for="username">Username:</label>
+          <input type="text" id="username" name="username" required />
+        </div>
+        <div class="input-group">
+          <label for="password">Password:</label>
+          <input type="password" id="password" name="password" required />
+        </div>
+        <button type="submit" class="btn btn-primary">Login</button>
+        <p id="login-error-message" class="error-message" style="display: none;">
+        </p>
+      </form>
+    </div>
+    <script src="/resources/authentication/login.js">
+      
+    </script>
+  </body>
+</html>

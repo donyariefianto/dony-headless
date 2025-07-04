@@ -1,0 +1,76 @@
+/* public/css/login.css */
+
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f4f7f6;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  margin: 0;
+  color: #333;
+}
+
+.login-container {
+  background-color: #ffffff;
+  padding: 40px;
+  border-radius: 8px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+}
+
+.login-container h2 {
+  margin-bottom: 30px;
+  color: #3f51b5; /* Warna utama */
+}
+
+.input-group {
+  margin-bottom: 20px;
+  text-align: left;
+}
+
+.input-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: bold;
+}
+
+.input-group input[type='text'],
+.input-group input[type='password'] {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  box-sizing: border-box; /* Pastikan padding tidak menambah lebar */
+  font-size: 1rem;
+}
+
+.btn {
+  display: inline-block;
+  width: 100%;
+  padding: 12px 20px;
+  margin-top: 10px;
+  border: none;
+  border-radius: 5px;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.btn-primary {
+  background-color: #3f51b5; /* Warna utama */
+  color: white;
+}
+
+.btn-primary:hover {
+  background-color: #303f9f; /* Warna lebih gelap saat hover */
+}
+
+.error-message {
+  color: #d32f2f; /* Warna merah untuk pesan error */
+  margin-top: 20px;
+  font-size: 0.95rem;
+  font-weight: bold;
+}

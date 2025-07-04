@@ -1,0 +1,355 @@
+@php
+// Mengakses properti 'settings' dari field, parse dari string JSON jika perlu
+  const parsed_settings = typeof field.settings === 'string' ? JSON.parse(field.settings) : field.settings;
+  // Nama input akan menggunakan slug field: field_values[nama_field_slug]
+  const input_name = `field_values[${field.slug}]`;
+  // Mengakses properti current_value yang dikirim dari controller
+  const current_val = current_value !== null && current_value !== undefined ? current_value : (field.default_value === null ? '' : field.default_value);
+@endphp
+
+@switch(field.field_type)
+{{-- Mengakses properti 'field_type' --}}
+@case('Text')
+  @if(parsed_settings.is_wysiwyg)
+    <textarea name="{{ input_name }}" id="{{ field.slug }}" style="width: 100%; height: 150px;">{{ current_val }}</textarea>
+    {{-- Anda akan perlu menginisialisasi editor WYSIWYG di sini dengan JavaScript --}}
+  @else
+    <input
+      type="text"
+      name="{{ input_name }}"
+      id="{{ field.slug }}"
+      value="{{ current_val }}"
+      minlength="{{ parsed_settings.min_length || 0 }}"
+      maxlength="{{ parsed_settings.max_length || 255 }}"
+      style="width: 100%; padding: 8px;"
+    />
+  @endif
+  @break
+  
+  @case('Number')
+    <input
+      type="number"
+      name="{{ input_name }}"
+      id="{{ field.slug }}"
+      value="{{ current_val }}"
+      min="{{ parsed_settings.min_value }}"
+      max="{{ parsed_settings.max_value }}"
+      step="{{ parsed_settings.decimal_places ? 1 / Math.pow(10, parsed_settings.decimal_places) : 1 }}"
+      style="width: 100%; padding: 8px;"
+    />
+    @break
+    
+    @case('Selection')
+      @php
+      const selection_type = parsed_settings.type || 'Dropdown';
+    @endphp
+    
+    @switch(selection_type)
+      @case('Toggle')
+        <input
+          type="checkbox"
+          name="{{ input_name }}"
+          id="{{ field.slug }}"
+          value="true"
+          if
+          @if(current_val === 'true' || current_val === true) checked @end
+        />
+        @break
+        
+        @case('Datetime')
+          {{-- Ini akan memerlukan library JS client-side seperti flatpickr atau sejenisnya --}}
+          <input
+            type="datetime-local"
+            name="{{ input_name }}"
+            id="{{ field.slug }}"
+            value="{{ current_val ? (new Date(current_val)).toISOString().slice(0, 16) : '' }}"
+            style="width: 100%; padding: 8px;"
+            {{-- Format untuk datetime-local input --}}
+          />
+          @break
+          
+          @case('Color')
+            <input
+              type="color"
+              name="{{ input_name }}"
+              id="{{ field.slug }}"
+              value="{{ current_val || '#000000' }}"
+              style="padding: 0; height: 30px;"
+            />
+            {{-- Atau gunakan JS color picker library --}}
+            @break
+            
+            @case('Dropdown')
+              <select name="{{ input_name }}" id="{{ field.slug }}" style="width: 100%; padding: 8px;">
+                <option value="">
+                  Pilih {{ field.name }}
+                </option>
+                @each(option in parsed_settings.options)
+                  <option value="{{ option.value }}" if @if(current_val == option.value) selected @end>
+                    {{ option.label }}
+                  </option>
+                @endeach
+              </select>
+              @break
+              
+              @case('Checkboxes')
+                @php
+                // Nilai current_val untuk Checkboxes akan berupa array string
+          const selected_checkboxes = Array.isArray(current_val) ? current_val : (current_val ? [current_val] : []);
+              @endphp
+              <div>
+                @each(option in parsed_settings.options)
+                  <label style="margin-right: 15px;">
+                    <input
+                      type="checkbox"
+                      name="{{ input_name }}[]"
+                      value="{{ option.value }}"
+                      if
+                      @if(selected_checkboxes.includes(option.value)) checked @end
+                    />{{ option.label }}
+            </label>
+                @endeach
+              </div>
+              @break
+              
+              @case('Dropdown Multiple')
+                @php
+                // Nilai current_val untuk Dropdown Multiple akan berupa array string
+          const selected_dropdown_multi = Array.isArray(current_val) ? current_val : (current_val ? [current_val] : []);
+              @endphp
+              <select
+                name="{{ input_name }}[]"
+                id="{{ field.slug }}"
+                multiple
+                style="width: 100%; padding: 8px; height: 100px;"
+              >
+                @each(option in parsed_settings.options)
+                  <option value="{{ option.value }}" if @if(selected_dropdown_multi.includes(option.value)) selected @end>
+                    {{ option.label }}
+                  </option>
+                @endeach
+              </select>
+              @break
+              
+              @case('Radio Button')
+                <div>
+                  @each(option in parsed_settings.options)
+                    <label style="margin-right: 15px;">
+                      <input
+                        type="radio"
+                        name="{{ input_name }}"
+                        value="{{ option.value }}"
+                        if
+                        @if(current_val == option.value) checked @end
+                      />{{ option.label }}
+            </label>
+                  @endeach
+                </div>
+                @break
+                
+                @case('Icon')
+                  <input
+                    type="text"
+                    name="{{ input_name }}"
+                    id="{{ field.slug }}"
+                    value="{{ current_val || '' }}"
+                    placeholder="e.g., fas fa-home"
+                    style="width: 100%; padding: 8px;"
+                  />
+                  {{-- Anda bisa menampilkan preview icon di sini dengan JS/CSS --}}
+                  @break
+                  
+                  @case('Repeater')
+                    @php
+                    // Nilai current_val untuk Repeater akan berupa array objek
+          const repeater_items = Array.isArray(current_val) ? current_val : [];
+                  @endphp
+                  <div class="repeater-field" style="border: 1px solid #eee; padding: 10px;">
+                    <div class="repeater-items">
+                      @each(item, item_index in repeater_items)
+                        <div class="repeater-item" style="border: 1px dashed #ccc; padding: 10px; margin-bottom: 10px;">
+                          @each(sub_field in parsed_settings.fields)
+                            <div style="margin-bottom: 10px;">
+                              <label for="{{ field.slug }}_item_{{ item_index }}_{{ sub_field.name }}">{{ sub_field.name }}:</label>
+                              {{-- Rekursif memanggil partial field_input untuk sub-field --}}
+                              ! include('partials/field_input', {
+                        field: {
+                            id: field.id + '_' + item_index + '_' + sub_field.name, // ID unik untuk input DOM
+                            slug: field.slug + `[${item_index}][${sub_field.name}]`, // Nama input array untuk backend
+                            name: sub_field.name,
+                            field_type: sub_field.type, // Sub-tipe field
+                            settings: sub_field.settings || {}
+                        },
+                        current_value: item[sub_field.name] // Mengakses nilai sub-field dari item
+                    })
+                            </div>
+                          @endeach
+                          <button
+                            type="button"
+                            class="repeater-remove-item-btn"
+                            style="background-color: #dc3545; color: white; border: none; padding: 5px 10px; cursor: pointer;"
+                          >Hapus Item</button>
+                        </div>
+                      @endeach
+                    </div>
+                    <template>
+                      {{-- Template untuk item baru (akan di-clone oleh JS) --}}
+                      <div class="repeater-item" style="border: 1px dashed #ccc; padding: 10px; margin-bottom: 10px;">
+                        @php
+                        const new_index_placeholder = '__NEW_INDEX__'; // Placeholder untuk JS
+                      @endphp
+                      @each(sub_field in parsed_settings.fields)
+                        <div style="margin-bottom: 10px;">
+                          <label for="{{ field.slug }}_item_${new_index_placeholder}_{{ sub_field.name }}">{{ sub_field.name }}:</label>
+                          ! include('partials/field_input', {
+                            field: {
+                                id: field.id + '_${new_index_placeholder}_' + sub_field.name,
+                                slug: field.slug + `[${new_index_placeholder}][${sub_field.name}]`,
+                                name: sub_field.name,
+                                field_type: sub_field.type,
+                                settings: sub_field.settings || {}
+                            },
+                            current_value: null
+                        })
+                        </div>
+                      @endeach
+                      <button
+                        type="button"
+                        class="repeater-remove-item-btn"
+                        style="background-color: #dc3545; color: white; border: none; padding: 5px 10px; cursor: pointer;"
+                      >Hapus Item</button>
+                    </div>
+                  </template>
+                  <button
+                    type="button"
+                    class="repeater-add-item-btn"
+                    style="background-color: #28a745; color: white; border: none; padding: 5px 10px; cursor: pointer;"
+                  >Tambah Item Repeater</button>
+                </div>
+                @break
+                
+                @default
+                <p>
+                  Tipe seleksi {{ selection_type }} tidak didukung.
+                </p>
+              @endswitch
+              @break
+              
+              @case('Relational')
+                @php
+                const relation_type = parsed_settings.relation_type || 'Many to One';
+      // Mengambil data relasi dari controller (atau mungkin AJAX di frontend)
+      // Perhatikan bahwa di Edge.js, Anda tidak bisa memanggil controller method secara langsung.
+      // Data `target_module_options` harus dikirim dari controller utama ke view.
+      // Untuk demo ini, kita asumsikan `target_module_options` sudah ada di scope.
+      // Dalam aplikasi nyata, Anda mungkin mengirimkan data ini dari controller `edit` atau `create`
+      // Atau memuatnya via AJAX jika jumlahnya sangat besar.
+      // Jika data sudah ada, akan ada di `target_module_options` di context.
+      // Jika belum, Anda harus memuatnya di controller sebelum render view.
+      // Contoh sederhana (ini tidak dinamis tanpa AJAX):
+      let target_module_options = [];
+      // Jika Anda mengirim `target_module_options_map` dari controller (misal { 'moduleId': [entries] })
+      // target_module_options = target_module_options_map[parsed_settings.target_module_id] || [];
+      // Atau, jika Anda hanya perlu daftar ID dan nama (tidak memerlukan controller helper)
+      // Anda perlu preload entri dari modul target di controller `edit`/`create`
+      // dan kirim ke view.
+      // Untuk contoh ini, saya akan memanggil controller helper secara pseudo-sinkron,
+      // tetapi dalam praktik, Anda perlu memuat data ini lebih awal.
+      const current_http_context = new ModulesController().get_module_entries_for_field({ params: { module_id: parsed_settings.target_module_id } } as HttpContext);
+      if (current_http_context && current_http_context.body && current_http_context.body.entries) {
+        target_module_options = current_http_context.body.entries;
+      }
+              @endphp
+              
+              @switch(relation_type)
+                @case('Files')
+                  <input type="file" name="{{ input_name }}[]" id="{{ field.slug }}" if @if(true) multiple @end />
+                  {{-- Anda akan memerlukan JS untuk mengelola unggahan file --}}
+                  {{-- Menampilkan daftar file yang sudah ada --}}
+                  @if(current_val && current_val.length > 0)
+                    <ul class="current-files-list">
+                      @each(file in current_val)
+                        <li>
+                          <a href="{{ file }}" target="_blank">{{ file.split('/').pop() }}</a>
+                        </li>
+                      @endeach
+                    </ul>
+                  @endif
+                  @break
+                  
+                  @case('Many to One')
+                    @case('Tree View')
+                      <select name="{{ input_name }}" id="{{ field.slug }}" style="width: 100%; padding: 8px;">
+                        <option value="">
+                          Pilih {{ field.name }}
+                        </option>
+                        @each(option in target_module_options)
+                          <option value="{{ option.id }}" if @if(current_val == option.id) selected @end>
+                            {{ option.display_name }}
+                          </option>
+                        @endeach
+                      </select>
+                      @break
+                      
+                      @case('One to Many')
+                        @case('Many to Many')
+                          @php
+                          // Nilai current_val untuk relasi multiple akan berupa array ID
+              const selected_relational = Array.isArray(current_val) ? current_val : [];
+                        @endphp
+                        <div style="max-height: 150px; overflow-y: auto; border: 1px solid #ccc; padding: 10px;">
+                          @each(option in target_module_options)
+                            <label style="display: block;">
+                              <input
+                                type="checkbox"
+                                name="{{ input_name }}[]"
+                                value="{{ option.id }}"
+                                if
+                                @if(selected_relational.includes(option.id)) checked @end
+                              />{{ option.display_name }}
+                    </label>
+                          @endeach
+                        </div>
+                        @break
+                        
+                        @default
+                        <p>
+                          Tipe relasional {{ relation_type }} tidak didukung.
+                        </p>
+                      @endswitch
+                      @break
+                      
+                      @case('Slider')
+                        <input
+                          type="range"
+                          name="{{ input_name }}"
+                          id="{{ field.slug }}"
+                          value="{{ current_val || parsed_settings.min || 0 }}"
+                          min="{{ parsed_settings.min }}"
+                          max="{{ parsed_settings.max }}"
+                          step="{{ parsed_settings.step || 1 }}"
+                          oninput="this.nextElementSibling.value=this.value"
+                          style="width: 100%;"
+                        />
+                        <output>
+                          {{ current_val || parsed_settings.min || 0 }}
+                        </output>
+                        @break
+                        
+                        @case('Hash')
+                          <input
+                            type="text"
+                            name="{{ input_name }}"
+                            id="{{ field.slug }}"
+                            value="{{ current_val || '' }}"
+                            readonly
+                            style="width: 100%; padding: 8px; background-color: #f2f2f2;"
+                          />
+                          <small>Nilai hash akan dibuat otomatis di backend.</small>
+                          @break
+                          
+                          @default
+                          <p>
+                            Tipe field `{{ field.field_type }}` tidak didukung atau belum diimplementasikan.
+                          </p>
+                        @endswitch

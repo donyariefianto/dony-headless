@@ -1,0 +1,1362 @@
+/* General Styles */
+:root {
+  --primary-color: #007bff; /* Blue */
+  --secondary-color: #6c757d; /* Gray */
+  --success-color: #28a745; /* Green */
+  --danger-color: #dc3545; /* Red */
+  --info-color: #17a2b8; /* Cyan */
+  --warning-color: #ffc107; /* Yellow */
+  --light-color: #f8f9fa; /* Light Gray */
+  --dark-color: #343a40; /* Dark Gray */
+
+  --text-color: #333;
+  --bg-color: #f4f7fa;
+  --card-bg: #ffffff;
+  --border-color: #e0e0e0;
+  --sidebar-bg: #ffffff;
+  --header-bg: #ffffff;
+  --shadow-light: rgba(0, 0, 0, 0.08);
+  --shadow-medium: rgba(0, 0, 0, 0.15);
+  --hover-bg: #e9ecef;
+
+  --font-family: 'Inter', sans-serif;
+  --border-radius: 8px;
+  --transition-speed: 0.2s;
+}
+
+/* Dark Mode Variables */
+body.dark-mode {
+  --primary-color: #6b9fd8;
+  --secondary-color: #9299a1;
+  --success-color: #28a745;
+  --danger-color: #ff6b6b;
+  --info-color: #30bad7;
+  --warning-color: #fdd835;
+
+  --text-color: #e0e0e0;
+  --bg-color: #2c2c2c;
+  --card-bg: #3c3c3c;
+  --border-color: #4a4a4a;
+  --sidebar-bg: #333333;
+  --header-bg: #333333;
+  --shadow-light: rgba(0, 0, 0, 0.2);
+  --shadow-medium: rgba(0, 0, 0, 0.3);
+  --hover-bg: #4a4a4a;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-family);
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  line-height: 1.6;
+  transition:
+    background-color var(--transition-speed) ease,
+    color var(--transition-speed) ease;
+  display: flex; /* Ensure body takes full height and contains layout */
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.container {
+  display: flex;
+  flex-direction: column; /* Changed to column for header above main */
+  min-height: 100vh;
+  width: 100%;
+}
+
+/* Header */
+header {
+  background-color: var(--header-bg);
+  padding: 15px 30px;
+  box-shadow: 0 2px 8px var(--shadow-light);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--border-color);
+  flex-shrink: 0; /* Prevent shrinking */
+}
+
+.logo h2 {
+  color: var(--primary-color);
+  font-size: 1.8rem;
+  font-weight: 700;
+}
+
+.header-actions {
+  display: flex;
+  gap: 10px;
+}
+
+/* Main Layout */
+.main-layout {
+  display: flex;
+  flex-grow: 1; /* Allows main content to take remaining space */
+}
+
+/* Left Sidebar */
+.left-sidebar {
+  width: 250px;
+  background-color: var(--sidebar-bg);
+  padding: 20px 0; /* Adjusted padding */
+  box-shadow: 2px 0 8px var(--shadow-light);
+  flex-shrink: 0;
+  border-right: 1px solid var(--border-color);
+  display: flex; /* Aktifkan Flexbox di sidebar */
+  flex-direction: column; /* Tata item secara vertikal */
+}
+
+.main-nav ul {
+  list-style: none;
+  padding: 0;
+  display: flex; /* Aktifkan Flexbox di ul */
+  flex-direction: column; /* Tata item li secara vertikal */
+  flex-grow: 1; /* Biarkan ul mengambil ruang yang tersisa */
+}
+
+.main-nav .nav-item {
+  display: flex;
+  align-items: center;
+  padding: 12px 25px; /* Indent from left edge */
+  color: var(--text-color);
+  cursor: pointer;
+  transition:
+    background-color var(--transition-speed) ease,
+    color var(--transition-speed) ease;
+  font-weight: 500;
+  gap: 10px;
+}
+
+.main-nav .nav-item:hover {
+  background-color: var(--hover-bg);
+  color: var(--primary-color);
+}
+
+.main-nav .nav-item.active {
+  background-color: var(--primary-color);
+  color: #fff;
+  border-left: 5px solid var(--primary-color); /* Highlight active */
+  padding-left: 20px; /* Adjust for border */
+}
+
+.main-nav .nav-item.active:hover {
+  background-color: color-mix(in srgb, var(--primary-color) 90%, black);
+  color: #fff;
+}
+
+/* Content Area */
+.content-area {
+  flex-grow: 1;
+  padding: 30px;
+  display: flex;
+  flex-direction: column;
+  min-width: 0; /* Important for shrinking content */
+}
+
+.content-view {
+  display: none;
+  flex-grow: 1;
+  flex-direction: column; /* Changed to column to stack header and content */
+}
+
+.content-view.active-view {
+  display: flex;
+}
+
+.content-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.content-header h3 {
+  font-size: 1.8rem;
+  color: var(--dark-color);
+}
+.dark-mode .content-header h3 {
+  color: var(--text-color);
+}
+
+.collections-main-content {
+  display: flex;
+  gap: 30px; /* Space between list and detail */
+  flex-wrap: wrap; /* Allow wrapping on smaller screens */
+}
+
+.collection-list-cards {
+  flex: 2; /* Takes 2 parts of available space */
+  min-width: 300px; /* Minimum width before wrapping */
+}
+
+.collection-detail-wrapper {
+  flex: 3; /* Takes 3 parts of available space */
+  min-width: 400px; /* Minimum width before wrapping */
+}
+
+/* Collection Cards */
+.collections-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.collection-card {
+  background-color: var(--card-bg);
+  border-radius: var(--border-radius);
+  padding: 25px;
+  box-shadow: 0 4px 10px var(--shadow-light);
+  transition:
+    transform var(--transition-speed) ease,
+    box-shadow var(--transition-speed) ease,
+    border-color var(--transition-speed) ease;
+  cursor: pointer;
+  border: 1px solid var(--border-color);
+  position: relative;
+  overflow: hidden;
+}
+
+.collection-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background-color: transparent;
+  transition: background-color var(--transition-speed) ease;
+}
+
+.collection-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 16px var(--shadow-medium);
+}
+
+.collection-card.active {
+  border-color: var(--primary-color);
+}
+
+.collection-card.active::before {
+  background-color: var(--primary-color);
+}
+
+.collection-card h4 {
+  color: var(--primary-color);
+  margin-bottom: 10px;
+  font-size: 1.25rem;
+}
+
+.collection-card .description {
+  font-size: 0.95rem;
+  color: var(--secondary-color);
+  height: 40px; /* Limit height for consistent card size */
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.placeholder-card {
+  text-align: center;
+  padding: 50px;
+  background-color: var(--card-bg);
+  border-radius: var(--border-radius);
+  box-shadow: 0 2px 5px var(--shadow-light);
+  color: var(--secondary-color);
+  border: 1px dashed var(--border-color);
+}
+
+.info-message {
+  text-align: center;
+  padding: 30px;
+  background-color: var(--card-bg);
+  border-radius: var(--border-radius);
+  box-shadow: 0 4px 10px var(--shadow-light);
+  color: var(--secondary-color);
+  margin-top: 0; /* Adjusted from previous */
+  border: 1px solid var(--border-color);
+}
+
+/* Detail Panel (Right Side) */
+.detail-panel {
+  background-color: var(--card-bg);
+  border-radius: var(--border-radius);
+  padding: 30px;
+  box-shadow: 0 4px 10px var(--shadow-light);
+  border: 1px solid var(--border-color);
+}
+
+.detail-panel .detail-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.detail-panel .detail-header h2 {
+  font-size: 1.8rem;
+  color: var(--primary-color);
+}
+
+.detail-actions .btn {
+  margin-left: 10px;
+}
+
+.detail-content p {
+  margin-bottom: 8px;
+  color: var(--text-color);
+}
+
+.detail-content strong {
+  color: var(--dark-color);
+}
+.dark-mode .detail-content strong {
+  color: var(--text-color);
+}
+
+/* NEW: Data Items Section */
+.data-items-section {
+  margin-top: 40px;
+  padding-top: 30px;
+  border-top: 1px solid var(--border-color);
+  margin-bottom: 15px;
+}
+
+.data-items-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.data-items-header h4 {
+  font-size: 1.5rem;
+  color: var(--dark-color);
+}
+.dark-mode .data-items-header h4 {
+  color: var(--text-color);
+}
+
+.data-items-list-container {
+  min-height: 100px; /* Give some space */
+  position: relative; /* For placeholder positioning */
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 15px;
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  overflow: hidden; /* For rounded corners on table */
+  box-shadow: 0 2px 8px var(--shadow-light);
+}
+
+.data-table th,
+.data-table td {
+  padding: 12px 15px;
+  text-align: left;
+  border-bottom: 1px solid var(--border-color);
+  font-size: 0.9rem;
+}
+
+.data-table th {
+  background-color: var(--hover-bg);
+  color: var(--dark-color);
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+}
+.dark-mode .data-table th {
+  background-color: color-mix(in srgb, var(--sidebar-bg) 90%, black);
+  color: var(--text-color);
+}
+
+.data-table tbody tr:hover {
+  background-color: var(--hover-bg);
+}
+
+.data-table .actions-cell {
+  width: 1%; /* Keep actions column narrow */
+  white-space: nowrap;
+}
+
+.data-table .actions-cell button {
+  margin-left: 5px;
+  padding: 6px 10px;
+  font-size: 0.8rem;
+}
+/* END NEW */
+
+/* Right Form Sidebar */
+.right-form-sidebar {
+  position: fixed;
+  top: 0;
+  right: -500px; /* Hidden by default */
+  width: 500px; /* Increased width for more space */
+  max-width: 90%; /* Max width for responsiveness */
+  height: 100%;
+  background-color: var(--sidebar-bg);
+  box-shadow: -6px 0 20px var(--shadow-medium);
+  transition: right 0.3s ease-in-out;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  border-left: 1px solid var(--border-color);
+}
+
+.right-form-sidebar.open {
+  right: 0;
+}
+
+.sidebar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 30px;
+  border-bottom: 1px solid var(--border-color);
+  flex-shrink: 0;
+}
+
+.sidebar-header h3 {
+  font-size: 1.6rem;
+  color: var(--primary-color);
+}
+
+.close-sidebar-btn {
+  background: none;
+  border: none;
+  font-size: 2rem;
+  color: var(--secondary-color);
+  cursor: pointer;
+  transition: color var(--transition-speed) ease;
+}
+
+.close-sidebar-btn:hover {
+  color: var(--danger-color);
+}
+
+.sidebar-content {
+  flex-grow: 1;
+  padding: 30px;
+  overflow-y: auto; /* Enable scrolling for long forms */
+}
+
+/* Form Styling */
+/* Use .active-form to show/hide forms within sidebar */
+#collection-form,
+#data-item-form {
+  display: none;
+}
+#collection-form.active-form,
+#data-item-form.active-form {
+  display: block;
+}
+
+.form-section {
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  padding: 25px;
+  margin-bottom: 25px;
+  box-shadow: 0 2px 8px var(--shadow-light);
+}
+/* NEW: For data item form, which might not have sections, just direct fields */
+.form-sections-data-item {
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  padding: 25px;
+  margin-bottom: 25px;
+  box-shadow: 0 2px 8px var(--shadow-light);
+}
+
+.form-section h4 {
+  color: var(--primary-color);
+  font-size: 1.25rem;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 1px dashed var(--border-color);
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: var(--dark-color);
+}
+.dark-mode .form-group label {
+  color: var(--text-color);
+}
+
+.form-group .required {
+  color: var(--danger-color);
+  margin-left: 4px;
+}
+
+.form-group input[type="text"],
+.form-group input[type="email"],
+.form-group input[type="password"],
+.form-group input[type="number"],
+.form-group input[type="date"], /* Added for datetime inputs */
+.form-group input[type="time"], /* Added for datetime inputs */
+.form-group select,
+.form-group textarea {
+  width: 100%;
+  padding: 12px 15px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  font-size: 1rem;
+  transition:
+    border-color var(--transition-speed) ease,
+    box-shadow var(--transition-speed) ease;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary-color) 30%, transparent);
+  outline: none;
+}
+
+.form-group input[readonly],
+.form-group select[disabled],
+.form-group textarea[readonly] {
+  background-color: var(--hover-bg);
+  cursor: not-allowed;
+  opacity: 0.8;
+}
+
+.help-text {
+  font-size: 0.85rem;
+  color: var(--secondary-color);
+  margin-top: 5px;
+  display: block;
+}
+
+/* Fields and Relations List (Formerly sortable-list) */
+.sortable-list {
+  /* Retain class name from HTML for consistency, but remove Sortable.js specific styles */
+  margin-bottom: 20px;
+  border: 1px dashed var(--border-color);
+  border-radius: var(--border-radius);
+  padding: 15px;
+  min-height: 80px; /* Provide some visual space even when empty */
+  background-color: var(--hover-bg);
+}
+
+.sortable-list .field-item,
+.sortable-list .relation-item {
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  padding: 15px;
+  margin-bottom: 10px;
+  box-shadow: 0 2px 5px var(--shadow-light);
+  display: flex;
+  flex-direction: column; /* Stack header and content */
+  gap: 15px; /* Space between header and content */
+  transition: all var(--transition-speed) ease;
+}
+
+.sortable-list .field-item:last-child,
+.sortable-list .relation-item:last-child {
+  margin-bottom: 0;
+}
+
+/* Header for field/relation item (draggable handle if sortable was active) */
+.field-header,
+.relation-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 600;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border-color);
+  cursor: grab; /* Indicate it was draggable, though not anymore */
+}
+
+.field-header .title,
+.relation-header .title {
+  font-size: 1.1rem;
+  color: var(--dark-color);
+}
+.dark-mode .field-header .title,
+.dark-mode .relation-header .title {
+  color: var(--text-color);
+}
+
+.item-actions {
+  display: flex;
+  gap: 5px;
+}
+
+.toggle-collapse-btn,
+.remove-item-btn {
+  background: none;
+  border: none;
+  color: var(--secondary-color);
+  cursor: pointer;
+  font-size: 1rem;
+  transition: color var(--transition-speed) ease;
+  padding: 5px; /* Add padding for easier clicking */
+}
+
+.remove-item-btn:hover {
+  color: var(--danger-color);
+}
+
+.toggle-collapse-btn:hover {
+  color: var(--primary-color);
+}
+
+/* Collapsible Content */
+.collapsible-content {
+  display: grid;
+  grid-template-columns: 1fr; /* Single column layout by default */
+  gap: 15px;
+  overflow: hidden;
+  transition:
+    max-height 0.3s ease-out,
+    opacity 0.3s ease-out;
+  max-height: 1000px; /* Arbitrarily large value for 'open' state */
+  opacity: 1;
+}
+
+.collapsible-content.collapsed {
+  max-height: 0;
+  opacity: 0;
+  padding-top: 0; /* Remove padding when collapsed */
+  padding-bottom: 0;
+}
+
+/* Specific styling for field type selection */
+.field-item .type-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.field-item .type-option {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 8px 12px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  transition:
+    background-color var(--transition-speed) ease,
+    border-color var(--transition-speed) ease;
+  background-color: var(--bg-color);
+}
+
+.field-item .type-option.selected {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+  color: #fff;
+}
+
+.field-item .type-option:hover:not(.selected) {
+  background-color: var(--hover-bg);
+}
+
+/* Options for specific field types */
+.field-type-specific-options {
+  border-top: 1px dashed var(--border-color);
+  padding-top: 15px;
+  margin-top: 15px;
+}
+
+.checkbox-group {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+  gap: 10px;
+}
+
+.checkbox-group input[type='checkbox'] {
+  width: auto; /* Override 100% width */
+  margin-right: 5px;
+}
+
+/* Form Actions */
+.form-actions {
+  padding-top: 25px;
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  gap: 15px;
+  justify-content: flex-end;
+}
+
+.form-actions .btn {
+  flex: 1; /* Make buttons take equal width */
+  max-width: 180px; /* Limit max width */
+}
+
+/* Buttons */
+.btn {
+  padding: 10px 18px;
+  border: none;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  font-size: 1rem;
+  transition: all var(--transition-speed) ease-in-out;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  justify-content: center;
+  font-weight: 500;
+}
+
+.btn-primary {
+  background-color: var(--primary-color);
+  color: #fff;
+}
+
+.btn-primary:hover {
+  background-color: color-mix(in srgb, var(--primary-color) 80%, black);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px var(--shadow-light);
+}
+
+.btn-secondary {
+  background-color: var(--secondary-color);
+  color: #fff;
+}
+
+.btn-secondary:hover {
+  background-color: color-mix(in srgb, var(--secondary-color) 80%, black);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px var(--shadow-light);
+}
+
+.btn-danger {
+  background-color: var(--danger-color);
+  color: #fff;
+}
+
+.btn-danger:hover {
+  background-color: color-mix(in srgb, var(--danger-color) 80%, black);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px var(--shadow-light);
+}
+
+.btn-outline-info {
+  background-color: transparent;
+  color: var(--info-color);
+  border: 1px solid var(--info-color);
+}
+.btn-outline-info:hover {
+  background-color: var(--info-color);
+  color: #fff;
+}
+
+.btn-outline-danger {
+  background-color: transparent;
+  color: var(--danger-color);
+  border: 1px solid var(--danger-color);
+}
+.btn-outline-danger:hover {
+  background-color: var(--danger-color);
+  color: #fff;
+}
+
+.btn-outline-primary {
+  background-color: transparent;
+  color: var(--primary-color);
+  border: 1px solid var(--primary-color);
+}
+.btn-outline-primary:hover {
+  background-color: var(--primary-color);
+  color: #fff;
+}
+
+.btn-add-item {
+  margin-top: 15px;
+  width: 100%;
+}
+
+/* Overlay */
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.4);
+  z-index: 990;
+  display: none;
+}
+
+/* Modal */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1010; /* Above sidebar */
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0, 0, 0, 0.4);
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-content {
+  background-color: var(--card-bg);
+  margin: auto;
+  padding: 30px;
+  border-radius: var(--border-radius);
+  box-shadow: 0 5px 15px var(--shadow-medium);
+  width: 90%;
+  max-width: 500px;
+  position: relative;
+  text-align: center;
+}
+
+.modal-content.small-modal {
+  max-width: 400px;
+}
+
+.modal-content h3 {
+  color: var(--primary-color);
+  margin-bottom: 20px;
+  font-size: 1.5rem;
+}
+
+.modal-content p {
+  margin-bottom: 25px;
+  color: var(--text-color);
+}
+
+.modal-content .close-modal-btn {
+  position: absolute;
+  top: 15px;
+  right: 20px;
+  color: var(--secondary-color);
+  font-size: 28px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.modal-content .close-modal-btn:hover,
+.modal-content .close-modal-btn:focus {
+  color: var(--dark-color);
+  text-decoration: none;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+}
+
+/* Notifications */
+#notification-area {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 1050; /* Ensure it's on top */
+}
+
+.notification {
+  padding: 12px 20px;
+  border-radius: var(--border-radius);
+  box-shadow: 0 4px 12px var(--shadow-medium);
+  font-weight: 500;
+  opacity: 1;
+  transform: translateX(0);
+  transition:
+    opacity 0.3s ease,
+    transform 0.3s ease;
+  min-width: 250px;
+  max-width: 350px;
+}
+
+.notification.success {
+  background-color: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+.dark-mode .notification.success {
+  background-color: var(--success-color);
+  color: #fff;
+  border-color: color-mix(in srgb, var(--success-color) 80%, black);
+}
+
+.notification.error {
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}
+.dark-mode .notification.error {
+  background-color: var(--danger-color);
+  color: #fff;
+  border-color: color-mix(in srgb, var(--danger-color) 80%, black);
+}
+
+/* Loading Spinner */
+/* .loading-spinner {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1020;
+} */
+.loading-spinner {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6); /* Overlay gelap */
+  display: flex; /* Menggunakan flexbox untuk penempatan konten */
+  justify-content: center;
+  align-items: center;
+  z-index: 9999; /* Pastikan di atas semua elemen lain */
+
+  /* ----- BAGIAN PENTING UNTUK SMOOTH TRANSITION ----- */
+  opacity: 0; /* Awalnya tidak terlihat */
+  transition: opacity 0.3s ease-in-out; /* Transisi opacity selama 0.3 detik */
+  pointer-events: none; /* Mencegah interaksi mouse saat tidak terlihat */
+  /* ------------------------------------------------ */
+
+  /* Pastikan awalnya disembunyikan oleh JS atau inline style */
+  /* style="display: none;" pada HTML sudah benar */
+}
+
+/* Jika Anda memiliki spinner di dalamnya, tambahkan animasinya */
+/* Contoh spinner sederhana (sesuaikan dengan desain Anda) */
+.spinner-icon {
+  /* Ganti ini dengan class atau elemen spinner Anda */
+  border: 4px solid rgba(255, 255, 255, 0.3);
+  border-top: 4px solid #3498db; /* Warna spinner */
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+}
+
+.loading-spinner::after {
+  content: '';
+  border: 4px solid rgba(255, 255, 255, 0.3);
+  border-top: 4px solid #fff;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Jika Anda memiliki teks "Memuat data...", stylingnya */
+.loading-spinner p {
+  color: #ffffff;
+  margin-left: 15px;
+  font-size: 1.1rem;
+}
+
+/* Menambahkan kelas ke body untuk mencegah scroll saat loading */
+body.loading-active {
+  overflow: hidden;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 992px) {
+  .collections-main-content {
+    flex-direction: column; /* Stack list and detail vertically */
+    gap: 20px;
+  }
+
+  .collection-list-cards,
+  .collection-detail-wrapper {
+    flex: none; /* Remove flex grow */
+    width: 100%; /* Take full width */
+    min-width: unset; /* Remove min-width restriction */
+  }
+
+  .right-form-sidebar {
+    width: 100%; /* Full width on smaller screens */
+    right: -100%;
+  }
+  .right-form-sidebar.open {
+    right: 0;
+  }
+}
+
+@media (max-width: 768px) {
+  .main-layout {
+    flex-direction: column;
+  }
+
+  .left-sidebar {
+    width: 100%;
+    height: auto;
+    border-right: none;
+    box-shadow: 0 2px 8px var(--shadow-light);
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  .main-nav ul {
+    display: flex;
+    justify-content: space-around;
+    padding: 0 10px;
+  }
+
+  .main-nav .nav-item {
+    padding: 10px 15px;
+    font-size: 0.9rem;
+    border-left: none;
+    border-bottom: 3px solid transparent;
+    border-radius: 0;
+  }
+  .main-nav .nav-item.active {
+    border-left: none;
+    border-bottom: 3px solid var(--primary-color);
+    padding-left: 15px;
+  }
+
+  .content-area {
+    padding: 20px;
+    flex-grow: 1;
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+
+  header {
+    flex-direction: column;
+    gap: 15px;
+    padding: 15px 20px;
+  }
+  .header-actions {
+    width: 100%;
+    justify-content: center;
+  }
+  .logo {
+    text-align: center;
+  }
+
+  .modal-actions {
+    flex-direction: column;
+    gap: 10px;
+  }
+  .modal-actions .btn {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+/* Specific adjustments for field/relation items inside form */
+.field-item .form-group,
+.relation-item .form-group {
+  margin-bottom: 15px; /* Slightly reduce space inside items */
+}
+
+/* --- NEW: Styles for Search and Pagination in Collections --- */
+
+.collections-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  gap: 15px;
+  flex-wrap: wrap; /* Allow wrapping on smaller screens */
+}
+
+.search-container {
+  flex-grow: 1;
+  position: relative;
+  min-width: 200px;
+  /* Hapus atau komentari border dari sini jika Anda ingin border pada input saja */
+  /* border: 1px solid var(--border-color); */
+  border-radius: var(--border-radius);
+  /* Tambahkan shadow tipis pada container jika diinginkan */
+  /* box-shadow: 0 2px 5px var(--shadow-light); */
+}
+
+.search-container .form-control {
+  /* Use your existing form-control style */
+  width: 100%;
+  padding-right: 40px; /* Space for icon */
+}
+
+.search-container input[type='text'] {
+  /* Menggunakan class .form-control Anda, tapi kita override beberapa properti */
+  width: 100%;
+  padding: 12px 45px 12px 18px; /* Lebih banyak padding kanan untuk ikon */
+  border: 1px solid var(--border-color); /* Border standar */
+  border-radius: var(--border-radius);
+  background-color: var(--card-bg); /* Background kartu untuk konsistensi */
+  color: var(--text-color);
+  font-size: 1rem;
+  transition:
+    border-color var(--transition-speed) ease,
+    box-shadow var(--transition-speed) ease;
+  /* Reset default appearance */
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+
+/* Hover & Focus state for a modern feel */
+.search-container input[type='text']:hover {
+  border-color: color-mix(in srgb, var(--primary-color) 30%, var(--border-color));
+}
+
+.search-container input[type='text']:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary-color) 25%, transparent); /* Shadow yang lebih lembut */
+  outline: none; /* Hilangkan outline default browser */
+}
+
+/* Placeholder text style */
+.search-container input::placeholder {
+  color: var(--secondary-color);
+  opacity: 0.8; /* Make it slightly more subtle */
+}
+body.dark-mode .search-container input::placeholder {
+  color: var(--secondary-color); /* Pastikan di dark mode tetap bagus */
+}
+
+.search-container .search-icon {
+  position: absolute;
+  right: 18px; /* Sesuaikan posisi ikon */
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--secondary-color); /* Warna ikon */
+  font-size: 1.1rem; /* Ukuran ikon sedikit lebih besar */
+  pointer-events: none;
+  transition: color var(--transition-speed) ease;
+}
+
+.pagination-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  margin-top: 20px;
+  padding-top: 15px;
+  border-top: 1px solid var(--border-color);
+  width: 100%;
+}
+
+.pagination-controls .btn {
+  /* Reuse your existing button styles */
+  padding: 8px 12px;
+  font-size: 0.9rem;
+}
+
+.pagination-controls .btn:disabled {
+  background-color: var(--hover-bg);
+  color: var(--secondary-color);
+  cursor: not-allowed;
+  opacity: 0.7;
+  transform: none;
+  box-shadow: none;
+  border: 1px solid var(--border-color);
+}
+/* Ensure dark mode colors for disabled buttons are respected */
+body.dark-mode .pagination-controls .btn:disabled {
+  background-color: color-mix(
+    in srgb,
+    var(--bg-color) 90%,
+    black
+  ); /* A bit darker for disabled in dark mode */
+  color: var(--secondary-color);
+  border-color: var(--border-color);
+}
+
+.pagination-controls span {
+  color: var(--text-color); /* Use your text color */
+  font-size: 0.9rem;
+  padding: 0 5px; /* Add a little padding */
+}
+
+/* Adjustments for the collection list to use grid layout */
+.collections-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+  /* This overrides the previous .collection-list-cards display: flex */
+  /* .collection-list-cards will now primarily act as a container with flex properties for its children */
+}
+
+/* Ensure placeholder card also respects the grid layout */
+.collections-grid .placeholder-card {
+  grid-column: 1 / -1; /* Make placeholder span all columns */
+}
+
+/* Adjustments for smaller screens */
+@media (max-width: 576px) {
+  .collections-controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .search-container {
+    min-width: unset;
+  }
+  .pagination-controls {
+    flex-wrap: wrap;
+    justify-content: space-around;
+  }
+  .pagination-controls .btn {
+    flex-grow: 1; /* Allow buttons to expand */
+    min-width: 120px;
+  }
+}
+/* NEW: Dashboard Styles */
+
+.dashboard-content {
+  flex-grow: 1; /* Biarkan konten dashboard mengambil ruang yang tersisa */
+  padding-top: 15px; /* Sedikit padding atas setelah header */
+}
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* Kolom responsif */
+  gap: 25px; /* Jarak antar kartu */
+  align-items: start; /* Sejajarkan kartu ke atas */
+}
+
+.dashboard-card {
+  background-color: var(--card-bg);
+  border-radius: var(--border-radius);
+  padding: 30px; /* Padding yang nyaman */
+  box-shadow: 0 4px 12px var(--shadow-light); /* Bayangan yang sedikit lebih jelas */
+  border: 1px solid var(--border-color);
+  transition:
+    transform var(--transition-speed) ease,
+    box-shadow var(--transition-speed) ease;
+  height: auto; /* Biarkan tinggi menyesuaikan konten */
+  display: flex;
+  flex-direction: column;
+}
+
+.dashboard-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 18px var(--shadow-medium);
+}
+
+.chart-container {
+  width: 100%;
+  min-height: 300px; /* Tinggi minimum untuk chart */
+  /* Anda bisa mengatur tinggi fixed jika diperlukan, misal: height: 350px; */
+  margin-top: 15px; /* Jarak dari judul kartu */
+  flex-grow: 1; /* Biarkan chart mengambil ruang yang tersedia */
+}
+
+.dashboard-card h4 {
+  color: var(--primary-color);
+  font-size: 1.35rem;
+  margin-bottom: 15px;
+  padding-bottom: 10px;
+  border-bottom: 1px dashed var(--border-color); /* Garis pemisah judul */
+}
+
+.dashboard-card p {
+  font-size: 0.95rem;
+  color: var(--text-color);
+  margin-bottom: 8px;
+  line-height: 1.5;
+}
+
+.dashboard-card p strong {
+  color: var(--dark-color);
+}
+.dark-mode .dashboard-card p strong {
+  color: var(--text-color);
+}
+
+.dashboard-card ul {
+  list-style: none;
+  padding-left: 0;
+  margin-top: 10px;
+}
+
+.dashboard-card ul li {
+  font-size: 0.9rem;
+  color: var(--secondary-color);
+  margin-bottom: 5px;
+  display: flex;
+  align-items: center;
+}
+.dashboard-card ul li::before {
+  content: '•'; /* Bullet point kustom */
+  color: var(--primary-color);
+  font-weight: bold;
+  display: inline-block;
+  width: 1em;
+  margin-left: -1em;
+}
+
+/* Specific styles for wide cards */
+.dashboard-card.wide-card {
+  grid-column: span 2; /* Biarkan kartu ini mengambil 2 kolom */
+  display: flex; /* Aktifkan flexbox */
+  flex-direction: column; /* Item dalam kartu ditumpuk vertikal */
+}
+
+/* Text colors for messages inside cards */
+.dashboard-card .text-danger {
+  color: var(--danger-color);
+  font-weight: 500;
+}
+.dashboard-card .text-info {
+  color: var(--info-color);
+  font-weight: 500;
+}
+
+/* Responsive Adjustments for Dashboard Grid */
+@media (max-width: 992px) {
+  .dashboard-grid {
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* Lebih kecil di tablet */
+    gap: 20px;
+  }
+  .dashboard-card.wide-card {
+    grid-column: 1 / -1; /* Ambil semua kolom pada layar yang lebih kecil */
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard-grid {
+    grid-template-columns: 1fr; /* Satu kolom di ponsel */
+  }
+  .content-area {
+    padding: 20px; /* Kurangi padding di ponsel */
+  }
+}
