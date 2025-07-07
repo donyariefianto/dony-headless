@@ -1,114 +1,116 @@
-[{
-  "_id": "users_config",
-  "id": "col-1751358283891",
-  "displayName": "Users",
-  "name": "users",
-  "description": null,
-  "fields": [
-    {
-      "id": "field-1751358260903-0",
-      "name": "created_at",
-      "type": "datetime",
-      "required": false,
-      "unique": false,
-      "readOnly": true,
-      "collapsed": true,
-      "options": {}
-    },
-    {
-      "id": "field-1751358260904-1",
-      "name": "updated_at",
-      "type": "datetime",
-      "required": false,
-      "unique": false,
-      "readOnly": true,
-      "collapsed": true,
-      "options": {}
-    },
-    {
-      "id": "field-1751358267688-2",
-      "name": "name",
-      "type": "string",
-      "required": false,
-      "unique": false,
-      "readOnly": false,
-      "collapsed": true,
-      "options": {
-        "minLength": null,
-        "maxLength": null,
-        "pattern": null
+[
+  {
+    "_id": "users_config",
+    "id": "col-1751358283891",
+    "displayName": "Users",
+    "name": "users",
+    "description": null,
+    "fields": [
+      {
+        "id": "field-1751358260903-0",
+        "name": "created_at",
+        "type": "datetime",
+        "required": false,
+        "unique": false,
+        "readOnly": true,
+        "collapsed": true,
+        "options": {}
+      },
+      {
+        "id": "field-1751358260904-1",
+        "name": "updated_at",
+        "type": "datetime",
+        "required": false,
+        "unique": false,
+        "readOnly": true,
+        "collapsed": true,
+        "options": {}
+      },
+      {
+        "id": "field-1751358267688-2",
+        "name": "name",
+        "type": "string",
+        "required": false,
+        "unique": false,
+        "readOnly": false,
+        "collapsed": true,
+        "options": {
+          "minLength": null,
+          "maxLength": null,
+          "pattern": null
+        }
+      },
+      {
+        "id": "field-1751358274368-3",
+        "name": "gender",
+        "type": "string",
+        "required": false,
+        "unique": false,
+        "readOnly": false,
+        "collapsed": true,
+        "options": {
+          "minLength": null,
+          "maxLength": null,
+          "pattern": null
+        }
       }
-    },
-    {
-      "id": "field-1751358274368-3",
-      "name": "gender",
-      "type": "string",
-      "required": false,
-      "unique": false,
-      "readOnly": false,
-      "collapsed": true,
-      "options": {
-        "minLength": null,
-        "maxLength": null,
-        "pattern": null
+    ],
+    "relations": [],
+    "created_at": "2025-07-01T08:24:43+00:00",
+    "updated_at": "2025-07-01T08:24:43+00:00"
+  },
+  {
+    "_id": "orders_config",
+    "id": "col-1751358324115",
+    "displayName": "Orders",
+    "name": "orders",
+    "description": null,
+    "fields": [
+      {
+        "id": "field-1751358298701-4",
+        "name": "created_at",
+        "type": "datetime",
+        "required": false,
+        "unique": false,
+        "readOnly": true,
+        "collapsed": true,
+        "options": {}
+      },
+      {
+        "id": "field-1751358298702-5",
+        "name": "updated_at",
+        "type": "datetime",
+        "required": false,
+        "unique": false,
+        "readOnly": true,
+        "collapsed": true,
+        "options": {}
+      },
+      {
+        "id": "field-1751358307408-6",
+        "name": "number",
+        "type": "string",
+        "required": false,
+        "unique": false,
+        "readOnly": false,
+        "collapsed": false,
+        "options": {
+          "minLength": null,
+          "maxLength": null,
+          "pattern": null
+        }
       }
-    }
-  ],
-  "relations": [],
-  "created_at": "2025-07-01T08:24:43+00:00",
-  "updated_at": "2025-07-01T08:24:43+00:00"
-},
-{
-  "_id": "orders_config",
-  "id": "col-1751358324115",
-  "displayName": "Orders",
-  "name": "orders",
-  "description": null,
-  "fields": [
-    {
-      "id": "field-1751358298701-4",
-      "name": "created_at",
-      "type": "datetime",
-      "required": false,
-      "unique": false,
-      "readOnly": true,
-      "collapsed": true,
-      "options": {}
-    },
-    {
-      "id": "field-1751358298702-5",
-      "name": "updated_at",
-      "type": "datetime",
-      "required": false,
-      "unique": false,
-      "readOnly": true,
-      "collapsed": true,
-      "options": {}
-    },
-    {
-      "id": "field-1751358307408-6",
-      "name": "number",
-      "type": "string",
-      "required": false,
-      "unique": false,
-      "readOnly": false,
-      "collapsed": false,
-      "options": {
-        "minLength": null,
-        "maxLength": null,
-        "pattern": null
+    ],
+    "relations": [
+      {
+        "id": "relation-1751358315309-0",
+        "name": "koneksi",
+        "type": "one-to-one",
+        "targetCollection": "users",
+        "collapsed": false
       }
-    }
-  ],
-  "relations": [
-    {
-      "id": "relation-1751358315309-0",
-      "name": "koneksi",
-      "type": "one-to-one",
-      "targetCollection": "users",
-      "collapsed": false
-    }
-  ],
-  "created_at": "2025-07-01T08:25:24+00:00",
-  "updated_at": "2025-07-01T10:04:46.054Z"
-}]
+    ],
+    "created_at": "2025-07-01T08:25:24+00:00",
+    "updated_at": "2025-07-01T10:04:46.054Z"
+  }
+]

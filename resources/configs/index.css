@@ -456,8 +456,12 @@ header {
 #data-item-form {
   display: none;
 }
+#data-dashboard-form {
+  display: none;
+}
 #collection-form.active-form,
-#data-item-form.active-form {
+#data-item-form.active-form,
+#data-dashboard-form.active-form {
   display: block;
 }
 
@@ -1359,4 +1363,43 @@ body.dark-mode .pagination-controls .btn:disabled {
   .content-area {
     padding: 20px; /* Kurangi padding di ponsel */
   }
+}
+/* Existing styles like .form-group, .form-control, .btn should apply */
+.content-view {
+  display: none; /* Hidden by default, shown by JS */
+}
+.content-view.active-view {
+  display: block; /* Show when active */
+}
+.view-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+.form-sections-container {
+  border: 1px dashed var(--border-color);
+  padding: 15px;
+  min-height: 100px; /* Example min height */
+  border-radius: var(--border-radius);
+}
+.widget-item .collapsible-content {
+  max-height: 1000px; /* Arbitrary large value */
+  overflow: hidden;
+  transition: max-height 0.3s ease-out, opacity 0.3s ease-out;
+  opacity: 1;
+}
+.widget-item .collapsible-content.collapsed {
+  max-height: 0;
+  opacity: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+  border-width: 0;
+}
+.widget-options-container {
+  background-color: var(--hover-bg);
+  border-radius: var(--border-radius);
+}
+.widget-options-container p.text-muted {
+  font-style: italic;
 }

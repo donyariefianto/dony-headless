@@ -3,12 +3,18 @@ document.addEventListener('DOMContentLoaded', () => {
   // --- DOM Elements ---
   const collectionsList = document.getElementById('collections-list')
   const addCollectionBtn = document.getElementById('add-collection-btn')
+  const addDashboardnBtn = document.getElementById('add-dashboard-btn')
   const rightFormSidebar = document.getElementById('right-form-sidebar')
   const closeSidebarBtns = document.querySelectorAll('.close-sidebar-btn')
   const overlay = document.getElementById('overlay')
   const sidebarFormTitle = document.getElementById('sidebar-form-title')
   const userDisplayElement = document.getElementById('user-display')
   const logoutBtn = document.getElementById('logout-btn')
+
+  // Generate Dashboard Elements
+  const dashboardForm = document.getElementById('data-dashboard-form')
+  const dataDashboardIdInput = document.getElementById('data-dashboard-id')
+  const dataDashboardFieldsContainer = document.getElementById('data-item-fields-container')
 
   // Collection Form Elements
   const collectionForm = document.getElementById('collection-form')
@@ -26,12 +32,12 @@ document.addEventListener('DOMContentLoaded', () => {
   const dataItemIdInput = document.getElementById('data-item-id')
   const dataItemCollectionNameInput = document.getElementById('data-item-collection-name')
   const dataItemFieldsContainer = document.getElementById('data-item-fields-container')
-  const saveDataItemBtn = document.getElementById('save-data-item-btn')
   const pageInfo = document.getElementById('page-info')
   const toggleDarkModeBtn = document.getElementById('toggle-dark-mode')
 
   const collectionsView = document.getElementById('collections-view')
   const settingsView = document.getElementById('settings-view')
+  const settingsBoardView = document.getElementById('settings-dashboard-view')
   const boardsView = document.getElementById('dashboard-view')
   const navItems = document.querySelectorAll('.nav-item')
 
@@ -91,23 +97,11 @@ document.addEventListener('DOMContentLoaded', () => {
   let loggedInUsername = localStorage.getItem('username')
   let loggedInUserRole = localStorage.getItem('userRole')
 
-  async function authorizedFetch(url, options = {}) {
-    const token = localStorage.getItem('token')
-    if (!token) {
-      logoutUser()
-      throw new Error('Tidak ada token autentikasi.')
-    }
-  }
-  if (logoutBtn) {
-    logoutBtn.addEventListener('click', logoutUser)
-  }
   async function checkAuthAndLoadUser() {
     if (!userToken) {
       logoutUser() // Jika tidak ada token, langsung redirect
       return
     }
-    console.log(userToken)
-
     try {
       const requestOptions = {
         method: 'POST',
@@ -133,10 +127,12 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       // --- Panggil fungsi inisialisasi khusus halaman configure di sini ---
-      loadCollections()
+      // loadCollections()
     } catch (error) {
       console.error('Autentikasi gagal di halaman configure:', error.message)
-      showError(error.message || 'Sesi berakhir atau tidak diizinkan. Silakan login kembali.')
+      showNotification(
+        error.message || 'Sesi berakhir atau tidak diizinkan. Silakan login kembali.'
+      )
       setTimeout(() => logoutUser(), 5000)
     }
   }
@@ -146,44 +142,12 @@ document.addEventListener('DOMContentLoaded', () => {
     localStorage.removeItem('userRole')
     window.location.href = '/login' // Redirect ke halaman login
   }
-
-  if (dataItemsSearchInput) {
-    let dataItemSearchTimeout
-    dataItemsSearchInput.addEventListener('keyup', (event) => {
-      clearTimeout(dataItemSearchTimeout)
-      dataItemSearchTimeout = setTimeout(() => {
-        applyDataItemSearchFilter(event.target.value)
-      }, 500)
-    })
-  }
-  if (collectionSearchInput) {
-    let searchTimeout // Variabel untuk debounce
-    collectionSearchInput.addEventListener('keyup', (event) => {
-      clearTimeout(searchTimeout) // Hapus timeout sebelumnya
-      // Tunda pencarian untuk mengurangi beban API (debounce)
-      searchTimeout = setTimeout(() => {
-        applySearchFilter(event.target.value) // <-- Memanggil fungsi applySearchFilter
-      }, 500) // Tunggu 300ms setelah user berhenti mengetik
-    })
-  }
-  if (dataItemsPrevPageBtn) {
-    dataItemsPrevPageBtn.addEventListener('click', () => {
-      if (currentDataItemPage > 1) {
-        currentDataItemPage--
-        loadDataItems(currentSelectedCollection, currentDataItemPage, 4, currentDataItemSearchTerm)
-      }
-    })
-  }
-
-  // NEW: Event listener untuk tombol 'Selanjutnya' data item
-  if (dataItemsNextPageBtn) {
-    dataItemsNextPageBtn.addEventListener('click', () => {
-      const totalPages = Math.ceil(totalDataItems / dataItemsPerPage)
-      if (currentDataItemPage < totalPages) {
-        currentDataItemPage++
-        loadDataItems(currentSelectedCollection, currentDataItemPage, 4, currentDataItemSearchTerm)
-      }
-    })
+  async function authorizedFetch(url, options = {}) {
+    const token = localStorage.getItem('token')
+    if (!token) {
+      logoutUser()
+      throw new Error('Tidak ada token autentikasi.')
+    }
   }
   // Menerapkan filter pencarian (hanya pemicu fetchCollections)
   function applySearchFilter(searchTerm) {
@@ -305,7 +269,6 @@ document.addEventListener('DOMContentLoaded', () => {
       }, delay) // Terapkan delay untuk MIN_LOADING_TIME
     }
   }
-
   function showNotification(message, type) {
     const notificationElement = type === 'success' ? successMessage : errorMessage
     notificationElement.textContent = message
@@ -315,7 +278,6 @@ document.addEventListener('DOMContentLoaded', () => {
       notificationElement.textContent = '' // Clear message
     }, 5000) // Hide after 5 seconds
   }
-
   function slugify(text) {
     return text
       .toString()
@@ -326,7 +288,6 @@ document.addEventListener('DOMContentLoaded', () => {
       .replace(/^-+/, '') // Trim - from start of text
       .replace(/-+$/, '') // Trim - from end of text
   }
-
   function formatDateTime(isoString) {
     if (!isoString) return 'N/A'
     const options = {
@@ -344,7 +305,6 @@ document.addEventListener('DOMContentLoaded', () => {
       return isoString // Return original if invalid
     }
   }
-
   // Function to get data items for a specific collection from Local Storage
   // Fungsi untuk mendapatkan item data untuk koleksi tertentu dari API
   async function getDataItems(collectionName, page = 1, limit = 5, searchTerm) {
@@ -368,7 +328,6 @@ document.addEventListener('DOMContentLoaded', () => {
       hideLoading() // Sembunyikan indikator loading setelah selesai
     }
   }
-
   // Function to save data items for a specific collection to Local Storage
   async function saveDataItems(collectionName, newItemData, isEditing, itemId) {
     try {
@@ -408,13 +367,11 @@ document.addEventListener('DOMContentLoaded', () => {
       hideLoading()
     }
   }
-
   // --- Sidebar and Overlay Handlers ---
   function openSidebar() {
     rightFormSidebar.classList.add('open')
     overlay.style.display = 'block'
   }
-
   function closeSidebar() {
     rightFormSidebar.classList.remove('open')
     overlay.style.display = 'none'
@@ -431,6 +388,11 @@ document.addEventListener('DOMContentLoaded', () => {
     dataItemFieldsContainer.innerHTML = ''
     dataItemIdInput.value = ''
     dataItemCollectionNameInput.value = ''
+
+    dashboardForm.classList.remove('active-form')
+    dashboardForm.reset()
+    dataDashboardFieldsContainer.innerHTML = ''
+    dataDashboardIdInput.value = ''
   }
 
   closeSidebarBtns.forEach((btn) => btn.addEventListener('click', closeSidebar))
@@ -441,61 +403,10 @@ document.addEventListener('DOMContentLoaded', () => {
     modalElement.style.display = 'flex' // Use flex to center
     overlay.style.display = 'block'
   }
-
   function closeModal(modalElement) {
     modalElement.style.display = 'none'
     overlay.style.display = 'none'
   }
-
-  closeModalBtns.forEach((btn) => {
-    btn.addEventListener('click', () => closeModal(btn.closest('.modal')))
-  })
-
-  cancelDeleteBtn.addEventListener('click', () => closeModal(deleteConfirmModal))
-
-  // --- Dark Mode Toggle ---
-  toggleDarkModeBtn.addEventListener('click', () => {
-    document.body.classList.toggle('dark-mode')
-    const isDarkMode = document.body.classList.contains('dark-mode')
-    localStorage.setItem('darkMode', isDarkMode)
-    toggleDarkModeBtn.textContent = isDarkMode ? 'Mode Terang' : 'Mode Gelap'
-  })
-
-  // Apply dark mode preference on load
-  const savedDarkMode = localStorage.getItem('darkMode')
-  if (savedDarkMode === 'true') {
-    document.body.classList.add('dark-mode')
-    toggleDarkModeBtn.textContent = 'Mode Terang'
-  } else {
-    toggleDarkModeBtn.textContent = 'Mode Gelap'
-  }
-
-  // --- Navigation ---
-  navItems.forEach((item) => {
-    item.addEventListener('click', (e) => {
-      e.preventDefault()
-      const menu = item.dataset.menu
-
-      // Remove active from all nav items
-      navItems.forEach((nav) => nav.classList.remove('active'))
-      // Add active to clicked nav item
-      item.classList.add('active')
-      // Hide all content views
-      collectionsView.classList.remove('active-view')
-      settingsView.classList.remove('active-view')
-      boardsView.classList.remove('active-view')
-      // Show selected content view
-      if (menu === 'collections') {
-        collectionsView.classList.add('active-view')
-        loadCollections() // Reload collections when navigating back
-      } else if (menu === 'settings') {
-        settingsView.classList.add('active-view')
-      } else if (menu === 'dashboard') {
-        boardsView.classList.add('active-view')
-      }
-    })
-  })
-
   // --- Collection Management ---
   function renderCollections(collections) {
     collectionsList.innerHTML = '' // Clear existing cards
@@ -533,7 +444,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     updatePaginationControls(totalCollections)
   }
-
   async function loadCollections(search = null) {
     showLoading()
     try {
@@ -576,7 +486,6 @@ document.addEventListener('DOMContentLoaded', () => {
       hideLoading()
     }
   }
-
   function showCollectionDetail(id) {
     currentSelectedCollectionId = id // Store selected ID
     const selectedCollection = currentCollections.find((col) => col.id === id)
@@ -618,7 +527,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // NEW: Load and render data items for this collection
     loadDataItems(currentSelectedCollection, currentDataItemPage, 4, currentDataItemSearchTerm)
   }
-
   async function handleDeleteCollection(id) {
     closeModal(deleteConfirmModal)
     showLoading()
@@ -643,12 +551,459 @@ document.addEventListener('DOMContentLoaded', () => {
       hideLoading()
     }
   }
+  function initMonthlySalesChart() {
+    // Mendapatkan elemen DOM wadah chart
+    const chartDom = document.getElementById('monthly-sales-chart')
+    if (!chartDom) {
+      console.warn("Element 'monthly-sales-chart' not found. Chart will not be initialized.")
+      return
+    }
+
+    // Inisialisasi instance ECharts
+    const myChart = echarts.init(chartDom)
+
+    // Opsi konfigurasi chart
+    const option = {
+      title: {
+        text: 'Grafik Penjualan Bulanan',
+        left: 'center',
+        textStyle: {
+          color: getComputedStyle(document.documentElement).getPropertyValue('--text-color').trim(),
+        },
+      },
+      tooltip: {
+        trigger: 'axis',
+        axisPointer: {
+          type: 'shadow',
+        },
+      },
+      grid: {
+        left: '3%',
+        right: '4%',
+        bottom: '3%',
+        containLabel: true,
+      },
+      xAxis: {
+        type: 'category',
+        data: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'],
+        axisLabel: {
+          color: getComputedStyle(document.documentElement)
+            .getPropertyValue('--secondary-color')
+            .trim(),
+        },
+      },
+      yAxis: {
+        type: 'value',
+        axisLabel: {
+          color: getComputedStyle(document.documentElement)
+            .getPropertyValue('--secondary-color')
+            .trim(),
+        },
+        splitLine: {
+          lineStyle: {
+            color: getComputedStyle(document.documentElement)
+              .getPropertyValue('--border-color')
+              .trim(),
+          },
+        },
+      },
+      series: [
+        {
+          name: 'Penjualan',
+          type: 'bar',
+          data: [120, 200, 150, 80, 70, 110, 130, 90, 180, 220, 160, 140],
+          itemStyle: {
+            color: getComputedStyle(document.documentElement)
+              .getPropertyValue('--primary-color')
+              .trim(), // Menggunakan warna primer Anda
+          },
+          emphasis: {
+            itemStyle: {
+              shadowBlur: 10,
+              shadowOffsetX: 0,
+              shadowColor: 'rgba(0, 0, 0, 0.5)',
+            },
+          },
+        },
+      ],
+    }
+
+    // Mengatur opsi dan merender chart
+    myChart.setOption(option)
+
+    // Menyesuaikan ukuran chart saat window di-resize
+    window.addEventListener('resize', function () {
+      myChart.resize()
+    })
+
+    // Contoh bagaimana merespons perubahan mode gelap
+    // Anda mungkin sudah memiliki fungsi toggleDarkMode. Panggil myChart.resize() di sana.
+    // Atau buat observer untuk class 'dark-mode' pada body.
+    const darkModeToggle = document.getElementById('toggle-dark-mode')
+    if (darkModeToggle) {
+      darkModeToggle.addEventListener('click', () => {
+        // Perbarui warna teks chart saat mode gelap diubah
+        option.title.textStyle.color = getComputedStyle(document.documentElement)
+          .getPropertyValue('--text-color')
+          .trim()
+        option.xAxis.axisLabel.color = getComputedStyle(document.documentElement)
+          .getPropertyValue('--secondary-color')
+          .trim()
+        option.yAxis.axisLabel.color = getComputedStyle(document.documentElement)
+          .getPropertyValue('--secondary-color')
+          .trim()
+        option.yAxis.splitLine.lineStyle.color = getComputedStyle(document.documentElement)
+          .getPropertyValue('--border-color')
+          .trim()
+        myChart.setOption(option) // Terapkan opsi yang diperbarui
+        myChart.resize() // Penting untuk memastikan chart menyesuaikan ukuran dan warna
+      })
+    }
+  }
+  // Function to load and render data items for the selected collection
+  async function loadDataItems(collection, page = 1, limit = 4, searchQuery = '') {
+    let items = await getDataItems(collection.name, page, limit, searchQuery)
+    totalDataItems = items.totalCount // Update total count for pagination
+    items = items.documents
+
+    // Clear existing table
+    dataTableHeaderRow.innerHTML = ''
+    dataTableBody.innerHTML = ''
+
+    if (items.length === 0) {
+      dataItemsPlaceholder.style.display = 'block'
+      dataItemsTable.style.display = 'none'
+      totalDataItems = 0
+      updateDataItemsPaginationControls(0)
+      return
+    } else {
+      dataItemsPlaceholder.style.display = 'none'
+      dataItemsTable.style.display = 'table' // Show table
+      updateDataItemsPaginationControls(totalDataItems)
+    }
+
+    // Render table headers
+    // Include 'id' and system fields by default, then custom fields
+    const displayedFields = collection.fields.filter(
+      (f) => !['created_at', 'updated_at'].includes(f.name)
+    ) // Filter out these for brevity in table
+
+    // Add header for Action buttons
+    const actionHeader = document.createElement('th')
+    actionHeader.textContent = 'Aksi'
+    actionHeader.style.width = '1%'
+    actionHeader.style.textAlign = 'center'
+    dataTableHeaderRow.appendChild(actionHeader)
+
+    // Reverse the order so custom fields appear first, then 'id'
+    const orderedFields = [...displayedFields].reverse()
+    orderedFields.forEach((field) => {
+      const th = document.createElement('th')
+      th.textContent = field.name.replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase()) // Format to Title Case
+      dataTableHeaderRow.appendChild(th)
+    })
+
+    // Render table rows
+    items.forEach((item) => {
+      const tr = document.createElement('tr')
+      tr.dataset.id = item.id
+
+      // Action buttons column (first column)
+      const actionsTd = document.createElement('td')
+      actionsTd.className = 'actions-cell'
+      actionsTd.innerHTML = `
+                <button class="btn btn-outline-info btn-edit-data-item" data-id="${item._id}" title="Edit Data"><i class="fas fa-edit"></i></button>
+                <button class="btn btn-outline-danger btn-delete-data-item" data-id="${item._id}" title="Hapus Data"><i class="fas fa-trash"></i></button>
+            `
+      tr.appendChild(actionsTd)
+
+      // Data columns (reversed order to match header)
+      orderedFields.forEach((field) => {
+        const td = document.createElement('td')
+        let fieldValue = item[field.name]
+
+        if (field.type === 'datetime') {
+          fieldValue = formatDateTime(fieldValue)
+        } else if (field.type === 'boolean') {
+          fieldValue = fieldValue ? 'Ya' : 'Tidak'
+        } else if (field.type === 'json') {
+          fieldValue = JSON.stringify(fieldValue) // Display as string
+        } else if (field.type === 'media') {
+          fieldValue = fieldValue
+            ? `<a href="${fieldValue}" target="_blank">Lihat Media</a>`
+            : 'Tidak Ada'
+        } else if (field.type.startsWith('one-to') || field.type.startsWith('many-to')) {
+          // Handle relations: Display linked collection display name if available
+          const relation = collection.relations.find((rel) => rel.name === field.name)
+          if (relation && fieldValue) {
+            const targetCollectionData = getDataItems(relation.targetCollection)
+            if (Array.isArray(fieldValue)) {
+              // Many-to-many, one-to-many
+              const linkedNames = fieldValue
+                .map((linkedId) => {
+                  const linkedItem = targetCollectionData.find((ti) => ti.id === linkedId)
+                  return linkedItem
+                    ? linkedItem.name || linkedItem.title || linkedItem.id
+                    : linkedId // Try to find a display name
+                })
+                .filter(Boolean)
+              fieldValue = linkedNames.length > 0 ? linkedNames.join(', ') : 'Tidak Ada'
+            } else {
+              // One-to-one, many-to-one
+              const linkedItem = targetCollectionData.find((ti) => ti.id === fieldValue)
+              fieldValue = linkedItem
+                ? linkedItem.name || linkedItem.title || linkedItem.id
+                : fieldValue
+            }
+          } else {
+            fieldValue = 'Tidak Ada'
+          }
+        }
+
+        td.innerHTML =
+          fieldValue !== undefined && fieldValue !== null && fieldValue !== '' ? fieldValue : 'N/A'
+        tr.appendChild(td)
+      })
+      dataTableBody.appendChild(tr)
+    })
+
+    // Attach event listeners for edit and delete buttons on data items
+    dataTableBody.querySelectorAll('.btn-edit-data-item').forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        const itemId = e.currentTarget.dataset.id
+        const itemToEdit = items.find((item) => item._id === itemId)
+        if (itemToEdit) {
+          populateDataItemForm(collection, itemToEdit)
+        } else {
+          showNotification('Item data tidak ditemukan untuk diedit.', 'error')
+        }
+      })
+    })
+
+    dataTableBody.querySelectorAll('.btn-delete-data-item').forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        const itemId = e.currentTarget.dataset.id
+        const itemToDelete = items.find((item) => item._id === itemId)
+        if (itemToDelete) {
+          deleteConfirmName.textContent = `data item (ID: ${itemId})`
+          openModal(deleteConfirmModal)
+          confirmDeleteBtn.onclick = () => handleDeleteDataItem(collection.name, itemId)
+        }
+      })
+    })
+  }
+  // Function to populate the data item form
+  async function populateDataItemForm(collection, dataItem = null) {
+    sidebarFormTitle.textContent = dataItem
+      ? `Edit Data ${collection.displayName}`
+      : `Tambah Data ${collection.displayName}`
+
+    dashboardForm.classList.remove('active-form')
+    collectionForm.classList.remove('active-form') // Hide collection form
+    dataItemForm.classList.add('active-form') // Show data item form
+
+    dataItemFieldsContainer.innerHTML = '' // Clear previous fields
+    dataItemIdInput.value = dataItem ? dataItem._id : ''
+    dataItemCollectionNameInput.value = collection.name
+
+    // Render fields based on collection schema
+    for (const field of collection.fields) {
+      // Skip system fields like id, created_at, updated_at unless they are explicitly editable (unlikely)
+      if (['id', 'created_at', 'updated_at'].includes(field.name) && field.readOnly) {
+        // If ID is not readOnly, we might include it for manual input, but generally, it's system generated.
+        // For now, we skip it as it's typically auto-generated.
+        continue
+      }
+      const fieldValue = dataItem ? dataItem[field.name] : ''
+      let inputHtml = ''
+      const fieldId = `data-item-${collection.name}-${field.name}` // Unique ID for input
+      const isRequiredAttr = field.required ? 'required' : ''
+      const isReadOnlyAttr = field.readOnly ? 'readonly' : ''
+      const labelText = field.name.replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase()) // Title Case
+
+      switch (field.type) {
+        case 'string':
+          inputHtml = `<input type="text" id="${fieldId}" value="${fieldValue || ''}" placeholder="${labelText}" ${isRequiredAttr} ${isReadOnlyAttr}>`
+          break
+        case 'text':
+          inputHtml = `<textarea id="${fieldId}" rows="5" placeholder="${labelText}" ${isRequiredAttr} ${isReadOnlyAttr}>${fieldValue || ''}</textarea>`
+          break
+        case 'number':
+          inputHtml = `<input type="number" id="${fieldId}" value="${fieldValue !== null ? fieldValue : ''}" placeholder="${labelText}" ${isRequiredAttr} ${isReadOnlyAttr}>`
+          break
+        case 'boolean':
+          inputHtml = `
+                        <select id="${fieldId}" ${isRequiredAttr} ${isReadOnlyAttr}>
+                            <option value="">Pilih...</option>
+                            <option value="true" ${fieldValue === true ? 'selected' : ''}>Ya</option>
+                            <option value="false" ${fieldValue === false ? 'selected' : ''}>Tidak</option>
+                        </select>
+                    `
+          break
+        case 'datetime':
+          // Convert ISO string to date and time parts for input[type=date] and input[type=time]
+          let datePart = ''
+          let timePart = ''
+          if (fieldValue) {
+            try {
+              const dateObj = new Date(fieldValue)
+              datePart = dateObj.toISOString().split('T')[0] // YYYY-MM-DD
+              timePart = dateObj.toTimeString().split(' ')[0].substring(0, 5) // HH:MM
+            } catch (e) {
+              console.warn('Invalid datetime format for field:', field.name, fieldValue)
+            }
+          }
+          inputHtml = `
+            <input type="date" id="${fieldId}-date" value="${datePart}" ${isRequiredAttr} ${isReadOnlyAttr}>
+            <input type="time" id="${fieldId}-time" value="${timePart}" ${isRequiredAttr} ${isReadOnlyAttr}>
+          `
+          break
+        case 'json':
+          inputHtml = `<textarea id="${fieldId}" rows="8" placeholder="${labelText} (JSON valid)" ${isRequiredAttr} ${isReadOnlyAttr}>${fieldValue ? JSON.stringify(fieldValue, null, 2) : ''}</textarea>`
+          break
+        case 'media':
+          inputHtml = `<input type="text" id="${fieldId}" value="${fieldValue || ''}" placeholder="URL Media" ${isRequiredAttr} ${isReadOnlyAttr}>`
+          break
+        case 'enum':
+          const enumOptions = field.options.values
+            .map(
+              (val) =>
+                `<option value="${val}" ${fieldValue === val ? 'selected' : ''}>${val}</option>`
+            )
+            .join('')
+          inputHtml = `
+            <select id="${fieldId}" ${isRequiredAttr} ${isReadOnlyAttr}>
+                <option value="">Pilih ${labelText}</option>
+                ${enumOptions}
+            </select>
+          `
+          break
+        default:
+          inputHtml = `<input type="text" id="${fieldId}" value="${fieldValue || ''}" placeholder="${labelText}" ${isRequiredAttr} ${isReadOnlyAttr}>`
+          break
+      }
+
+      const formGroup = document.createElement('div')
+      formGroup.className = 'form-group'
+      formGroup.innerHTML = `
+            <label for="${fieldId}">${labelText} ${field.required ? '<span class="required">*</span>' : ''}</label>
+            ${inputHtml}
+            ${field.unique ? '<small class="help-text">Nilai harus unik.</small>' : ''}
+        `
+      dataItemFieldsContainer.appendChild(formGroup)
+    }
+
+    // Render relations
+    for (const relation of collection.relations) {
+      const relationId = `data-item-${collection.name}-${relation.name}`
+      const labelText = relation.name.replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase())
+
+      const targetCollectionData = await getDataItems(relation.targetCollection)
+      // Generate options for related items (e.g., ID and a "display" field if available)
+      const targetOptions = targetCollectionData.documents
+        .map((item) => {
+          const displayValue = item.name || item.title || item.id // Try common display fields
+          return `<option value="${item.id}">${displayValue} (ID: ${item.id})</option>`
+        })
+        .join('')
+
+      let relationInputHtml = ''
+      const currentRelationValue = dataItem ? dataItem[relation.name] : null
+
+      switch (relation.type) {
+        case 'one-to-one':
+        case 'many-to-one':
+          relationInputHtml = `
+                <select id="${relationId}">
+                    <option value="">Tidak Ada</option>
+                    ${targetOptions}
+                </select>
+            `
+          // Set selected value
+          if (currentRelationValue) {
+            setTimeout(() => {
+              // Timeout to ensure select is rendered
+              const selectElement = document.getElementById(relationId)
+              if (selectElement) selectElement.value = currentRelationValue
+            }, 0)
+          }
+          break
+        case 'one-to-many':
+        case 'many-to-many':
+          // For multiple selections, we'll use a multi-select dropdown
+          // Note: Basic select with 'multiple' attribute is used. For better UX, a library like Select2 might be preferred.
+          relationInputHtml = `
+                        <select id="${relationId}" multiple style="min-height: 100px;">
+                            ${targetOptions}
+                        </select>
+                        <small class="help-text">Tahan Ctrl/Cmd untuk memilih beberapa.</small>
+                    `
+          // Set selected values
+          if (currentRelationValue && Array.isArray(currentRelationValue)) {
+            setTimeout(() => {
+              const selectElement = document.getElementById(relationId)
+              if (selectElement) {
+                Array.from(selectElement.options).forEach((option) => {
+                  if (currentRelationValue.includes(option.value)) {
+                    option.selected = true
+                  }
+                })
+              }
+            }, 0)
+          }
+          break
+      }
+
+      const formGroup = document.createElement('div')
+      formGroup.className = 'form-group'
+      formGroup.innerHTML = `
+                <label for="${relationId}">Relasi ${labelText}</label>
+                ${relationInputHtml}
+            `
+      dataItemFieldsContainer.appendChild(formGroup)
+    }
+    openSidebar()
+  }
+  function populateFormForEdit(collection) {
+    sidebarFormTitle.textContent = 'Edit Koleksi'
+
+    collectionForm.classList.add('active-form') // Show collection form
+    dataItemForm.classList.remove('active-form') // Hide data item form
+    dashboardForm.classList.remove('active-form') // Hide dashboard form
+
+    collectionIdInput.value = collection.id
+    collectionDisplayNameInput.value = collection.displayName
+    collectionNameInput.value = collection.name
+    collectionDescriptionInput.value = collection.description || ''
+
+    fieldsContainer.innerHTML = ''
+    // Add existing fields, including system ones
+    collection.fields.forEach((field) => addField(field))
+
+    relationsContainer.innerHTML = ''
+    collection.relations.forEach((relation) => addRelation(relation))
+
+    openSidebar()
+  }
+
+  async function populateDataDashboardForm(dataDashboard = null) {
+    sidebarFormTitle.textContent = dataDashboard ? `Edit Dashboard` : `Tambah Dashboard`
+    collectionForm.classList.remove('active-form') // Show collection form
+    dataItemForm.classList.remove('active-form') // Hide data item form
+    dashboardForm.classList.add('active-form') // Hide dashboard form
+
+    // dataDashboardFieldsContainer = ''
+    // dataDashboardIdInput.value = dataDashboard?dataDashboard._id:''
+
+    openSidebar()
+  }
 
   addCollectionBtn.addEventListener('click', () => {
     sidebarFormTitle.textContent = 'Tambah Koleksi Baru'
 
     collectionForm.classList.add('active-form') // Show collection form
     dataItemForm.classList.remove('active-form') // Hide data item form
+    dashboardForm.classList.remove('active-form') // Hide dashboard form
 
     collectionForm.reset()
     collectionIdInput.value = ''
@@ -851,9 +1206,6 @@ document.addEventListener('DOMContentLoaded', () => {
       hideLoading()
     }
   })
-
-  // --- Field Management ---
-  addFieldBtn.addEventListener('click', () => addField())
 
   let fieldCounter = 0 // Use a counter for uniqueness within a session
   const fieldTypes = [
@@ -1154,6 +1506,102 @@ document.addEventListener('DOMContentLoaded', () => {
     })
   }
 
+  closeModalBtns.forEach((btn) => {
+    btn.addEventListener('click', () => closeModal(btn.closest('.modal')))
+  })
+
+  cancelDeleteBtn.addEventListener('click', () => closeModal(deleteConfirmModal))
+
+  // --- Dark Mode Toggle ---
+  toggleDarkModeBtn.addEventListener('click', () => {
+    document.body.classList.toggle('dark-mode')
+    const isDarkMode = document.body.classList.contains('dark-mode')
+    localStorage.setItem('darkMode', isDarkMode)
+    toggleDarkModeBtn.textContent = isDarkMode ? 'Mode Terang' : 'Mode Gelap'
+  })
+
+  // Apply dark mode preference on load
+  const savedDarkMode = localStorage.getItem('darkMode')
+  if (savedDarkMode === 'true') {
+    document.body.classList.add('dark-mode')
+    toggleDarkModeBtn.textContent = 'Mode Terang'
+  } else {
+    toggleDarkModeBtn.textContent = 'Mode Gelap'
+  }
+
+  if (logoutBtn) {
+    logoutBtn.addEventListener('click', logoutUser)
+  }
+
+  if (dataItemsSearchInput) {
+    let dataItemSearchTimeout
+    dataItemsSearchInput.addEventListener('keyup', (event) => {
+      clearTimeout(dataItemSearchTimeout)
+      dataItemSearchTimeout = setTimeout(() => {
+        applyDataItemSearchFilter(event.target.value)
+      }, 500)
+    })
+  }
+  if (collectionSearchInput) {
+    let searchTimeout // Variabel untuk debounce
+    collectionSearchInput.addEventListener('keyup', (event) => {
+      clearTimeout(searchTimeout) // Hapus timeout sebelumnya
+      // Tunda pencarian untuk mengurangi beban API (debounce)
+      searchTimeout = setTimeout(() => {
+        applySearchFilter(event.target.value) // <-- Memanggil fungsi applySearchFilter
+      }, 500) // Tunggu 300ms setelah user berhenti mengetik
+    })
+  }
+  if (dataItemsPrevPageBtn) {
+    dataItemsPrevPageBtn.addEventListener('click', () => {
+      if (currentDataItemPage > 1) {
+        currentDataItemPage--
+        loadDataItems(currentSelectedCollection, currentDataItemPage, 4, currentDataItemSearchTerm)
+      }
+    })
+  }
+
+  // NEW: Event listener untuk tombol 'Selanjutnya' data item
+  if (dataItemsNextPageBtn) {
+    dataItemsNextPageBtn.addEventListener('click', () => {
+      const totalPages = Math.ceil(totalDataItems / dataItemsPerPage)
+      if (currentDataItemPage < totalPages) {
+        currentDataItemPage++
+        loadDataItems(currentSelectedCollection, currentDataItemPage, 4, currentDataItemSearchTerm)
+      }
+    })
+  }
+  // --- Navigation ---
+  navItems.forEach((item) => {
+    item.addEventListener('click', (e) => {
+      e.preventDefault()
+      const menu = item.dataset.menu
+      // Remove active from all nav items
+      navItems.forEach((nav) => nav.classList.remove('active'))
+      // Add active to clicked nav item
+      item.classList.add('active')
+      // Hide all content views
+      collectionsView.classList.remove('active-view')
+      settingsView.classList.remove('active-view')
+      boardsView.classList.remove('active-view')
+      settingsBoardView.classList.remove('active-view')
+      // Show selected content view
+      if (menu === 'collections') {
+        collectionsView.classList.add('active-view')
+        loadCollections() // Reload collections when navigating back
+      } else if (menu === 'settings') {
+        settingsView.classList.add('active-view')
+      } else if (menu === 'dashboard') {
+        boardsView.classList.add('active-view')
+      } else if (menu === 'settings-dashboard') {
+        settingsBoardView.classList.add('active-view')
+      }
+    })
+  })
+
+  // --- Field Management ---
+  addFieldBtn.addEventListener('click', () => addField())
+
   // --- Data Item Management (NEW SECTION) ---
 
   // Event listener for "Tambah Data Baru" button
@@ -1165,332 +1613,9 @@ document.addEventListener('DOMContentLoaded', () => {
     populateDataItemForm(currentSelectedCollection, null) // Pass null for new item
   })
 
-  // Function to load and render data items for the selected collection
-  async function loadDataItems(collection, page = 1, limit = 4, searchQuery = '') {
-    let items = await getDataItems(collection.name, page, limit, searchQuery)
-    totalDataItems = items.totalCount // Update total count for pagination
-    items = items.documents
-
-    // Clear existing table
-    dataTableHeaderRow.innerHTML = ''
-    dataTableBody.innerHTML = ''
-
-    if (items.length === 0) {
-      dataItemsPlaceholder.style.display = 'block'
-      dataItemsTable.style.display = 'none'
-      totalDataItems = 0
-      updateDataItemsPaginationControls(0)
-      return
-    } else {
-      dataItemsPlaceholder.style.display = 'none'
-      dataItemsTable.style.display = 'table' // Show table
-      updateDataItemsPaginationControls(totalDataItems)
-    }
-
-    // Render table headers
-    // Include 'id' and system fields by default, then custom fields
-    const displayedFields = collection.fields.filter(
-      (f) => !['created_at', 'updated_at'].includes(f.name)
-    ) // Filter out these for brevity in table
-
-    // Add header for Action buttons
-    const actionHeader = document.createElement('th')
-    actionHeader.textContent = 'Aksi'
-    actionHeader.style.width = '1%'
-    actionHeader.style.textAlign = 'center'
-    dataTableHeaderRow.appendChild(actionHeader)
-
-    // Reverse the order so custom fields appear first, then 'id'
-    const orderedFields = [...displayedFields].reverse()
-    orderedFields.forEach((field) => {
-      const th = document.createElement('th')
-      th.textContent = field.name.replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase()) // Format to Title Case
-      dataTableHeaderRow.appendChild(th)
-    })
-
-    // Render table rows
-    items.forEach((item) => {
-      const tr = document.createElement('tr')
-      tr.dataset.id = item.id
-
-      // Action buttons column (first column)
-      const actionsTd = document.createElement('td')
-      actionsTd.className = 'actions-cell'
-      actionsTd.innerHTML = `
-                <button class="btn btn-outline-info btn-edit-data-item" data-id="${item._id}" title="Edit Data"><i class="fas fa-edit"></i></button>
-                <button class="btn btn-outline-danger btn-delete-data-item" data-id="${item._id}" title="Hapus Data"><i class="fas fa-trash"></i></button>
-            `
-      tr.appendChild(actionsTd)
-
-      // Data columns (reversed order to match header)
-      orderedFields.forEach((field) => {
-        const td = document.createElement('td')
-        let fieldValue = item[field.name]
-
-        if (field.type === 'datetime') {
-          fieldValue = formatDateTime(fieldValue)
-        } else if (field.type === 'boolean') {
-          fieldValue = fieldValue ? 'Ya' : 'Tidak'
-        } else if (field.type === 'json') {
-          fieldValue = JSON.stringify(fieldValue) // Display as string
-        } else if (field.type === 'media') {
-          fieldValue = fieldValue
-            ? `<a href="${fieldValue}" target="_blank">Lihat Media</a>`
-            : 'Tidak Ada'
-        } else if (field.type.startsWith('one-to') || field.type.startsWith('many-to')) {
-          // Handle relations: Display linked collection display name if available
-          const relation = collection.relations.find((rel) => rel.name === field.name)
-          if (relation && fieldValue) {
-            const targetCollectionData = getDataItems(relation.targetCollection)
-            if (Array.isArray(fieldValue)) {
-              // Many-to-many, one-to-many
-              const linkedNames = fieldValue
-                .map((linkedId) => {
-                  const linkedItem = targetCollectionData.find((ti) => ti.id === linkedId)
-                  return linkedItem
-                    ? linkedItem.name || linkedItem.title || linkedItem.id
-                    : linkedId // Try to find a display name
-                })
-                .filter(Boolean)
-              fieldValue = linkedNames.length > 0 ? linkedNames.join(', ') : 'Tidak Ada'
-            } else {
-              // One-to-one, many-to-one
-              const linkedItem = targetCollectionData.find((ti) => ti.id === fieldValue)
-              fieldValue = linkedItem
-                ? linkedItem.name || linkedItem.title || linkedItem.id
-                : fieldValue
-            }
-          } else {
-            fieldValue = 'Tidak Ada'
-          }
-        }
-
-        td.innerHTML =
-          fieldValue !== undefined && fieldValue !== null && fieldValue !== '' ? fieldValue : 'N/A'
-        tr.appendChild(td)
-      })
-      dataTableBody.appendChild(tr)
-    })
-
-    // Attach event listeners for edit and delete buttons on data items
-    dataTableBody.querySelectorAll('.btn-edit-data-item').forEach((btn) => {
-      btn.addEventListener('click', (e) => {
-        const itemId = e.currentTarget.dataset.id
-        const itemToEdit = items.find((item) => item._id === itemId)
-        if (itemToEdit) {
-          populateDataItemForm(collection, itemToEdit)
-        } else {
-          showNotification('Item data tidak ditemukan untuk diedit.', 'error')
-        }
-      })
-    })
-
-    dataTableBody.querySelectorAll('.btn-delete-data-item').forEach((btn) => {
-      btn.addEventListener('click', (e) => {
-        const itemId = e.currentTarget.dataset.id
-        const itemToDelete = items.find((item) => item._id === itemId)
-        if (itemToDelete) {
-          deleteConfirmName.textContent = `data item (ID: ${itemId})`
-          openModal(deleteConfirmModal)
-          confirmDeleteBtn.onclick = () => handleDeleteDataItem(collection.name, itemId)
-        }
-      })
-    })
-  }
-
-  // Function to populate the data item form
-  async function populateDataItemForm(collection, dataItem = null) {
-    sidebarFormTitle.textContent = dataItem
-      ? `Edit Data ${collection.displayName}`
-      : `Tambah Data ${collection.displayName}`
-
-    collectionForm.classList.remove('active-form') // Hide collection form
-    dataItemForm.classList.add('active-form') // Show data item form
-
-    dataItemFieldsContainer.innerHTML = '' // Clear previous fields
-    dataItemIdInput.value = dataItem ? dataItem._id : ''
-    dataItemCollectionNameInput.value = collection.name
-
-    // Render fields based on collection schema
-    for (const field of collection.fields) {
-      // Skip system fields like id, created_at, updated_at unless they are explicitly editable (unlikely)
-      if (['id', 'created_at', 'updated_at'].includes(field.name) && field.readOnly) {
-        // If ID is not readOnly, we might include it for manual input, but generally, it's system generated.
-        // For now, we skip it as it's typically auto-generated.
-        continue
-      }
-      const fieldValue = dataItem ? dataItem[field.name] : ''
-      let inputHtml = ''
-      const fieldId = `data-item-${collection.name}-${field.name}` // Unique ID for input
-      const isRequiredAttr = field.required ? 'required' : ''
-      const isReadOnlyAttr = field.readOnly ? 'readonly' : ''
-      const labelText = field.name.replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase()) // Title Case
-
-      switch (field.type) {
-        case 'string':
-          inputHtml = `<input type="text" id="${fieldId}" value="${fieldValue || ''}" placeholder="${labelText}" ${isRequiredAttr} ${isReadOnlyAttr}>`
-          break
-        case 'text':
-          inputHtml = `<textarea id="${fieldId}" rows="5" placeholder="${labelText}" ${isRequiredAttr} ${isReadOnlyAttr}>${fieldValue || ''}</textarea>`
-          break
-        case 'number':
-          inputHtml = `<input type="number" id="${fieldId}" value="${fieldValue !== null ? fieldValue : ''}" placeholder="${labelText}" ${isRequiredAttr} ${isReadOnlyAttr}>`
-          break
-        case 'boolean':
-          inputHtml = `
-                        <select id="${fieldId}" ${isRequiredAttr} ${isReadOnlyAttr}>
-                            <option value="">Pilih...</option>
-                            <option value="true" ${fieldValue === true ? 'selected' : ''}>Ya</option>
-                            <option value="false" ${fieldValue === false ? 'selected' : ''}>Tidak</option>
-                        </select>
-                    `
-          break
-        case 'datetime':
-          // Convert ISO string to date and time parts for input[type=date] and input[type=time]
-          let datePart = ''
-          let timePart = ''
-          if (fieldValue) {
-            try {
-              const dateObj = new Date(fieldValue)
-              datePart = dateObj.toISOString().split('T')[0] // YYYY-MM-DD
-              timePart = dateObj.toTimeString().split(' ')[0].substring(0, 5) // HH:MM
-            } catch (e) {
-              console.warn('Invalid datetime format for field:', field.name, fieldValue)
-            }
-          }
-          inputHtml = `
-                        <input type="date" id="${fieldId}-date" value="${datePart}" ${isRequiredAttr} ${isReadOnlyAttr}>
-                        <input type="time" id="${fieldId}-time" value="${timePart}" ${isRequiredAttr} ${isReadOnlyAttr}>
-                    `
-          break
-        case 'json':
-          inputHtml = `<textarea id="${fieldId}" rows="8" placeholder="${labelText} (JSON valid)" ${isRequiredAttr} ${isReadOnlyAttr}>${fieldValue ? JSON.stringify(fieldValue, null, 2) : ''}</textarea>`
-          break
-        case 'media':
-          inputHtml = `<input type="text" id="${fieldId}" value="${fieldValue || ''}" placeholder="URL Media" ${isRequiredAttr} ${isReadOnlyAttr}>`
-          break
-        case 'enum':
-          const enumOptions = field.options.values
-            .map(
-              (val) =>
-                `<option value="${val}" ${fieldValue === val ? 'selected' : ''}>${val}</option>`
-            )
-            .join('')
-          inputHtml = `
-                        <select id="${fieldId}" ${isRequiredAttr} ${isReadOnlyAttr}>
-                            <option value="">Pilih ${labelText}</option>
-                            ${enumOptions}
-                        </select>
-                    `
-          break
-        default:
-          inputHtml = `<input type="text" id="${fieldId}" value="${fieldValue || ''}" placeholder="${labelText}" ${isRequiredAttr} ${isReadOnlyAttr}>`
-          break
-      }
-
-      const formGroup = document.createElement('div')
-      formGroup.className = 'form-group'
-      formGroup.innerHTML = `
-            <label for="${fieldId}">${labelText} ${field.required ? '<span class="required">*</span>' : ''}</label>
-            ${inputHtml}
-            ${field.unique ? '<small class="help-text">Nilai harus unik.</small>' : ''}
-        `
-
-      dataItemFieldsContainer.appendChild(formGroup)
-    }
-
-    // Render relations
-    for (const relation of collection.relations) {
-      const relationId = `data-item-${collection.name}-${relation.name}`
-      const labelText = relation.name.replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase())
-
-      const targetCollectionData = await getDataItems(relation.targetCollection)
-      // Generate options for related items (e.g., ID and a "display" field if available)
-      const targetOptions = targetCollectionData.documents
-        .map((item) => {
-          const displayValue = item.name || item.title || item.id // Try common display fields
-          return `<option value="${item.id}">${displayValue} (ID: ${item.id})</option>`
-        })
-        .join('')
-
-      let relationInputHtml = ''
-      const currentRelationValue = dataItem ? dataItem[relation.name] : null
-
-      switch (relation.type) {
-        case 'one-to-one':
-        case 'many-to-one':
-          relationInputHtml = `
-                <select id="${relationId}">
-                    <option value="">Tidak Ada</option>
-                    ${targetOptions}
-                </select>
-            `
-          // Set selected value
-          if (currentRelationValue) {
-            setTimeout(() => {
-              // Timeout to ensure select is rendered
-              const selectElement = document.getElementById(relationId)
-              if (selectElement) selectElement.value = currentRelationValue
-            }, 0)
-          }
-          break
-        case 'one-to-many':
-        case 'many-to-many':
-          // For multiple selections, we'll use a multi-select dropdown
-          // Note: Basic select with 'multiple' attribute is used. For better UX, a library like Select2 might be preferred.
-          relationInputHtml = `
-                        <select id="${relationId}" multiple style="min-height: 100px;">
-                            ${targetOptions}
-                        </select>
-                        <small class="help-text">Tahan Ctrl/Cmd untuk memilih beberapa.</small>
-                    `
-          // Set selected values
-          if (currentRelationValue && Array.isArray(currentRelationValue)) {
-            setTimeout(() => {
-              const selectElement = document.getElementById(relationId)
-              if (selectElement) {
-                Array.from(selectElement.options).forEach((option) => {
-                  if (currentRelationValue.includes(option.value)) {
-                    option.selected = true
-                  }
-                })
-              }
-            }, 0)
-          }
-          break
-      }
-
-      const formGroup = document.createElement('div')
-      formGroup.className = 'form-group'
-      formGroup.innerHTML = `
-                <label for="${relationId}">Relasi ${labelText}</label>
-                ${relationInputHtml}
-            `
-      dataItemFieldsContainer.appendChild(formGroup)
-    }
-    openSidebar()
-  }
-
-  function populateFormForEdit(collection) {
-    sidebarFormTitle.textContent = 'Edit Koleksi'
-
-    collectionForm.classList.add('active-form') // Show collection form
-    dataItemForm.classList.remove('active-form') // Hide data item form
-
-    collectionIdInput.value = collection.id
-    collectionDisplayNameInput.value = collection.displayName
-    collectionNameInput.value = collection.name
-    collectionDescriptionInput.value = collection.description || ''
-
-    fieldsContainer.innerHTML = ''
-    // Add existing fields, including system ones
-    collection.fields.forEach((field) => addField(field))
-
-    relationsContainer.innerHTML = ''
-    collection.relations.forEach((relation) => addRelation(relation))
-
-    openSidebar()
-  }
+  addDashboardnBtn.addEventListener('click', () => {
+    populateDataDashboardForm()
+  })
   // Handle Data Item Form Submission
   dataItemForm.addEventListener('submit', async (e) => {
     e.preventDefault()
@@ -1688,119 +1813,14 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     })
   }
-  
-  function initMonthlySalesChart() {
-    // Mendapatkan elemen DOM wadah chart
-    const chartDom = document.getElementById('monthly-sales-chart')
-    if (!chartDom) {
-      console.warn("Element 'monthly-sales-chart' not found. Chart will not be initialized.")
-      return
-    }
 
-    // Inisialisasi instance ECharts
-    const myChart = echarts.init(chartDom)
-
-    // Opsi konfigurasi chart
-    const option = {
-      title: {
-        text: 'Grafik Penjualan Bulanan',
-        left: 'center',
-        textStyle: {
-          color: getComputedStyle(document.documentElement).getPropertyValue('--text-color').trim(),
-        },
-      },
-      tooltip: {
-        trigger: 'axis',
-        axisPointer: {
-          type: 'shadow',
-        },
-      },
-      grid: {
-        left: '3%',
-        right: '4%',
-        bottom: '3%',
-        containLabel: true,
-      },
-      xAxis: {
-        type: 'category',
-        data: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'],
-        axisLabel: {
-          color: getComputedStyle(document.documentElement)
-            .getPropertyValue('--secondary-color')
-            .trim(),
-        },
-      },
-      yAxis: {
-        type: 'value',
-        axisLabel: {
-          color: getComputedStyle(document.documentElement)
-            .getPropertyValue('--secondary-color')
-            .trim(),
-        },
-        splitLine: {
-          lineStyle: {
-            color: getComputedStyle(document.documentElement)
-              .getPropertyValue('--border-color')
-              .trim(),
-          },
-        },
-      },
-      series: [
-        {
-          name: 'Penjualan',
-          type: 'bar',
-          data: [120, 200, 150, 80, 70, 110, 130, 90, 180, 220, 160, 140],
-          itemStyle: {
-            color: getComputedStyle(document.documentElement)
-              .getPropertyValue('--primary-color')
-              .trim(), // Menggunakan warna primer Anda
-          },
-          emphasis: {
-            itemStyle: {
-              shadowBlur: 10,
-              shadowOffsetX: 0,
-              shadowColor: 'rgba(0, 0, 0, 0.5)',
-            },
-          },
-        },
-      ],
-    }
-
-    // Mengatur opsi dan merender chart
-    myChart.setOption(option)
-
-    // Menyesuaikan ukuran chart saat window di-resize
-    window.addEventListener('resize', function () {
-      myChart.resize()
-    })
-
-    // Contoh bagaimana merespons perubahan mode gelap
-    // Anda mungkin sudah memiliki fungsi toggleDarkMode. Panggil myChart.resize() di sana.
-    // Atau buat observer untuk class 'dark-mode' pada body.
-    const darkModeToggle = document.getElementById('toggle-dark-mode')
-    if (darkModeToggle) {
-      darkModeToggle.addEventListener('click', () => {
-        // Perbarui warna teks chart saat mode gelap diubah
-        option.title.textStyle.color = getComputedStyle(document.documentElement)
-          .getPropertyValue('--text-color')
-          .trim()
-        option.xAxis.axisLabel.color = getComputedStyle(document.documentElement)
-          .getPropertyValue('--secondary-color')
-          .trim()
-        option.yAxis.axisLabel.color = getComputedStyle(document.documentElement)
-          .getPropertyValue('--secondary-color')
-          .trim()
-        option.yAxis.splitLine.lineStyle.color = getComputedStyle(document.documentElement)
-          .getPropertyValue('--border-color')
-          .trim()
-        myChart.setOption(option) // Terapkan opsi yang diperbarui
-        myChart.resize() // Penting untuk memastikan chart menyesuaikan ukuran dan warna
-      })
-    }
+  if (
+    document.getElementById('dashboard-view') &&
+    document.getElementById('dashboard-view').classList.contains('active-view')
+  ) {
+    initMonthlySalesChart()
   }
-  if (document.getElementById('dashboard-view') && document.getElementById('dashboard-view').classList.contains('active-view')) {
-    initMonthlySalesChart();
-  }
+
   // Initial load
   loadCollections()
   checkAuthAndLoadUser()

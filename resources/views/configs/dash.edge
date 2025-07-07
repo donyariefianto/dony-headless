@@ -3,162 +3,1442 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>
-      CMS Koleksi Profesional
-    </title>
+    <title>Dashboard Generator Dinamis</title>
     <link
       href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="/resources/configs/index.css" />
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
     />
+    <style>
+      /* General Styles */
+      :root {
+        --primary-color: #007bff; /* Blue */
+        --secondary-color: #6c757d; /* Gray */
+        --success-color: #28a745; /* Green */
+        --danger-color: #dc3545; /* Red */
+        --info-color: #17a2b8; /* Cyan */
+        --warning-color: #ffc107; /* Yellow */
+        --light-color: #f8f9fa; /* Light Gray */
+        --dark-color: #343a40; /* Dark Gray */
+
+        --text-color: #333;
+        --bg-color: #f4f7fa;
+        --card-bg: #ffffff;
+        --border-color: #e0e0e0;
+        --sidebar-bg: #ffffff;
+        --header-bg: #ffffff;
+        --shadow-light: rgba(0, 0, 0, 0.08);
+        --shadow-medium: rgba(0, 0, 0, 0.15);
+        --hover-bg: #e9ecef;
+
+        --font-family: 'Inter', sans-serif;
+        --border-radius: 8px;
+        --transition-speed: 0.2s;
+      }
+
+      /* Dark Mode Variables */
+      body.dark-mode {
+        --primary-color: #6b9fd8;
+        --secondary-color: #9299a1;
+        --success-color: #28a745;
+        --danger-color: #dc3545;
+        --info-color: #17a2b8;
+        --warning-color: #ffc107;
+        --light-color: #3f454b;
+        --dark-color: #f8f9fa;
+
+        --text-color: #e0e0e0;
+        --bg-color: #2a2d33;
+        --card-bg: #34373d;
+        --border-color: #44474d;
+        --sidebar-bg: #34373d;
+        --header-bg: #34373d;
+        --shadow-light: rgba(0, 0, 0, 0.3);
+        --shadow-medium: rgba(0, 0, 0, 0.5);
+        --hover-bg: #44474d;
+      }
+
+      body {
+        font-family: var(--font-family);
+        margin: 0;
+        padding: 0;
+        background-color: var(--bg-color);
+        color: var(--text-color);
+        transition: background-color var(--transition-speed),
+          color var(--transition-speed);
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .container {
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
+        width: 100%;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+
+      header {
+        background-color: var(--header-bg);
+        padding: 15px 20px;
+        border-radius: var(--border-radius);
+        margin-bottom: 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 2px 4px var(--shadow-light);
+      }
+
+      header h2 {
+        margin: 0;
+        color: var(--primary-color);
+      }
+
+      .header-actions {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .btn {
+        padding: 8px 15px;
+        border: none;
+        border-radius: var(--border-radius);
+        cursor: pointer;
+        font-weight: 500;
+        transition: background-color var(--transition-speed),
+          color var(--transition-speed), border-color var(--transition-speed);
+      }
+
+      .btn-primary {
+        background-color: var(--primary-color);
+        color: white;
+      }
+
+      .btn-primary:hover {
+        background-color: var(--primary-color);
+        filter: brightness(90%);
+      }
+
+      .btn-secondary {
+        background-color: var(--secondary-color);
+        color: white;
+      }
+
+      .btn-secondary:hover {
+        background-color: var(--secondary-color);
+        filter: brightness(90%);
+      }
+
+      .btn-danger {
+        background-color: var(--danger-color);
+        color: white;
+      }
+
+      .btn-danger:hover {
+        background-color: var(--danger-color);
+        filter: brightness(90%);
+      }
+
+      .main-layout {
+        display: flex;
+        gap: 20px;
+        flex-grow: 1;
+      }
+
+      nav.sidebar {
+        flex: 0 0 200px;
+        background-color: var(--sidebar-bg);
+        padding: 20px;
+        border-radius: var(--border-radius);
+        box-shadow: 0 2px 4px var(--shadow-light);
+        height: fit-content; /* Adjust height to content */
+      }
+
+      nav.sidebar ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
+
+      nav.sidebar ul li {
+        margin-bottom: 10px;
+      }
+
+      nav.sidebar ul li a {
+        display: block;
+        padding: 10px;
+        color: var(--text-color);
+        text-decoration: none;
+        border-radius: var(--border-radius);
+        transition: background-color var(--transition-speed),
+          color var(--transition-speed);
+      }
+
+      nav.sidebar ul li a:hover,
+      nav.sidebar ul li a.active {
+        background-color: var(--hover-bg);
+        color: var(--primary-color);
+      }
+
+      main.content {
+        flex-grow: 1;
+        background-color: var(--card-bg);
+        padding: 20px;
+        border-radius: var(--border-radius);
+        box-shadow: 0 2px 4px var(--shadow-light);
+      }
+
+      .content-view {
+        display: none; /* Hidden by default */
+      }
+
+      .content-view.active-view {
+        display: block; /* Shown when active */
+      }
+
+      .view-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+      }
+
+      .card {
+        background-color: var(--card-bg);
+        border: 1px solid var(--border-color);
+        border-radius: var(--border-radius);
+        padding: 20px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 4px var(--shadow-light);
+      }
+
+      .form-group {
+        margin-bottom: 15px;
+      }
+
+      .form-group label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: 500;
+      }
+
+      .form-control {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid var(--border-color);
+        border-radius: var(--border-radius);
+        background-color: var(--bg-color);
+        color: var(--text-color);
+        transition: border-color var(--transition-speed);
+        box-sizing: border-box; /* Ensure padding doesn't affect width */
+      }
+
+      .form-control:focus {
+        border-color: var(--primary-color);
+        outline: none;
+      }
+
+      .form-actions {
+        display: flex;
+        gap: 10px;
+        justify-content: flex-end;
+        margin-top: 20px;
+      }
+
+      .form-sections-container {
+        border: 1px dashed var(--border-color);
+        padding: 15px;
+        min-height: 100px;
+        border-radius: var(--border-radius);
+        margin-top: 15px;
+      }
+
+      .placeholder-card {
+        text-align: center;
+        color: var(--secondary-color);
+        padding: 20px;
+      }
+
+      .form-section {
+        background-color: var(--card-bg);
+        border: 1px solid var(--border-color);
+        border-radius: var(--border-radius);
+        padding: 15px;
+        margin-bottom: 15px;
+        transition: all var(--transition-speed);
+      }
+
+      .form-section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+      }
+
+      .form-section-actions .btn-sm {
+        padding: 5px 10px;
+        font-size: 0.8rem;
+      }
+
+      .collapsible-content {
+        max-height: 1000px; /* Arbitrary large value */
+        overflow: hidden;
+        transition: max-height 0.3s ease-out, opacity 0.3s ease-out;
+        opacity: 1;
+      }
+
+      .collapsible-content.collapsed {
+        max-height: 0;
+        opacity: 0;
+        padding-top: 0;
+        padding-bottom: 0;
+        border-width: 0;
+        margin-top: 0;
+        margin-bottom: 0;
+      }
+
+      .widget-options-container {
+        background-color: var(--hover-bg);
+        border-radius: var(--border-radius);
+        padding: 15px;
+        margin-top: 15px;
+        border-top: 1px solid var(--border-color);
+      }
+
+      .widget-options-container p.text-muted {
+        font-style: italic;
+        color: var(--secondary-color);
+      }
+
+      /* Sidebar Forms (simplified for this standalone example) */
+      .right-form-sidebar {
+        position: fixed;
+        top: 0;
+        right: -400px; /* Hidden by default */
+        width: 380px;
+        height: 100%;
+        background-color: var(--sidebar-bg);
+        box-shadow: -2px 0 10px var(--shadow-medium);
+        transition: right 0.3s ease-out;
+        z-index: 1000;
+        padding: 20px;
+        box-sizing: border-box;
+        overflow-y: auto;
+      }
+
+      .right-form-sidebar.open {
+        right: 0;
+      }
+
+      .overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 999;
+        display: none;
+      }
+
+      .overlay.show {
+        display: block;
+      }
+
+      .sidebar-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+      }
+
+      .sidebar-header h3 {
+        margin: 0;
+        color: var(--text-color);
+      }
+
+      .close-sidebar-btn {
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        color: var(--secondary-color);
+        cursor: pointer;
+      }
+
+      /* Notification Styles */
+      #notification-container {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 1001;
+      }
+
+      .notification {
+        background-color: var(--success-color);
+        color: white;
+        padding: 10px 15px;
+        border-radius: var(--border-radius);
+        margin-bottom: 10px;
+        opacity: 0;
+        transition: opacity 0.3s ease-out;
+      }
+
+      .notification.error {
+        background-color: var(--danger-color);
+      }
+
+      .notification.show {
+        opacity: 1;
+      }
+
+      /* Loading Indicator */
+      #loading-indicator {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1002;
+        display: none; /* Hidden by default */
+      }
+
+      #loading-indicator .spinner {
+        border: 4px solid rgba(255, 255, 255, 0.3);
+        border-top: 4px solid #fff;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        animation: spin 1s linear infinite;
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+    </style>
   </head>
   <body>
     <div class="container">
       <header>
         <div class="logo">
-          <h2>
-            CMS Koleksi
-          </h2>
+          <h2>Dashboard Generator</h2>
         </div>
         <div class="header-actions">
           <button id="toggle-dark-mode" class="btn btn-secondary">
             Mode Gelap
           </button>
-          <div class="user-display-wrapper">
-            <span id="user-display" class="user-greeting"></span>            <button id="logout-btn" class="btn btn-secondary btn-logout">Logout</button>
+          <div class="user-info">
+            <span id="user-display">Guest</span>
           </div>
         </div>
       </header>
 
       <main class="main-layout">
-
-        <aside class="left-sidebar">
-          <nav class="main-nav">
-            <ul>
-              <li class="nav-item" data-menu="dashboard">
-                <span>Dashboard</span>
-              </li>
-              <li class="nav-item active" data-menu="collections">
-                <span>Koleksi</span>
-              </li>
-              <li class="nav-item" data-menu="settings">
-                <span>Pengaturan</span>
-              </li>
-              <li class="nav-item bottom-aligned">
-                <button id="notification-bell-btn" class="btn btn-secondary nav-icon-btn">
-                  <i class="fas fa-bell"></i>
-                  <span id="notification-count" class="notification-count">0</span>
-                </button>
-              </li>
+        <nav class="sidebar">
+          <ul>
+            <li>
+              <a href="#" class="nav-item active" data-menu="dashboard-config">
+                <i class="fas fa-cogs"></i> Konfigurasi Dashboard
+              </a>
+            </li>
             </ul>
-          </nav>
-        </aside>
+        </nav>
 
-        <section class="content-area">
-          <div id="dashboard-view" class="content-view">
-            <div class="content-header">
-              <h3>
-                Dashboard Kustom Anda
-              </h3>
+        <main class="content">
+          <div id="dashboard-config-view" class="content-view active-view">
+            <div class="view-header">
+              <h3>Konfigurasi Dashboard Baru</h3>
+              <button id="add-dashboard-widget-btn" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Tambah Widget
+              </button>
             </div>
-            <div class="dashboard-content">
-              <div class="dashboard-grid">
-                <div class="dashboard-card">
-                  <h4>
-                    Ringkasan Pengguna
-                  </h4>
-                  <p>
-                    Total Pengguna: <strong>1,245</strong>
-                  </p>
-                  <p>
-                    Pengguna Aktif Bulan Ini: <strong>789</strong>
-                  </p>
-                </div>
-                <div class="dashboard-card">
-                  <h4>
-                    Statistik Pesanan
-                  </h4>
-                  <p>
-                    Pesanan Baru Hari Ini: <strong>56</strong>
-                  </p>
-                  <p>
-                    Total Pendapatan: <strong>Rp 125.000.000</strong>
-                  </p>
-                </div>
-                <div class="dashboard-card wide-card">
-                  <h4>
-                    Aktivitas Terbaru
-                  </h4>
-                  <ul>
-                    <li>
-                      Pengguna 'John Doe' terdaftar.
-                    </li>
-                    <li>
-                      Pesanan #1001 telah dibayar.
-                    </li>
-                    <li>
-                      Koleksi 'Produk' diperbarui.
-                    </li>
-                  </ul>
-                </div>
-                <div class="dashboard-card">
-                  <h4>
-                    Koleksi Paling Aktif
-                  </h4>
-                  <p>
-                    Produk: 2,500 data item
-                  </p>
-                  <p>
-                    Artikel: 1,200 data item
-                  </p>
-                </div>
-                <div class="dashboard-card">
-                  <h4>
-                    Peringatan Sistem
-                  </h4>
-                  <p class="text-danger">
-                    <i class="fas fa-exclamation-triangle"></i>Database hampir penuh!
-                  </p>
-                  <p class="text-info">
-                    <i class="fas fa-info-circle"></i>Perbarui CMS ke versi terbaru.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div id="collections-view" class="content-view active-view">
-          </div>
+            <div class="card p-4 mb-4">
+              <form id="dashboard-form">
+                <input type="hidden" id="dashboard-id" />
 
-          <div id="settings-view" class="content-view">
-          </div>
+                <div class="form-group">
+                  <label for="dashboard-name">Nama Dashboard:</label>
+                  <input
+                    type="text"
+                    id="dashboard-name"
+                    class="form-control"
+                    required
+                  />
+                </div>
 
-          <div id="loading-indicator" class="loading-spinner" style="display: none;">
-          </div>
-          <div id="notification-area">
-            <div id="error-message" class="notification error" style="display: none;">
+                <div class="form-group">
+                  <label for="dashboard-description">Deskripsi Dashboard:</label>
+                  <textarea
+                    id="dashboard-description"
+                    class="form-control"
+                    rows="3"
+                  ></textarea>
+                </div>
+
+                <hr class="my-4" />
+                <h4>Widget Dashboard</h4>
+                <div
+                  id="dashboard-widgets-container"
+                  class="form-sections-container"
+                >
+                  <div class="placeholder-card" id="no-widgets-placeholder">
+                    <p>
+                      Klik "Tambah Widget" untuk mulai membuat visualisasi
+                      dashboard Anda.
+                    </p>
+                  </div>
+                </div>
+
+                <div class="form-actions mt-4">
+                  <button
+                    type="submit"
+                    class="btn btn-primary"
+                    id="save-dashboard-btn"
+                  >
+                    <i class="fas fa-save"></i> Simpan Dashboard
+                  </button>
+                  <button
+                    type="button"
+                    class="btn btn-secondary"
+                    id="cancel-dashboard-config-btn"
+                  >
+                    <i class="fas fa-times"></i> Batal
+                  </button>
+                </div>
+              </form>
             </div>
-            <div id="success-message" class="notification success" style="display: none;">
-            </div>
           </div>
-        </section>
+        </main>
       </main>
     </div>
 
-    <aside id="right-form-sidebar" class="right-form-sidebar">
-    </aside>
+    <template id="widget-template">
+      <div class="form-section widget-item border rounded p-3 mb-3">
+        <div
+          class="form-section-header d-flex justify-content-between align-items-center mb-3"
+        >
+          <h5 class="widget-display-name m-0">Widget Baru</h5>
+          <div class="form-section-actions">
+            <button
+              type="button"
+              class="btn btn-sm btn-secondary toggle-collapse-widget"
+              data-target-suffix="-content"
+            >
+              <i class="fas fa-chevron-up"></i>
+            </button>
+            <button
+              type="button"
+              class="btn btn-sm btn-danger remove-widget-btn ms-2"
+            >
+              <i class="fas fa-trash-alt"></i>
+            </button>
+          </div>
+        </div>
+        <div class="collapsible-content">
+          <div class="form-group">
+            <label for="widget-name">Nama Widget (internal):</label>
+            <input type="text" class="form-control widget-name" required />
+          </div>
+          <div class="form-group">
+            <label for="widget-display-name">Nama Tampilan Widget:</label>
+            <input
+              type="text"
+              class="form-control widget-display-name-input"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label for="widget-type">Tipe Widget:</label>
+            <select class="form-control widget-type-select">
+              <option value="chart">Chart</option>
+              <option value="table">Tabel Data</option>
+              <option value="single-value">Nilai Tunggal</option>
+              <option value="custom-text">Teks Kustom/HTML</option>
+              <option value="image">Gambar</option>
+              <option value="map">Peta</option>
+              <option value="list">Daftar</option>
+              <option value="stat-card">Kartu Statistik</option>
+              <option value="iframe">Iframe</option>
+              <option value="action-button">Tombol Aksi</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="widget-collection">Sumber Data (Koleksi):</label>
+            <select class="form-control widget-collection-select">
+              <option value="">Pilih Koleksi...</option>
+            </select>
+          </div>
 
-    <div id="delete-confirm-modal" class="modal">
+          <div class="widget-options-container mt-3 p-2 border-top">
+            <h6>Konfigurasi Spesifik Widget</h6>
+            <p class="text-muted">
+              Pilih tipe widget untuk melihat opsi konfigurasi.
+            </p>
+          </div>
+        </div>
+      </div>
+    </template>
+
+    <div id="notification-container"></div>
+    <div id="loading-indicator">
+      <div class="spinner"></div>
     </div>
 
-    <div id="overlay" class="overlay" style="display: none;">
-    </div>
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        // --- DOM Elements ---
+        const dom = {
+          // Layout and Navigation (simplified for standalone demo)
+          collectionsView: null, // Not used in this standalone demo
+          settingsView: null, // Not used in this standalone demo
+          boardsView: null, // Not used in this standalone demo
+          navItems: document.querySelectorAll('.nav-item'),
+          rightFormSidebar: null, // Not used in this standalone demo
+          closeSidebarBtns: null, // Not used in this standalone demo
+          overlay: document.getElementById('overlay'), // Dummy overlay if needed
 
-    <script src="/resources/configs/index">
-      
+          // Global UI elements
+          sidebarFormTitle: null, // Will be null in this demo, safe if not used for dashboard
+          userDisplayElement: document.getElementById('user-display'),
+          logoutBtn: null, // Not used in this standalone demo
+
+          // Notifications and Loading
+          loadingIndicator: document.getElementById('loading-indicator'),
+          notificationContainer: document.getElementById('notification-container'),
+
+          // Dashboard specific elements
+          dashboardConfigView: document.getElementById('dashboard-config-view'),
+          addDashboardWidgetBtn: document.getElementById('add-dashboard-widget-btn'),
+          dashboardForm: document.getElementById('dashboard-form'),
+          dashboardIdInput: document.getElementById('dashboard-id'),
+          dashboardNameInput: document.getElementById('dashboard-name'),
+          dashboardDescriptionInput: document.getElementById('dashboard-description'),
+          dashboardWidgetsContainer: document.getElementById('dashboard-widgets-container'),
+          noWidgetsPlaceholder: document.getElementById('no-widgets-placeholder'),
+          saveDashboardBtn: document.getElementById('save-dashboard-btn'),
+          cancelDashboardConfigBtn: document.getElementById('cancel-dashboard-config-btn'),
+          toggleDarkModeBtn: document.getElementById('toggle-dark-mode'),
+        };
+
+        // --- Global State Variables (simplified for demo) ---
+        let currentCollections = [
+          {
+            name: 'products',
+            displayName: 'Produk',
+            fields: [
+              { name: 'name', displayName: 'Nama Produk', type: 'string' },
+              { name: 'price', displayName: 'Harga', type: 'number' },
+              { name: 'category', displayName: 'Kategori', type: 'string' },
+              { name: 'stock', displayName: 'Stok', type: 'number' },
+            ],
+          },
+          {
+            name: 'orders',
+            displayName: 'Pesanan',
+            fields: [
+              { name: 'orderId', displayName: 'ID Pesanan', type: 'string' },
+              { name: 'amount', displayName: 'Jumlah', type: 'number' },
+              { name: 'date', displayName: 'Tanggal', type: 'date' },
+              { name: 'status', displayName: 'Status', type: 'string' },
+            ],
+          },
+          {
+            name: 'customers',
+            displayName: 'Pelanggan',
+            fields: [
+              { name: 'customerId', displayName: 'ID Pelanggan', type: 'string' },
+              { name: 'name', displayName: 'Nama Pelanggan', type: 'string' },
+              { name: 'email', displayName: 'Email', type: 'string' },
+            ],
+          },
+          {
+            name: 'locations',
+            displayName: 'Lokasi',
+            fields: [
+              { name: 'locationName', displayName: 'Nama Lokasi', type: 'string' },
+              { name: 'latitude', displayName: 'Lintang', type: 'number' },
+              { name: 'longitude', displayName: 'Bujur', type: 'number' },
+              { name: 'population', displayName: 'Populasi', type: 'number' },
+            ],
+          },
+        ]; // Mock data for collections
+
+        let widgetCounter = 0; // Counter for unique widget IDs
+
+        // --- Utility Functions ---
+
+        function slugify(text) {
+          return text
+            .toString()
+            .toLowerCase()
+            .trim()
+            .replace(/\s+/g, '-')
+            .replace(/[^\w-]+/g, '')
+            .replace(/--+/g, '-');
+        }
+
+        function showNotification(message, type = 'info') {
+          const notification = document.createElement('div');
+          notification.classList.add('notification', type);
+          notification.textContent = message;
+          dom.notificationContainer.appendChild(notification);
+
+          setTimeout(() => {
+            notification.classList.add('show');
+          }, 10); // Small delay to trigger CSS transition
+
+          setTimeout(() => {
+            notification.classList.remove('show');
+            notification.addEventListener(
+              'transitionend',
+              () => notification.remove(),
+              { once: true }
+            );
+          }, 3000);
+        }
+
+        function showLoading() {
+          dom.loadingIndicator.style.display = 'flex';
+        }
+
+        function hideLoading() {
+          dom.loadingIndicator.style.display = 'none';
+        }
+
+        function openSidebar() {
+          // This function is mocked for this standalone demo as there's no actual sidebar
+          console.log('Sidebar would open here.');
+          // dom.rightFormSidebar.classList.add('open');
+          // dom.overlay.classList.add('show');
+        }
+
+        function closeSidebar() {
+          // This function is mocked for this standalone demo as there's no actual sidebar
+          console.log('Sidebar would close here.');
+          // dom.rightFormSidebar.classList.remove('open');
+          // dom.overlay.classList.remove('show');
+          // Reset form or view as needed
+        }
+
+        /**
+         * Renders dynamic options for a widget based on its type.
+         * @param {HTMLElement} container - The container element for widget-specific options.
+         * @param {string} type - The type of the widget ('chart', 'table', 'single-value', etc.).
+         * @param {object} optionsData - Existing options data to pre-fill the form.
+         * @param {Array<object>} collectionFields - Fields of the selected collection to populate dropdowns.
+         */
+        function renderWidgetOptions(container, type, optionsData = {}, collectionFields = []) {
+          container.innerHTML = ''; // Clear existing options
+          let html = '';
+          const fieldOptions = collectionFields.map(
+            (f) => `<option value="${f.name}">${f.displayName || f.name}</option>`
+          ).join('');
+
+          switch (type) {
+            case 'chart':
+              html = `
+                <div class="form-group">
+                    <label for="chart-type">Tipe Chart:</label>
+                    <select class="form-control chart-type-select">
+                        <option value="bar" ${optionsData.chartType === 'bar' ? 'selected' : ''}>Bar</option>
+                        <option value="line" ${optionsData.chartType === 'line' ? 'selected' : ''}>Line</option>
+                        <option value="pie" ${optionsData.chartType === 'pie' ? 'selected' : ''}>Pie</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="chart-x-axis">Sumbu X (Field Kategori):</label>
+                    <select class="form-control chart-x-axis-select">
+                        <option value="">Pilih Field...</option>
+                        ${fieldOptions}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="chart-y-axis">Sumbu Y (Field Nilai):</label>
+                    <select class="form-control chart-y-axis-select">
+                        <option value="">Pilih Field...</option>
+                        ${fieldOptions}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="chart-title">Judul Chart:</label>
+                    <input type="text" class="form-control chart-title-input" value="${optionsData.title || ''}" />
+                </div>
+            `;
+              break;
+            case 'table':
+              html = `
+                <div class="form-group">
+                    <label for="table-fields">Field yang Ditampilkan (pisahkan dengan koma):</label>
+                    <input type="text" class="form-control table-fields-input" value="${optionsData.fields ? optionsData.fields.join(', ') : ''}" placeholder="field1, field2, field3" />
+                </div>
+                <div class="form-group">
+                    <label for="table-limit">Batas Baris:</label>
+                    <input type="number" class="form-control table-limit-input" value="${optionsData.limit || 10}" min="1" />
+                </div>
+            `;
+              break;
+            case 'single-value':
+              html = `
+                <div class="form-group">
+                    <label for="single-value-field">Field untuk Ditampilkan:</label>
+                    <select class="form-control single-value-field-select">
+                        <option value="">Pilih Field...</option>
+                        ${fieldOptions}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="single-value-aggregation">Agregasi (opsional):</label>
+                    <select class="form-control single-value-aggregation-select">
+                        <option value="" ${optionsData.aggregation === '' ? 'selected' : ''}>Tidak Ada</option>
+                        <option value="count" ${optionsData.aggregation === 'count' ? 'selected' : ''}>Jumlah (Count)</option>
+                        <option value="sum" ${optionsData.aggregation === 'sum' ? 'selected' : ''}>Total (Sum)</option>
+                        <option value="avg" ${optionsData.aggregation === 'avg' ? 'selected' : ''}>Rata-rata (Average)</option>
+                        <option value="min" ${optionsData.aggregation === 'min' ? 'selected' : ''}>Minimum</option>
+                        <option value="max" ${optionsData.aggregation === 'max' ? 'selected' : ''}>Maksimum</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="single-value-label">Label Nilai:</label>
+                    <input type="text" class="form-control single-value-label-input" value="${optionsData.label || ''}" />
+                </div>
+            `;
+              break;
+            case 'custom-text':
+              html = `
+                <div class="form-group">
+                    <label for="custom-text-content">Konten Teks/HTML:</label>
+                    <textarea class="form-control custom-text-content" rows="5">${optionsData.content || ''}</textarea>
+                </div>
+                <div class="form-group form-check">
+                    <input type="checkbox" class="form-check-input custom-text-is-html" id="custom-text-is-html" ${optionsData.isHtml ? 'checked' : ''}>
+                    <label class="form-check-label" for="custom-text-is-html">Interpretasi sebagai HTML</label>
+                </div>
+                <div class="form-group">
+                    <label for="custom-text-css-class">Kelas CSS Kustom (opsional):</label>
+                    <input type="text" class="form-control custom-text-css-class" value="${optionsData.cssClass || ''}" />
+                </div>
+                <div class="form-group">
+                    <label for="custom-text-title">Judul Widget Teks (opsional):</label>
+                    <input type="text" class="form-control custom-text-title" value="${optionsData.title || ''}" />
+                </div>
+            `;
+              break;
+            case 'image':
+              html = `
+                <div class="form-group">
+                    <label for="image-url">URL Gambar:</label>
+                    <input type="url" class="form-control image-url" value="${optionsData.imageUrl || ''}" required />
+                </div>
+                <div class="form-group">
+                    <label for="image-alt-text">Teks Alternatif Gambar:</label>
+                    <input type="text" class="form-control image-alt-text" value="${optionsData.altText || ''}" />
+                </div>
+                <div class="form-group">
+                    <label for="image-link-url">URL Tautan (opsional):</label>
+                    <input type="url" class="form-control image-link-url" value="${optionsData.linkUrl || ''}" />
+                </div>
+                <div class="form-group">
+                    <label for="image-width">Lebar (mis. 100%, 200px):</label>
+                    <input type="text" class="form-control image-width" value="${optionsData.width || ''}" />
+                </div>
+                <div class="form-group">
+                    <label for="image-height">Tinggi (mis. 150px):</label>
+                    <input type="text" class="form-control image-height" value="${optionsData.height || ''}" />
+                </div>
+                <div class="form-group">
+                    <label for="image-caption">Keterangan Gambar (opsional):</label>
+                    <input type="text" class="form-control image-caption" value="${optionsData.caption || ''}" />
+                </div>
+            `;
+              break;
+            case 'map':
+              html = `
+                <div class="form-group">
+                    <label for="map-provider">Penyedia Peta:</label>
+                    <select class="form-control map-provider-select">
+                        <option value="openstreetmap" ${optionsData.mapProvider === 'openstreetmap' ? 'selected' : ''}>OpenStreetMap</option>
+                        <option value="googlemaps" ${optionsData.mapProvider === 'googlemaps' ? 'selected' : ''}>Google Maps (Butuh API Key)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="map-latitude-field">Bidang Lintang (Latitude):</label>
+                    <select class="form-control map-latitude-field-select">
+                        <option value="">Pilih Field...</option>
+                        ${collectionFields.filter(f => f.type === 'number').map(f => `<option value="${f.name}">${f.displayName || f.name}</option>`).join('')}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="map-longitude-field">Bidang Bujur (Longitude):</label>
+                    <select class="form-control map-longitude-field-select">
+                        <option value="">Pilih Field...</option>
+                        ${collectionFields.filter(f => f.type === 'number').map(f => `<option value="${f.name}">${f.displayName || f.name}</option>`).join('')}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="map-marker-title-field">Bidang Judul Marker (opsional):</label>
+                    <select class="form-control map-marker-title-field-select">
+                        <option value="">Pilih Field...</option>
+                        ${fieldOptions}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="map-initial-zoom">Zoom Awal:</label>
+                    <input type="number" class="form-control map-initial-zoom" value="${optionsData.initialZoom || 10}" min="1" max="18" />
+                </div>
+                <div class="form-group form-check">
+                    <input type="checkbox" class="form-check-input map-show-heatmap" id="map-show-heatmap" ${optionsData.showHeatmap ? 'checked' : ''}>
+                    <label class="form-check-label" for="map-show-heatmap">Tampilkan sebagai Heatmap</label>
+                </div>
+            `;
+              break;
+            case 'list':
+              html = `
+                <div class="form-group">
+                    <label for="list-display-fields">Bidang yang Ditampilkan (pisahkan dengan koma):</label>
+                    <input type="text" class="form-control list-display-fields" value="${optionsData.displayFields ? optionsData.displayFields.join(', ') : ''}" placeholder="field1, field2" />
+                </div>
+                <div class="form-group">
+                    <label for="list-limit">Batas Item:</label>
+                    <input type="number" class="form-control list-limit" value="${optionsData.limit || 5}" min="1" />
+                </div>
+                <div class="form-group">
+                    <label for="list-sort-by">Urutkan Berdasarkan Bidang:</label>
+                    <select class="form-control list-sort-by-select">
+                        <option value="">Pilih Field...</option>
+                        ${fieldOptions}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="list-sort-order">Urutan Pengurutan:</label>
+                    <select class="form-control list-sort-order-select">
+                        <option value="asc" ${optionsData.sortOrder === 'asc' ? 'selected' : ''}>Ascending</option>
+                        <option value="desc" ${optionsData.sortOrder === 'desc' ? 'selected' : ''}>Descending</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="list-title-field">Bidang Judul Item (opsional):</label>
+                    <select class="form-control list-title-field-select">
+                        <option value="">Pilih Field...</option>
+                        ${fieldOptions}
+                    </select>
+                </div>
+            `;
+              break;
+            case 'stat-card':
+              html = `
+                <div class="form-group">
+                    <label for="stat-card-metric-type">Tipe Metrik:</label>
+                    <select class="form-control stat-card-metric-type-select">
+                        <option value="count" ${optionsData.metricType === 'count' ? 'selected' : ''}>Jumlah Item (Count)</option>
+                        <option value="sum" ${optionsData.metricType === 'sum' ? 'selected' : ''}>Total (Sum)</option>
+                        <option value="avg" ${optionsData.metricType === 'avg' ? 'selected' : ''}>Rata-rata (Average)</option>
+                        <option value="min" ${optionsData.metricType === 'min' ? 'selected' : ''}>Minimum</option>
+                        <option value="max" ${optionsData.metricType === 'max' ? 'selected' : ''}>Maksimum</option>
+                        <option value="custom-value" ${optionsData.metricType === 'custom-value' ? 'selected' : ''}>Nilai Kustom</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="stat-card-value-field">Bidang Nilai (jika Sum/Avg/Min/Max):</label>
+                    <select class="form-control stat-card-value-field-select">
+                        <option value="">Pilih Field...</option>
+                        ${collectionFields.filter(f => f.type === 'number').map(f => `<option value="${f.name}">${f.displayName || f.name}</option>`).join('')}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="stat-card-custom-value">Nilai Kustom (jika dipilih):</label>
+                    <input type="text" class="form-control stat-card-custom-value" value="${optionsData.customValue || ''}" placeholder="Misal: 12345, atau rumus" />
+                </div>
+                <div class="form-group">
+                    <label for="stat-card-label">Label Metrik:</label>
+                    <input type="text" class="form-control stat-card-label" value="${optionsData.label || ''}" required />
+                </div>
+                <div class="form-group">
+                    <label for="stat-card-prefix">Prefix Nilai (opsional):</label>
+                    <input type="text" class="form-control stat-card-prefix" value="${optionsData.prefix || ''}" placeholder="Misal: $" />
+                </div>
+                <div class="form-group">
+                    <label for="stat-card-suffix">Suffix Nilai (opsional):</label>
+                    <input type="text" class="form-control stat-card-suffix" value="${optionsData.suffix || ''}" placeholder="Misal: %" />
+                </div>
+                <div class="form-group">
+                    <label for="stat-card-icon">Ikon (FontAwesome, misal: fa-users):</label>
+                    <input type="text" class="form-control stat-card-icon" value="${optionsData.icon || ''}" />
+                </div>
+                <div class="form-group">
+                    <label for="stat-card-target-value">Nilai Target (opsional, untuk progress):</label>
+                    <input type="number" class="form-control stat-card-target-value" value="${optionsData.targetValue || ''}" />
+                </div>
+            `;
+              break;
+            case 'iframe':
+              html = `
+                <div class="form-group">
+                    <label for="iframe-source-url">URL Sumber Iframe:</label>
+                    <input type="url" class="form-control iframe-source-url" value="${optionsData.sourceUrl || ''}" required />
+                </div>
+                <div class="form-group">
+                    <label for="iframe-width">Lebar (mis. 100%, 800px):</label>
+                    <input type="text" class="form-control iframe-width" value="${optionsData.width || ''}" />
+                </div>
+                <div class="form-group">
+                    <label for="iframe-height">Tinggi (mis. 400px):</label>
+                    <input type="text" class="form-control iframe-height" value="${optionsData.height || ''}" />
+                </div>
+                <div class="form-group">
+                    <label for="iframe-sandbox-attributes">Atribut Sandbox (pisahkan dengan spasi, opsional):</label>
+                    <input type="text" class="form-control iframe-sandbox-attributes" value="${optionsData.sandboxAttributes || ''}" placeholder="misal: allow-scripts allow-same-origin" />
+                </div>
+            `;
+              break;
+            case 'action-button':
+              html = `
+                <div class="form-group">
+                    <label for="action-button-text">Teks Tombol:</label>
+                    <input type="text" class="form-control action-button-text" value="${optionsData.buttonText || ''}" required />
+                </div>
+                <div class="form-group">
+                    <label for="action-button-type">Tipe Aksi:</label>
+                    <select class="form-control action-button-type-select">
+                        <option value="link" ${optionsData.actionType === 'link' ? 'selected' : ''}>Buka Tautan (Link)</option>
+                        <option value="webhook" ${optionsData.actionType === 'webhook' ? 'selected' : ''}>Kirim Webhook</option>
+                        <option value="modal" ${optionsData.actionType === 'modal' ? 'selected' : ''}>Tampilkan Modal</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="action-button-target">URL Tujuan / ID Modal:</label>
+                    <input type="text" class="form-control action-button-target" value="${optionsData.target || ''}" placeholder="URL atau ID Modal" />
+                </div>
+                <div class="form-group">
+                    <label for="action-button-payload">Payload Webhook (JSON, opsional):</label>
+                    <textarea class="form-control action-button-payload" rows="3">${optionsData.payload || ''}</textarea>
+                </div>
+                <div class="form-group">
+                    <label for="action-button-style">Gaya Tombol (kelas CSS, misal: btn-primary):</label>
+                    <input type="text" class="form-control action-button-style" value="${optionsData.buttonStyle || ''}" />
+                </div>
+                <div class="form-group">
+                    <label for="action-button-icon">Ikon Tombol (FontAwesome, misal: fa-plus):</label>
+                    <input type="text" class="form-control action-button-icon" value="${optionsData.icon || ''}" />
+                </div>
+            `;
+              break;
+            default:
+              html = '<p class="text-muted">Pilih tipe widget untuk melihat opsi konfigurasi.</p>';
+              break;
+          }
+          container.innerHTML = html;
+
+          // Pre-select values for new dropdowns/checkboxes based on optionsData
+          if (type === 'map' && optionsData.mapProvider) container.querySelector('.map-provider-select').value = optionsData.mapProvider;
+          if (type === 'map' && optionsData.latitudeField) container.querySelector('.map-latitude-field-select').value = optionsData.latitudeField;
+          if (type === 'map' && optionsData.longitudeField) container.querySelector('.map-longitude-field-select').value = optionsData.longitudeField;
+          if (type === 'map' && optionsData.markerTitleField) container.querySelector('.map-marker-title-field-select').value = optionsData.markerTitleField;
+          if (type === 'map' && optionsData.showHeatmap) container.querySelector('.map-show-heatmap').checked = optionsData.showHeatmap;
+
+          if (type === 'list' && optionsData.sortBy) container.querySelector('.list-sort-by-select').value = optionsData.sortBy;
+          if (type === 'list' && optionsData.sortOrder) container.querySelector('.list-sort-order-select').value = optionsData.sortOrder;
+          if (type === 'list' && optionsData.titleField) container.querySelector('.list-title-field-select').value = optionsData.titleField;
+
+          if (type === 'stat-card' && optionsData.metricType) container.querySelector('.stat-card-metric-type-select').value = optionsData.metricType;
+          if (type === 'stat-card' && optionsData.valueField) container.querySelector('.stat-card-value-field-select').value = optionsData.valueField;
+          if (type === 'action-button' && optionsData.actionType) container.querySelector('.action-button-type-select').value = optionsData.actionType;
+          // ... (existing pre-selects for chart, table, single-value)
+          if (optionsData.chartType && container.querySelector('.chart-type-select')) {
+            container.querySelector('.chart-type-select').value = optionsData.chartType;
+          }
+          if (optionsData.xAxis && container.querySelector('.chart-x-axis-select')) {
+            container.querySelector('.chart-x-axis-select').value = optionsData.xAxis;
+          }
+          if (optionsData.yAxis && container.querySelector('.chart-y-axis-select')) {
+            container.querySelector('.chart-y-axis-select').value = optionsData.yAxis;
+          }
+          if (optionsData.field && container.querySelector('.single-value-field-select')) {
+            container.querySelector('.single-value-field-select').value = optionsData.field;
+          }
+          if (optionsData.aggregation && container.querySelector('.single-value-aggregation-select')) {
+            container.querySelector('.single-value-aggregation-select').value = optionsData.aggregation;
+          }
+        }
+
+        /**
+         * Adds a new widget input group to the dashboard form.
+         * @param {object} [widget={}] - Optional widget object to pre-fill the form for editing.
+         */
+        function addWidget(widget = {}) {
+          const id = widget.id || `widget-${widgetCounter++}`;
+          const widgetTemplate = document.getElementById('widget-template');
+          const widgetItem = widgetTemplate.content.firstElementChild.cloneNode(true);
+          widgetItem.dataset.id = id;
+
+          // Update IDs and names for unique elements within the cloned template
+          const elementsToUpdate = widgetItem.querySelectorAll('[id], [for]');
+          elementsToUpdate.forEach((el) => {
+            if (el.id) el.id = `${id}-${el.id}`;
+            if (el.htmlFor) el.htmlFor = `${id}-${el.htmlFor}`;
+          });
+
+          // Set unique data-target for collapse button
+          const toggleCollapseBtn = widgetItem.querySelector('.toggle-collapse-widget');
+          if (toggleCollapseBtn) {
+            toggleCollapseBtn.dataset.targetSuffix = `${id}-content`; // Unique target for this widget
+            toggleCollapseBtn.setAttribute('data-target-id', `${id}-content`); // New attribute for easier access
+          }
+          const collapsibleContent = widgetItem.querySelector('.collapsible-content');
+          if (collapsibleContent) {
+            collapsibleContent.id = `${id}-content`;
+            if (widget.collapsed) {
+              collapsibleContent.classList.add('collapsed');
+              if (toggleCollapseBtn) {
+                toggleCollapseBtn.querySelector('i').classList.remove('fa-chevron-up');
+                toggleCollapseBtn.querySelector('i').classList.add('fa-chevron-down');
+              }
+            }
+          }
+
+          dom.dashboardWidgetsContainer.appendChild(widgetItem);
+          dom.noWidgetsPlaceholder.style.display = 'none'; // Hide placeholder if adding widgets
+
+          // Populate the collection dropdown
+          const collectionSelect = widgetItem.querySelector('.widget-collection-select');
+          if (collectionSelect) {
+            collectionSelect.innerHTML = '<option value="">Pilih Koleksi...</option>';
+            currentCollections.forEach((col) => {
+              const option = document.createElement('option');
+              option.value = col.name; // Use internal name as value
+              option.textContent = col.displayName;
+              collectionSelect.appendChild(option);
+            });
+
+            // Set selected collection if editing
+            if (widget.collection) {
+              collectionSelect.value = widget.collection;
+            }
+          }
+
+          // Get references to elements within the new widget item
+          const nameInput = widgetItem.querySelector('.widget-name');
+          const displayNameInput = widgetItem.querySelector('.widget-display-name-input');
+          const typeSelect = widgetItem.querySelector('.widget-type-select');
+          const optionsContainer = widgetItem.querySelector('.widget-options-container');
+          const removeBtn = widgetItem.querySelector('.remove-widget-btn');
+          const widgetDisplayNameHeader = widgetItem.querySelector('.widget-display-name');
+
+          // Pre-fill values if editing
+          if (widget.name) {
+            nameInput.value = widget.name;
+          }
+          if (widget.displayName) {
+            displayNameInput.value = widget.displayName;
+          }
+          if (widget.type) {
+            typeSelect.value = widget.type;
+          }
+
+          // Event Listeners for the new widget
+          displayNameInput.addEventListener('input', () => {
+            widgetDisplayNameHeader.textContent = displayNameInput.value || nameInput.value || 'Widget Baru';
+            if (!widget.id) {
+              // Only auto-fill internal name for new widgets
+              nameInput.value = slugify(displayNameInput.value);
+            }
+          });
+          nameInput.addEventListener('input', () => {
+            widgetDisplayNameHeader.textContent = displayNameInput.value || nameInput.value || 'Widget Baru';
+          });
+
+          removeBtn.addEventListener('click', () => {
+            widgetItem.remove();
+            if (dom.dashboardWidgetsContainer.children.length === 1) {
+              // Only the placeholder remains
+              dom.noWidgetsPlaceholder.style.display = 'block';
+            }
+          });
+
+          if (toggleCollapseBtn) {
+            toggleCollapseBtn.addEventListener('click', () => {
+              const contentId = toggleCollapseBtn.getAttribute('data-target-id');
+              const contentElement = document.getElementById(contentId);
+              if (contentElement) {
+                contentElement.classList.toggle('collapsed');
+                toggleCollapseBtn.querySelector('i').classList.toggle('fa-chevron-up');
+                toggleCollapseBtn.querySelector('i').classList.toggle('fa-chevron-down');
+              }
+            });
+          }
+
+          // IMPORTANT: Re-attach event listener for type change to re-render options
+          typeSelect.addEventListener('change', () => {
+            const selectedCollection = currentCollections.find((col) => col.name === collectionSelect.value);
+            const collectionFields = selectedCollection ? selectedCollection.fields : [];
+            renderWidgetOptions(optionsContainer, typeSelect.value, {}, collectionFields);
+          });
+
+          collectionSelect.addEventListener('change', () => {
+            const selectedCollection = currentCollections.find((col) => col.name === collectionSelect.value);
+            const collectionFields = selectedCollection ? selectedCollection.fields : [];
+            renderWidgetOptions(optionsContainer, typeSelect.value, {}, collectionFields);
+          });
+
+          // Initial render of options based on type and pre-fill if editing
+          if (widget.type) {
+            const selectedCollection = currentCollections.find((col) => col.name === collectionSelect.value);
+            const collectionFields = selectedCollection ? selectedCollection.fields : [];
+            renderWidgetOptions(optionsContainer, widget.type, widget.options || {}, collectionFields);
+          } else {
+            renderWidgetOptions(optionsContainer, typeSelect.value, {}, []); // Render default empty for new
+          }
+
+          // Set initial display name in header
+          widgetDisplayNameHeader.textContent = widget.displayName || widget.name || 'Widget Baru';
+        }
+
+        // --- Event Listeners ---
+
+        // Toggle Dark Mode
+        dom.toggleDarkModeBtn.addEventListener('click', () => {
+          document.body.classList.toggle('dark-mode');
+        });
+
+        // Navigation (simplified for demo)
+        dom.navItems.forEach((item) => {
+          item.addEventListener('click', (e) => {
+            e.preventDefault();
+            const menu = item.dataset.menu;
+
+            // Hide all content views
+            document.querySelectorAll('.content-view').forEach((view) => {
+              view.classList.remove('active-view');
+            });
+
+            // Show selected content view
+            if (menu === 'dashboard-config') {
+              dom.dashboardConfigView.classList.add('active-view');
+            }
+
+            // Update active nav item
+            dom.navItems.forEach((navItem) => navItem.classList.remove('active'));
+            item.classList.add('active');
+          });
+        });
+
+        // Add Widget button
+        dom.addDashboardWidgetBtn.addEventListener('click', () => addWidget());
+
+        // Cancel Dashboard Config button (mocked close sidebar)
+        dom.cancelDashboardConfigBtn.addEventListener('click', () => {
+          dom.dashboardForm.reset();
+          dom.dashboardWidgetsContainer.innerHTML = '';
+          dom.noWidgetsPlaceholder.style.display = 'block';
+          widgetCounter = 0; // Reset counter for clean state
+          showNotification('Konfigurasi dashboard dibatalkan.', 'info');
+          // In a real app, you might navigate back to a list of dashboards
+        });
+
+        // Dashboard Form Submission
+        dom.dashboardForm.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          showLoading();
+
+          const isEditing = !!dom.dashboardIdInput.value;
+          const id = dom.dashboardIdInput.value || `dashboard-${Date.now()}`;
+          const name = dom.dashboardNameInput.value.trim();
+          const description = dom.dashboardDescriptionInput.value.trim();
+
+          // Collect widget data from dynamically added widget items
+          const widgets = Array.from(dom.dashboardWidgetsContainer.querySelectorAll('.widget-item'))
+            .filter((item) => item !== dom.noWidgetsPlaceholder) // Exclude the placeholder
+            .map((item) => {
+              const widgetId = item.dataset.id;
+              const nameInput = item.querySelector('.widget-name');
+              const displayNameInput = item.querySelector('.widget-display-name-input');
+              const typeSelect = item.querySelector('.widget-type-select');
+              const collectionSelect = item.querySelector('.widget-collection-select');
+              const optionsContainer = item.querySelector('.widget-options-container');
+              const collapsibleContent = item.querySelector('.collapsible-content');
+
+              if (!nameInput || !displayNameInput || !typeSelect || !collectionSelect || !optionsContainer || !collapsibleContent) {
+                console.error(`Error: Missing elements for widget ID: ${widgetId}`);
+                return null;
+              }
+
+              const widgetName = nameInput.value.trim();
+              const widgetDisplayName = displayNameInput.value.trim();
+              const widgetType = typeSelect.value;
+              const widgetCollection = collectionSelect.value;
+              const isCollapsed = collapsibleContent.classList.contains('collapsed');
+
+              let options = {};
+              // Collect widget-specific options based on type
+              if (widgetType === 'chart') {
+                const chartTypeSelect = optionsContainer.querySelector('.chart-type-select');
+                const xAxisSelect = optionsContainer.querySelector('.chart-x-axis-select');
+                const yAxisSelect = optionsContainer.querySelector('.chart-y-axis-select');
+                const titleInput = optionsContainer.querySelector('.chart-title-input');
+                options.chartType = chartTypeSelect ? chartTypeSelect.value : '';
+                options.xAxis = xAxisSelect ? xAxisSelect.value : '';
+                options.yAxis = yAxisSelect ? yAxisSelect.value : '';
+                options.title = titleInput ? titleInput.value.trim() : '';
+              } else if (widgetType === 'table') {
+                const fieldsInput = optionsContainer.querySelector('.table-fields-input');
+                const limitInput = optionsContainer.querySelector('.table-limit-input');
+                options.fields = fieldsInput ? fieldsInput.value.split(',').map((f) => f.trim()).filter((f) => f) : [];
+                options.limit = limitInput ? parseInt(limitInput.value) : 10;
+              } else if (widgetType === 'single-value') {
+                const fieldSelect = optionsContainer.querySelector('.single-value-field-select');
+                const aggregationSelect = optionsContainer.querySelector('.single-value-aggregation-select');
+                const labelInput = optionsContainer.querySelector('.single-value-label-input');
+                options.field = fieldSelect ? fieldSelect.value : '';
+                options.aggregation = aggregationSelect ? aggregationSelect.value : '';
+                options.label = labelInput ? labelInput.value.trim() : '';
+              } else if (widgetType === 'custom-text') {
+                const contentInput = optionsContainer.querySelector('.custom-text-content');
+                const isHtmlCheckbox = optionsContainer.querySelector('.custom-text-is-html');
+                const cssClassInput = optionsContainer.querySelector('.custom-text-css-class');
+                const titleInput = optionsContainer.querySelector('.custom-text-title');
+                options.content = contentInput ? contentInput.value.trim() : '';
+                options.isHtml = isHtmlCheckbox ? isHtmlCheckbox.checked : false;
+                options.cssClass = cssClassInput ? cssClassInput.value.trim() : '';
+                options.title = titleInput ? titleInput.value.trim() : '';
+              } else if (widgetType === 'image') {
+                const imageUrlInput = optionsContainer.querySelector('.image-url');
+                const altTextInput = optionsContainer.querySelector('.image-alt-text');
+                const linkUrlInput = optionsContainer.querySelector('.image-link-url');
+                const widthInput = optionsContainer.querySelector('.image-width');
+                const heightInput = optionsContainer.querySelector('.image-height');
+                const captionInput = optionsContainer.querySelector('.image-caption');
+                options.imageUrl = imageUrlInput ? imageUrlInput.value.trim() : '';
+                options.altText = altTextInput ? altTextInput.value.trim() : '';
+                options.linkUrl = linkUrlInput ? linkUrlInput.value.trim() : '';
+                options.width = widthInput ? widthInput.value.trim() : '';
+                options.height = heightInput ? heightInput.value.trim() : '';
+                options.caption = captionInput ? captionInput.value.trim() : '';
+              } else if (widgetType === 'map') {
+                const mapProviderSelect = optionsContainer.querySelector('.map-provider-select');
+                const latitudeFieldSelect = optionsContainer.querySelector('.map-latitude-field-select');
+                const longitudeFieldSelect = optionsContainer.querySelector('.map-longitude-field-select');
+                const markerTitleFieldSelect = optionsContainer.querySelector('.map-marker-title-field-select');
+                const initialZoomInput = optionsContainer.querySelector('.map-initial-zoom');
+                const showHeatmapCheckbox = optionsContainer.querySelector('.map-show-heatmap');
+                options.mapProvider = mapProviderSelect ? mapProviderSelect.value : '';
+                options.latitudeField = latitudeFieldSelect ? latitudeFieldSelect.value : '';
+                options.longitudeField = longitudeFieldSelect ? longitudeFieldSelect.value : '';
+                options.markerTitleField = markerTitleFieldSelect ? markerTitleFieldSelect.value : '';
+                options.initialZoom = initialZoomInput ? parseInt(initialZoomInput.value) : 10;
+                options.showHeatmap = showHeatmapCheckbox ? showHeatmapCheckbox.checked : false;
+              } else if (widgetType === 'list') {
+                const displayFieldsInput = optionsContainer.querySelector('.list-display-fields');
+                const limitInput = optionsContainer.querySelector('.list-limit');
+                const sortBySelect = optionsContainer.querySelector('.list-sort-by-select');
+                const sortOrderSelect = optionsContainer.querySelector('.list-sort-order-select');
+                const titleFieldSelect = optionsContainer.querySelector('.list-title-field-select');
+                options.displayFields = displayFieldsInput ? displayFieldsInput.value.split(',').map((f) => f.trim()).filter((f) => f) : [];
+                options.limit = limitInput ? parseInt(limitInput.value) : 5;
+                options.sortBy = sortBySelect ? sortBySelect.value : '';
+                options.sortOrder = sortOrderSelect ? sortOrderSelect.value : 'asc';
+                options.titleField = titleFieldSelect ? titleFieldSelect.value : '';
+              } else if (widgetType === 'stat-card') {
+                const metricTypeSelect = optionsContainer.querySelector('.stat-card-metric-type-select');
+                const valueFieldSelect = optionsContainer.querySelector('.stat-card-value-field-select');
+                const customValueInput = optionsContainer.querySelector('.stat-card-custom-value');
+                const labelInput = optionsContainer.querySelector('.stat-card-label');
+                const prefixInput = optionsContainer.querySelector('.stat-card-prefix');
+                const suffixInput = optionsContainer.querySelector('.stat-card-suffix');
+                const iconInput = optionsContainer.querySelector('.stat-card-icon');
+                const targetValueInput = optionsContainer.querySelector('.stat-card-target-value');
+                options.metricType = metricTypeSelect ? metricTypeSelect.value : 'count';
+                options.valueField = valueFieldSelect ? valueFieldSelect.value : '';
+                options.customValue = customValueInput ? customValueInput.value.trim() : '';
+                options.label = labelInput ? labelInput.value.trim() : '';
+                options.prefix = prefixInput ? prefixInput.value.trim() : '';
+                options.suffix = suffixInput ? suffixInput.value.trim() : '';
+                options.icon = iconInput ? iconInput.value.trim() : '';
+                options.targetValue = targetValueInput ? parseInt(targetValueInput.value) : undefined;
+              } else if (widgetType === 'iframe') {
+                const sourceUrlInput = optionsContainer.querySelector('.iframe-source-url');
+                const widthInput = optionsContainer.querySelector('.iframe-width');
+                const heightInput = optionsContainer.querySelector('.iframe-height');
+                const sandboxAttributesInput = optionsContainer.querySelector('.iframe-sandbox-attributes');
+                options.sourceUrl = sourceUrlInput ? sourceUrlInput.value.trim() : '';
+                options.width = widthInput ? widthInput.value.trim() : '';
+                options.height = heightInput ? heightInput.value.trim() : '';
+                options.sandboxAttributes = sandboxAttributesInput ? sandboxAttributesInput.value.trim() : '';
+              } else if (widgetType === 'action-button') {
+                const buttonTextInput = optionsContainer.querySelector('.action-button-text');
+                const actionTypeSelect = optionsContainer.querySelector('.action-button-type-select');
+                const targetInput = optionsContainer.querySelector('.action-button-target');
+                const payloadInput = optionsContainer.querySelector('.action-button-payload');
+                const buttonStyleInput = optionsContainer.querySelector('.action-button-style');
+                const iconInput = optionsContainer.querySelector('.action-button-icon');
+                options.buttonText = buttonTextInput ? buttonTextInput.value.trim() : '';
+                options.actionType = actionTypeSelect ? actionTypeSelect.value : 'link';
+                options.target = targetInput ? targetInput.value.trim() : '';
+                options.payload = payloadInput ? payloadInput.value.trim() : '';
+                options.buttonStyle = buttonStyleInput ? buttonStyleInput.value.trim() : '';
+                options.icon = iconInput ? iconInput.value.trim() : '';
+              }
+
+              return {
+                id: widgetId,
+                name: widgetName,
+                displayName: widgetDisplayName,
+                type: widgetType,
+                collection: widgetCollection === '' ? undefined : widgetCollection, // Store undefined if no collection selected
+                collapsed: isCollapsed,
+                options: options,
+              };
+            })
+            .filter((item) => item !== null);
+
+          const newDashboard = {
+            id: id,
+            name: name,
+            description: description,
+            widgets: widgets,
+            created_at: new Date().toISOString(), // Simplified for demo
+            updated_at: new Date().toISOString(),
+          };
+
+          console.log('Generated Dashboard Configuration:', newDashboard); // For debugging
+
+          try {
+            // In a real application, you would send this 'newDashboard' object to your backend API
+            // For this standalone demo, we just simulate saving.
+            await new Promise((resolve) => setTimeout(resolve, 500)); // Simulate API call
+            showNotification('Dashboard berhasil disimpan! (Lihat di konsol)', 'success');
+            // Reset form after successful save
+            dom.dashboardForm.reset();
+            dom.dashboardWidgetsContainer.innerHTML = '';
+            dom.noWidgetsPlaceholder.style.display = 'block';
+            widgetCounter = 0; // Reset counter
+          } catch (error) {
+            console.error('Error saving dashboard:', error);
+            showNotification(`Gagal menyimpan dashboard: ${error.message}`, 'error');
+          } finally {
+            hideLoading();
+          }
+        });
+
+        // --- Initial Load / Setup ---
+        dom.userDisplayElement.textContent = 'Guest User'; // Set default user for demo
+
+        // Automatically add one widget when the page loads
+        addWidget();
+      });
     </script>
   </body>
 </html>

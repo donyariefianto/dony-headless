@@ -19,7 +19,7 @@ router
     router.delete('/delete', '#controllers/settings_controller.deleteCollectionConfig')
   })
   .prefix('/configuration')
-
+router.get('/', '#controllers/settings_controller.UIdash')
 router
   .group(() => {
     router.get('/', '#controllers/settings_controller.UI')

@@ -13,6 +13,7 @@
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
     />
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
   </head>
   <body>
     <div class="container">
@@ -33,7 +34,10 @@
         <aside class="left-sidebar">
           <nav class="main-nav">
             <ul>
-              <li class="nav-item active" data-menu="collections">
+              <li class="nav-item active" data-menu="dashboard">
+                <span>Dashboard</span>
+              </li>
+              <li class="nav-item" data-menu="collections">
                 <span>Koleksi</span>
               </li>
               <li class="nav-item" data-menu="settings">
@@ -44,7 +48,7 @@
         </aside>
 
         <section class="content-area">
-          <div id="collections-view" class="content-view active-view">
+          <div id="collections-view" class="content-view">
             <div class="content-header">
               <h3>Daftar Koleksi</h3>
               <button id="add-collection-btn" class="btn btn-primary">Tambah Koleksi</button>
@@ -194,6 +198,47 @@
               <p>
                 Di sini akan ada pengaturan untuk CMS Anda. (Fitur ini belum diimplementasikan).
               </p>
+            </div>
+          </div>
+
+          <div id="dashboard-view" class="content-view active-view">
+            <div class="content-header">
+              <h3>Dashboard Kustom Anda</h3>
+            </div>
+            <div class="dashboard-content">
+              <div class="dashboard-grid">
+                <div class="dashboard-card">
+                  <h4>Ringkasan Pengguna</h4>
+                  <p>Total Pengguna: <strong>1,245</strong></p>
+                  <p>Pengguna Aktif Bulan Ini: <strong>789</strong></p>
+                </div>
+                <div class="dashboard-card wide-card">
+                  <h4>Penjualan Bulanan</h4>
+                  <div id="monthly-sales-chart" class="chart-container"></div>
+                </div>
+                <div class="dashboard-card wide-card">
+                  <h4>Aktivitas Terbaru</h4>
+                  <ul>
+                    <li>Pengguna 'John Doe' terdaftar.</li>
+                    <li>Pesanan #1001 telah dibayar.</li>
+                    <li>Koleksi 'Produk' diperbarui.</li>
+                  </ul>
+                </div>
+                <div class="dashboard-card">
+                  <h4>Koleksi Paling Aktif</h4>
+                  <p>Produk: 2,500 data item</p>
+                  <p>Artikel: 1,200 data item</p>
+                </div>
+                <div class="dashboard-card">
+                  <h4>Peringatan Sistem</h4>
+                  <p class="text-danger">
+                    <i class="fas fa-exclamation-triangle"></i> Database hampir penuh!
+                  </p>
+                  <p class="text-info">
+                    <i class="fas fa-info-circle"></i> Perbarui CMS ke versi terbaru.
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
 

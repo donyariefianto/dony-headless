@@ -52,6 +52,9 @@
               <li class="nav-item" data-menu="settings">
                 <span>Pengaturan</span>
               </li>
+              <li class="nav-item" data-menu="settings-dashboard">
+                <span>Pengaturan Dashboard</span>
+              </li>
             </ul>
           </nav>
         </aside>
@@ -64,7 +67,7 @@
               </h3>
               <button id="add-collection-btn" class="btn btn-primary">
                 Tambah Koleksi
-                        </button>
+              </button>
             </div>
 
             <div class="collections-main-content">
@@ -216,6 +219,59 @@
             </div>
           </div>
 
+          <div id="settings-dashboard-view" class="content-view">
+            <div class="content-header">
+              <h3>
+                Pengaturan Dashboard
+              </h3>
+              <button id="add-dashboard-btn" class="btn btn-primary">
+                Tambah Koleksi
+              </button>
+            </div>
+            <div class="settings-dashboard-content">
+              <div class="search-container data-items-search-container">
+                <input type="text" id="data-items-search-input" placeholder="Cari data item..." class="form-control" />
+                <i class="fas fa-search search-icon"></i>
+              </div>
+              <div id="data-items-list-container" class="data-items-list-container">
+                <div class="placeholder-card" id="data-items-placeholder">
+                  <p>
+                    Belum ada data untuk koleksi ini.
+                  </p>
+                </div>
+                <table id="data-items-table" class="data-table" style="display: none">
+                  <thead>
+                    <tr id="data-table-header-row">
+                    </tr>
+                  </thead>
+                  <tbody id="data-table-body">
+                  </tbody>
+                </table>
+              </div>
+              <div class="pagination-controls data-items-pagination-controls">
+                <button
+                  id="data-items-prev-page-btn"
+                  class="btn btn-secondary"
+                  disabled
+                  aria-label="Halaman Sebelumnya Data Item"
+                  title="Pindah ke halaman sebelumnya data item"
+                >
+                  <i class="fas fa-chevron-left"></i>Sebelumnya
+                </button>
+                <span id="data-items-page-info">Halaman 1 dari 1</span>
+                <button
+                  id="data-items-next-page-btn"
+                  class="btn btn-secondary"
+                  disabled
+                  aria-label="Halaman Selanjutnya Data Item"
+                  title="Pindah ke halaman selanjutnya data item"
+                >
+                  Selanjutnya <i class="fas fa-chevron-right"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
           <div id="dashboard-view" class="content-view active-view">
             <div class="content-header">
               <h3>
@@ -225,31 +281,60 @@
             <div class="dashboard-content">
               <div class="dashboard-grid">
                 <div class="dashboard-card">
-                  <h4>Ringkasan Pengguna</h4>
-                  <p>Total Pengguna: <strong>1,245</strong></p>
-                  <p>Pengguna Aktif Bulan Ini: <strong>789</strong></p>
+                  <h4>
+                    Ringkasan Pengguna
+                  </h4>
+                  <p>
+                    Total Pengguna: <strong>1,245</strong>
+                  </p>
+                  <p>
+                    Pengguna Aktif Bulan Ini: <strong>789</strong>
+                  </p>
                 </div>
                 <div class="dashboard-card wide-card">
-                  <h4>Penjualan Bulanan</h4>
-                  <div id="monthly-sales-chart" class="chart-container"></div>
+                  <h4>
+                    Penjualan Bulanan
+                  </h4>
+                  <div id="monthly-sales-chart" class="chart-container">
+                  </div>
                 </div>
                 <div class="dashboard-card wide-card">
-                  <h4>Aktivitas Terbaru</h4>
+                  <h4>
+                    Aktivitas Terbaru
+                  </h4>
                   <ul>
-                    <li>Pengguna 'John Doe' terdaftar.</li>
-                    <li>Pesanan #1001 telah dibayar.</li>
-                    <li>Koleksi 'Produk' diperbarui.</li>
+                    <li>
+                      Pengguna 'John Doe' terdaftar.
+                    </li>
+                    <li>
+                      Pesanan #1001 telah dibayar.
+                    </li>
+                    <li>
+                      Koleksi 'Produk' diperbarui.
+                    </li>
                   </ul>
                 </div>
                 <div class="dashboard-card">
-                  <h4>Koleksi Paling Aktif</h4>
-                  <p>Produk: 2,500 data item</p>
-                  <p>Artikel: 1,200 data item</p>
+                  <h4>
+                    Koleksi Paling Aktif
+                  </h4>
+                  <p>
+                    Produk: 2,500 data item
+                  </p>
+                  <p>
+                    Artikel: 1,200 data item
+                  </p>
                 </div>
                 <div class="dashboard-card">
-                  <h4>Peringatan Sistem</h4>
-                  <p class="text-danger"><i class="fas fa-exclamation-triangle"></i> Database hampir penuh!</p>
-                  <p class="text-info"><i class="fas fa-info-circle"></i> Perbarui CMS ke versi terbaru.</p>
+                  <h4>
+                    Peringatan Sistem
+                  </h4>
+                  <p class="text-danger">
+                    <i class="fas fa-exclamation-triangle"></i>Database hampir penuh!
+                  </p>
+                  <p class="text-info">
+                    <i class="fas fa-info-circle"></i>Perbarui CMS ke versi terbaru.
+                  </p>
                 </div>
               </div>
             </div>
@@ -270,7 +355,8 @@
     <aside id="right-form-sidebar" class="right-form-sidebar">
       <div class="sidebar-header">
         <h3 id="sidebar-form-title">
-        </h3>        <button class="close-sidebar-btn">&times;</button>
+        </h3>
+        <button class="close-sidebar-btn">&times;</button>
       </div>
       <div class="sidebar-content">
         <form id="collection-form" class="active-form">
@@ -334,31 +420,146 @@
             <button type="button" class="btn btn-secondary close-sidebar-btn">Batal</button>
           </div>
         </form>
-      </div>
-    </aside>
 
-    <div id="delete-confirm-modal" class="modal">
-      <div class="modal-content small-modal">
-        <span class="close-modal-btn">&times;</span>
-        <h3>
-          Konfirmasi Hapus
-        </h3>
-        <p>
-          Apakah Anda yakin ingin menghapus <strong id="delete-confirm-name"></strong>? Tindakan ini tidak dapat dibatalkan.
-        </p>
-        <div class="modal-actions">
-          <button id="confirm-delete-btn" class="btn btn-danger">Hapus Sekarang</button>
-          <button id="cancel-delete-btn" class="btn btn-secondary">Batal</button>
+        <form id="data-dashboard-form" class="active-form">
+          <input type="hidden" id="data-dashboard-id" />
+          <div class="form-section">
+            <h4>
+              Field Koleksi
+            </h4>
+            <div id="fields-container" class="sortable-list">
+              <div class="form-group">
+                <label for="dashboard-name">Nama Dashboard:</label>
+                <input type="text" id="dashboard-name" class="form-control" required placeholder="Contoh: Analisis Data"/>
+              </div>
+
+              <div class="form-group">
+                <label for="dashboard-description">Deskripsi Dashboard:</label>
+                <textarea id="dashboard-description" class="form-control" rows="3" placeholder="Deskripsi singkat tentang dashboard ini (Optional)"></textarea>
+              </div>
+
+              <div id="dashboard-config-view" class="content-view">
+                <div class="view-header">
+                    <h3>Konfigurasi Dashboard Baru</h3>
+                    <button id="add-dashboard-widget-btn" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Tambah Widget
+                    </button>
+                </div>
+                <div class="card p-4 mb-4">
+                    <form id="dashboard-form">
+                        <input type="hidden" id="dashboard-id" />
+            
+                        <div class="form-group">
+                            <label for="dashboard-name">Nama Dashboard:</label>
+                            <input type="text" id="dashboard-name" class="form-control" required />
+                        </div>
+            
+                        <div class="form-group">
+                            <label for="dashboard-description">Deskripsi Dashboard:</label>
+                            <textarea id="dashboard-description" class="form-control" rows="3"></textarea>
+                        </div>
+            
+                        <hr class="my-4" />
+                        <h4>Widget Dashboard</h4>
+                        <div id="dashboard-widgets-container" class="form-sections-container">
+                            <div class="placeholder-card" id="no-widgets-placeholder">
+                                <p>Klik "Tambah Widget" untuk mulai membuat visualisasi dashboard Anda.</p>
+                            </div>
+                        </div>
+            
+                        <div class="form-actions mt-4">
+                            <button type="submit" class="btn btn-primary" id="save-dashboard-btn">
+                                <i class="fas fa-save"></i> Simpan Dashboard
+                            </button>
+                            <button type="button" class="btn btn-secondary" id="cancel-dashboard-config-btn">
+                                <i class="fas fa-times"></i> Batal
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <template id="widget-template">
+                <div class="form-section widget-item border rounded p-3 mb-3">
+                    <div class="form-section-header d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="widget-display-name m-0">Widget Baru</h5>
+                        <div class="form-section-actions">
+                            <button type="button" class="btn btn-sm btn-secondary toggle-collapse-widget" data-target-suffix="-content">
+                                <i class="fas fa-chevron-up"></i>
+                            </button>
+                            <button type="button" class="btn btn-sm btn-danger remove-widget-btn ms-2">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="collapsible-content">
+                        <div class="form-group">
+                            <label for="widget-name">Nama Widget (internal):</label>
+                            <input type="text" class="form-control widget-name" required />
+                        </div>
+                        <div class="form-group">
+                            <label for="widget-display-name">Nama Tampilan Widget:</label>
+                            <input type="text" class="form-control widget-display-name-input" required />
+                        </div>
+                        <div class="form-group">
+                            <label for="widget-type">Tipe Widget:</label>
+                            <select class="form-control widget-type-select">
+                                <option value="chart">Chart</option>
+                                <option value="table">Tabel Data</option>
+                                <option value="single-value">Nilai Tunggal</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="widget-collection">Sumber Data (Koleksi):</label>
+                            <select class="form-control widget-collection-select" required>
+                                <option value="">Pilih Koleksi...</option>
+                            </select>
+                        </div>
+            
+                        <div class="widget-options-container mt-3 p-2 border-top">
+                            <h6>Konfigurasi Spesifik Widget</h6>
+                            <p class="text-muted">Pilih tipe widget untuk melihat opsi konfigurasi.</p>
+                        </div>
+                    </div>
+                </div>
+            </template>
+            </div>
+            {{--  <button type="button" id="add-field-btn" class="btn btn-outline-primary btn-add-item">
+              Tambah Field
+            </button>  --}}
+            <small class="help-text">Secara otomatis akan ditambahkan field 'id' bawaan jika tidak ada.</small>
+          </div>
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary" id="save-data-dashboard-btn">Simpan Data</button>
+            <button type="button" class="btn btn-secondary close-sidebar-btn">Batal</button>
+          </div>
         </div>
+      </form>
+    </div>
+  </aside>
+
+  <div id="delete-confirm-modal" class="modal">
+    <div class="modal-content small-modal">
+      <span class="close-modal-btn">&times;</span>
+      <h3>
+        Konfirmasi Hapus
+      </h3>
+      <p>
+        Apakah Anda yakin ingin menghapus <strong id="delete-confirm-name"></strong>? Tindakan ini tidak dapat dibatalkan.
+      </p>
+      <div class="modal-actions">
+        <button id="confirm-delete-btn" class="btn btn-danger">Hapus Sekarang</button>
+        <button id="cancel-delete-btn" class="btn btn-secondary">Batal</button>
       </div>
     </div>
+  </div>
 
-    <div id="overlay" class="overlay" style="display: none;">
-    </div>
+  <div id="overlay" class="overlay" style="display: none;">
+  </div>
 
-    <script src="/resources/configs/index.js">
-      
-    </script>
+  <script src="/resources/configs/index.js">
     
-  </body>
+  </script>
+
+</body>
 </html>
