@@ -37,6 +37,7 @@
         --font-family: 'Inter', sans-serif;
         --border-radius: 8px;
         --transition-speed: 0.2s;
+        --sidebar-width: 450px; /* Width of the form sidebar */
       }
 
       /* Dark Mode Variables */
@@ -82,6 +83,7 @@
         max-width: 1200px;
         margin: 0 auto;
         padding: 20px;
+        position: relative; /* For sidebar overlay */
       }
 
       header {
@@ -144,6 +146,11 @@
       .btn-danger:hover {
         background-color: var(--danger-color);
         filter: brightness(90%);
+      }
+
+      .btn-sm {
+        padding: 5px 10px;
+        font-size: 0.8rem;
       }
 
       .main-layout {
@@ -317,59 +324,39 @@
         color: var(--secondary-color);
       }
 
-      /* Sidebar Forms (simplified for this standalone example) */
-      .right-form-sidebar {
-        position: fixed;
-        top: 0;
-        right: -400px; /* Hidden by default */
-        width: 380px;
-        height: 100%;
-        background-color: var(--sidebar-bg);
-        box-shadow: -2px 0 10px var(--shadow-medium);
-        transition: right 0.3s ease-out;
-        z-index: 1000;
-        padding: 20px;
-        box-sizing: border-box;
-        overflow-y: auto;
+      /* Dashboard List Specific Styles */
+      #dashboard-list {
+        list-style: none;
+        padding: 0;
       }
 
-      .right-form-sidebar.open {
-        right: 0;
-      }
-
-      .overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.5);
-        z-index: 999;
-        display: none;
-      }
-
-      .overlay.show {
-        display: block;
-      }
-
-      .sidebar-header {
+      .dashboard-list-item {
+        background-color: var(--card-bg);
+        border: 1px solid var(--border-color);
+        border-radius: var(--border-radius);
+        padding: 15px;
+        margin-bottom: 10px;
         display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 20px;
+        flex-direction: column;
+        gap: 10px;
+        box-shadow: 0 1px 3px var(--shadow-light);
       }
 
-      .sidebar-header h3 {
+      .dashboard-list-item h4 {
+        margin: 0;
+        color: var(--primary-color);
+      }
+
+      .dashboard-list-item p {
         margin: 0;
         color: var(--text-color);
+        font-size: 0.9rem;
       }
 
-      .close-sidebar-btn {
-        background: none;
-        border: none;
-        font-size: 1.5rem;
-        color: var(--secondary-color);
-        cursor: pointer;
+      .dashboard-item-actions {
+        display: flex;
+        gap: 10px;
+        justify-content: flex-end;
       }
 
       /* Notification Styles */
@@ -430,6 +417,168 @@
           transform: rotate(360deg);
         }
       }
+
+      /* Right Sidebar Form Styles */
+      aside#right-form-sidebar {
+        position: fixed;
+        top: 0;
+        right: -var(--sidebar-width); /* Initially hidden off-screen */
+        width: var(--sidebar-width);
+        height: 100%;
+        background-color: var(--sidebar-bg);
+        box-shadow: -4px 0 10px var(--shadow-medium);
+        z-index: 1000;
+        transition: right 0.3s ease-in-out;
+        display: flex;
+        flex-direction: column;
+        padding: 20px;
+        box-sizing: border-box;
+      }
+
+      aside#right-form-sidebar.open {
+        right: 0; /* Slide in */
+      }
+
+      aside#right-form-sidebar .sidebar-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid var(--border-color);
+      }
+
+      aside#right-form-sidebar .sidebar-header h3 {
+        margin: 0;
+        color: var(--primary-color);
+      }
+
+      aside#right-form-sidebar .close-sidebar-btn {
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        color: var(--secondary-color);
+        cursor: pointer;
+        transition: color var(--transition-speed);
+      }
+
+      aside#right-form-sidebar .close-sidebar-btn:hover {
+        color: var(--danger-color);
+      }
+
+      aside#right-form-sidebar form {
+        flex-grow: 1;
+        overflow-y: auto; /* Enable scrolling for long forms */
+        padding-right: 10px; /* Space for scrollbar */
+      }
+
+      /* Overlay for sidebar */
+      #overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.4);
+        z-index: 999; /* Below sidebar, above main content */
+        display: none; /* Hidden by default */
+        opacity: 0;
+        transition: opacity 0.3s ease-in-out;
+      }
+
+      #overlay.active {
+        display: block;
+        opacity: 1;
+      }
+
+      /* Modal for Preview */
+      .modal {
+        display: none;
+        position: fixed;
+        z-index: 1003;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0, 0, 0, 0.6);
+        align-items: center;
+        justify-content: center;
+      }
+
+      .modal-content {
+        background-color: var(--card-bg);
+        margin: auto;
+        padding: 30px;
+        border-radius: var(--border-radius);
+        box-shadow: 0 4px 8px var(--shadow-medium);
+        width: 80%;
+        max-width: 900px;
+        position: relative;
+        transform: translateY(-50px);
+        opacity: 0;
+        transition: transform 0.3s ease-out, opacity 0.3s ease-out;
+      }
+
+      .modal.show .modal-content {
+        transform: translateY(0);
+        opacity: 1;
+      }
+
+      .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        border-bottom: 1px solid var(--border-color);
+        padding-bottom: 10px;
+      }
+
+      .modal-header h3 {
+        margin: 0;
+        color: var(--primary-color);
+      }
+
+      .modal-actions {
+        margin-top: 20px;
+        text-align: right;
+      }
+
+      .close-modal-btn {
+        color: var(--secondary-color);
+        font-size: 28px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: color var(--transition-speed);
+      }
+
+      .close-modal-btn:hover,
+      .close-modal-btn:focus {
+        color: var(--danger-color);
+        text-decoration: none;
+      }
+
+      #preview-dashboard-content .preview-widget-card {
+        background-color: var(--bg-color);
+        border: 1px dashed var(--border-color);
+        padding: 15px;
+        margin-bottom: 10px;
+        border-radius: var(--border-radius);
+        opacity: 0.8;
+      }
+
+      #preview-dashboard-content .preview-widget-card h5 {
+        margin-top: 0;
+        color: var(--dark-color);
+      }
+      .dark-mode #preview-dashboard-content .preview-widget-card h5 {
+        color: var(--light-color);
+      }
+
+      #preview-dashboard-content .preview-widget-card p {
+        font-size: 0.9rem;
+        color: var(--secondary-color);
+      }
     </style>
   </head>
   <body>
@@ -452,80 +601,104 @@
         <nav class="sidebar">
           <ul>
             <li>
-              <a href="#" class="nav-item active" data-menu="dashboard-config">
-                <i class="fas fa-cogs"></i> Konfigurasi Dashboard
+              <a href="#" class="nav-item active" data-menu="dashboard-list-view">
+                <i class="fas fa-th-list"></i> Kelola Dashboard
               </a>
             </li>
-            </ul>
+            <li>
+              <a href="#" class="nav-item" data-menu="create-dashboard-link">
+                <i class="fas fa-plus-square"></i> Buat Dashboard Baru
+              </a>
+            </li>
+          </ul>
         </nav>
 
         <main class="content">
-          <div id="dashboard-config-view" class="content-view active-view">
+          <div id="dashboard-list-view" class="content-view active-view">
             <div class="view-header">
-              <h3>Konfigurasi Dashboard Baru</h3>
-              <button id="add-dashboard-widget-btn" class="btn btn-primary">
-                <i class="fas fa-plus"></i> Tambah Widget
-              </button>
+              <h3>Daftar Dashboard Tersimpan</h3>
             </div>
-            <div class="card p-4 mb-4">
-              <form id="dashboard-form">
-                <input type="hidden" id="dashboard-id" />
+            <div class="card">
+              <ul id="dashboard-list">
+                <li id="no-dashboards-placeholder" class="placeholder-card">
+                  <p>
+                    Belum ada dashboard yang tersimpan. Buat yang baru
+                    menggunakan menu "Buat Dashboard Baru".
+                  </p>
+                </li>
+              </ul>
+            </div>
+          </div>
 
-                <div class="form-group">
-                  <label for="dashboard-name">Nama Dashboard:</label>
-                  <input
-                    type="text"
-                    id="dashboard-name"
-                    class="form-control"
-                    required
-                  />
-                </div>
-
-                <div class="form-group">
-                  <label for="dashboard-description">Deskripsi Dashboard:</label>
-                  <textarea
-                    id="dashboard-description"
-                    class="form-control"
-                    rows="3"
-                  ></textarea>
-                </div>
-
-                <hr class="my-4" />
-                <h4>Widget Dashboard</h4>
-                <div
-                  id="dashboard-widgets-container"
-                  class="form-sections-container"
-                >
-                  <div class="placeholder-card" id="no-widgets-placeholder">
-                    <p>
-                      Klik "Tambah Widget" untuk mulai membuat visualisasi
-                      dashboard Anda.
-                    </p>
-                  </div>
-                </div>
-
-                <div class="form-actions mt-4">
-                  <button
-                    type="submit"
-                    class="btn btn-primary"
-                    id="save-dashboard-btn"
-                  >
-                    <i class="fas fa-save"></i> Simpan Dashboard
-                  </button>
-                  <button
-                    type="button"
-                    class="btn btn-secondary"
-                    id="cancel-dashboard-config-btn"
-                  >
-                    <i class="fas fa-times"></i> Batal
-                  </button>
-                </div>
-              </form>
+          <div id="dashboard-preview-modal" class="modal">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h3 id="preview-dashboard-title">Pratinjau Dashboard</h3>
+                <span class="close-modal-btn">&times;</span>
+              </div>
+              <div id="preview-dashboard-description"></div>
+              <div id="preview-dashboard-content" style="margin-top: 20px;">
+                <p class="text-muted">Tidak ada widget untuk ditampilkan.</p>
+              </div>
+              <div class="modal-actions">
+                <button type="button" class="btn btn-secondary close-modal-btn">
+                  <i class="fas fa-arrow-left"></i> Kembali ke Edit
+                </button>
+              </div>
             </div>
           </div>
         </main>
       </main>
     </div>
+
+    <aside id="right-form-sidebar">
+      <div class="sidebar-header">
+        <h3 id="sidebar-form-title">Konfigurasi Dashboard</h3>
+        <button type="button" class="close-sidebar-btn">&times;</button>
+      </div>
+      <form id="dashboard-form">
+        <input type="hidden" id="dashboard-id" />
+
+        <div class="form-group">
+          <label for="dashboard-name">Nama Dashboard:</label>
+          <input type="text" id="dashboard-name" class="form-control" required />
+        </div>
+
+        <div class="form-group">
+          <label for="dashboard-description">Deskripsi Dashboard:</label>
+          <textarea
+            id="dashboard-description"
+            class="form-control"
+            rows="3"
+          ></textarea>
+        </div>
+
+        <hr class="my-4" />
+        <h4>Widget Dashboard</h4>
+        <div id="dashboard-widgets-container" class="form-sections-container">
+          <div class="placeholder-card" id="no-widgets-placeholder">
+            <p>
+              Klik "Tambah Widget" untuk mulai membuat visualisasi dashboard
+              Anda.
+            </p>
+          </div>
+        </div>
+
+        <div class="form-actions mt-4">
+          <button id="add-dashboard-widget-btn" type="button" class="btn btn-secondary">
+            <i class="fas fa-plus"></i> Tambah Widget
+          </button>
+          <button type="button" class="btn btn-info" id="preview-dashboard-btn">
+            <i class="fas fa-eye"></i> Pratinjau
+          </button>
+          <button type="submit" class="btn btn-primary" id="save-dashboard-btn">
+            <i class="fas fa-save"></i> Simpan Dashboard
+          </button>
+        </div>
+      </form>
+    </aside>
+
+    <div id="overlay"></div>
 
     <template id="widget-template">
       <div class="form-section widget-item border rounded p-3 mb-3">
@@ -603,26 +776,22 @@
       document.addEventListener('DOMContentLoaded', () => {
         // --- DOM Elements ---
         const dom = {
-          // Layout and Navigation (simplified for standalone demo)
-          collectionsView: null, // Not used in this standalone demo
-          settingsView: null, // Not used in this standalone demo
-          boardsView: null, // Not used in this standalone demo
+          // Layout and Navigation
           navItems: document.querySelectorAll('.nav-item'),
-          rightFormSidebar: null, // Not used in this standalone demo
-          closeSidebarBtns: null, // Not used in this standalone demo
-          overlay: document.getElementById('overlay'), // Dummy overlay if needed
+          rightFormSidebar: document.getElementById('right-form-sidebar'),
+          overlay: document.getElementById('overlay'),
+          closeSidebarBtns: document.querySelectorAll('.close-sidebar-btn'),
+          sidebarFormTitle: document.getElementById('sidebar-form-title'),
 
           // Global UI elements
-          sidebarFormTitle: null, // Will be null in this demo, safe if not used for dashboard
           userDisplayElement: document.getElementById('user-display'),
-          logoutBtn: null, // Not used in this standalone demo
 
           // Notifications and Loading
           loadingIndicator: document.getElementById('loading-indicator'),
           notificationContainer: document.getElementById('notification-container'),
 
           // Dashboard specific elements
-          dashboardConfigView: document.getElementById('dashboard-config-view'),
+          dashboardConfigView: document.getElementById('dashboard-config-view'), // This view is now implicitly handled by sidebar
           addDashboardWidgetBtn: document.getElementById('add-dashboard-widget-btn'),
           dashboardForm: document.getElementById('dashboard-form'),
           dashboardIdInput: document.getElementById('dashboard-id'),
@@ -631,11 +800,24 @@
           dashboardWidgetsContainer: document.getElementById('dashboard-widgets-container'),
           noWidgetsPlaceholder: document.getElementById('no-widgets-placeholder'),
           saveDashboardBtn: document.getElementById('save-dashboard-btn'),
-          cancelDashboardConfigBtn: document.getElementById('cancel-dashboard-config-btn'),
+          previewDashboardBtn: document.getElementById('preview-dashboard-btn'), // New preview button
           toggleDarkModeBtn: document.getElementById('toggle-dark-mode'),
+
+          // Dashboard List View Elements
+          dashboardListView: document.getElementById('dashboard-list-view'),
+          dashboardList: document.getElementById('dashboard-list'),
+          noDashboardsPlaceholder: document.getElementById('no-dashboards-placeholder'),
+
+          // Dashboard Preview Modal Elements
+          dashboardPreviewModal: document.getElementById('dashboard-preview-modal'),
+          previewDashboardTitle: document.getElementById('preview-dashboard-title'),
+          previewDashboardDescription: document.getElementById('preview-dashboard-description'),
+          previewDashboardContent: document.getElementById('preview-dashboard-content'),
+          closePreviewModalBtns: document.querySelectorAll('#dashboard-preview-modal .close-modal-btn'),
         };
 
         // --- Global State Variables (simplified for demo) ---
+        const LOCAL_STORAGE_KEY = 'dashboards';
         let currentCollections = [
           {
             name: 'products',
@@ -720,19 +902,43 @@
           dom.loadingIndicator.style.display = 'none';
         }
 
-        function openSidebar() {
-          // This function is mocked for this standalone demo as there's no actual sidebar
-          console.log('Sidebar would open here.');
-          // dom.rightFormSidebar.classList.add('open');
-          // dom.overlay.classList.add('show');
+        function switchView(viewId) {
+          document.querySelectorAll('.content-view').forEach((view) => {
+            view.classList.remove('active-view');
+          });
+          document.getElementById(viewId).classList.add('active-view');
+
+          // Update active nav item
+          dom.navItems.forEach((navItem) => navItem.classList.remove('active'));
+          // Handle 'create-dashboard-link' special case
+          if (viewId === 'create-dashboard-link') {
+            document.querySelector('[data-menu="create-dashboard-link"]').classList.add('active');
+          } else {
+            const targetNavItem = document.querySelector(`[data-menu="${viewId}"]`);
+            if (targetNavItem) {
+              targetNavItem.classList.add('active');
+            }
+          }
+        }
+
+        function openSidebar(title = 'Konfigurasi Dashboard') {
+          dom.sidebarFormTitle.textContent = title;
+          dom.rightFormSidebar.classList.add('open');
+          dom.overlay.classList.add('active');
         }
 
         function closeSidebar() {
-          // This function is mocked for this standalone demo as there's no actual sidebar
-          console.log('Sidebar would close here.');
-          // dom.rightFormSidebar.classList.remove('open');
-          // dom.overlay.classList.remove('show');
-          // Reset form or view as needed
+          dom.rightFormSidebar.classList.remove('open');
+          dom.overlay.classList.remove('active');
+          clearDashboardForm(); // Clear form when closing
+        }
+
+        function clearDashboardForm() {
+          dom.dashboardIdInput.value = '';
+          dom.dashboardForm.reset();
+          dom.dashboardWidgetsContainer.innerHTML = '';
+          dom.noWidgetsPlaceholder.style.display = 'block';
+          widgetCounter = 0; // Reset counter for clean state
         }
 
         /**
@@ -1044,19 +1250,19 @@
           container.innerHTML = html;
 
           // Pre-select values for new dropdowns/checkboxes based on optionsData
-          if (type === 'map' && optionsData.mapProvider) container.querySelector('.map-provider-select').value = optionsData.mapProvider;
-          if (type === 'map' && optionsData.latitudeField) container.querySelector('.map-latitude-field-select').value = optionsData.latitudeField;
-          if (type === 'map' && optionsData.longitudeField) container.querySelector('.map-longitude-field-select').value = optionsData.longitudeField;
-          if (type === 'map' && optionsData.markerTitleField) container.querySelector('.map-marker-title-field-select').value = optionsData.markerTitleField;
-          if (type === 'map' && optionsData.showHeatmap) container.querySelector('.map-show-heatmap').checked = optionsData.showHeatmap;
+          if (type === 'map' && optionsData.mapProvider && container.querySelector('.map-provider-select')) container.querySelector('.map-provider-select').value = optionsData.mapProvider;
+          if (type === 'map' && optionsData.latitudeField && container.querySelector('.map-latitude-field-select')) container.querySelector('.map-latitude-field-select').value = optionsData.latitudeField;
+          if (type === 'map' && optionsData.longitudeField && container.querySelector('.map-longitude-field-select')) container.querySelector('.map-longitude-field-select').value = optionsData.longitudeField;
+          if (type === 'map' && optionsData.markerTitleField && container.querySelector('.map-marker-title-field-select')) container.querySelector('.map-marker-title-field-select').value = optionsData.markerTitleField;
+          if (type === 'map' && optionsData.showHeatmap && container.querySelector('.map-show-heatmap')) container.querySelector('.map-show-heatmap').checked = optionsData.showHeatmap;
 
-          if (type === 'list' && optionsData.sortBy) container.querySelector('.list-sort-by-select').value = optionsData.sortBy;
-          if (type === 'list' && optionsData.sortOrder) container.querySelector('.list-sort-order-select').value = optionsData.sortOrder;
-          if (type === 'list' && optionsData.titleField) container.querySelector('.list-title-field-select').value = optionsData.titleField;
+          if (type === 'list' && optionsData.sortBy && container.querySelector('.list-sort-by-select')) container.querySelector('.list-sort-by-select').value = optionsData.sortBy;
+          if (type === 'list' && optionsData.sortOrder && container.querySelector('.list-sort-order-select')) container.querySelector('.list-sort-order-select').value = optionsData.sortOrder;
+          if (type === 'list' && optionsData.titleField && container.querySelector('.list-title-field-select')) container.querySelector('.list-title-field-select').value = optionsData.titleField;
 
-          if (type === 'stat-card' && optionsData.metricType) container.querySelector('.stat-card-metric-type-select').value = optionsData.metricType;
-          if (type === 'stat-card' && optionsData.valueField) container.querySelector('.stat-card-value-field-select').value = optionsData.valueField;
-          if (type === 'action-button' && optionsData.actionType) container.querySelector('.action-button-type-select').value = optionsData.actionType;
+          if (type === 'stat-card' && optionsData.metricType && container.querySelector('.stat-card-metric-type-select')) container.querySelector('.stat-card-metric-type-select').value = optionsData.metricType;
+          if (type === 'stat-card' && optionsData.valueField && container.querySelector('.stat-card-value-field-select')) container.querySelector('.stat-card-value-field-select').value = optionsData.valueField;
+          if (type === 'action-button' && optionsData.actionType && container.querySelector('.action-button-type-select')) container.querySelector('.action-button-type-select').value = optionsData.actionType;
           // ... (existing pre-selects for chart, table, single-value)
           if (optionsData.chartType && container.querySelector('.chart-type-select')) {
             container.querySelector('.chart-type-select').value = optionsData.chartType;
@@ -1207,61 +1413,148 @@
           widgetDisplayNameHeader.textContent = widget.displayName || widget.name || 'Widget Baru';
         }
 
-        // --- Event Listeners ---
+        // --- Local Storage CRUD Operations ---
+        function getDashboards() {
+          try {
+            const dashboardsJson = localStorage.getItem(LOCAL_STORAGE_KEY);
+            return dashboardsJson ? JSON.parse(dashboardsJson) : [];
+          } catch (e) {
+            console.error("Error reading from localStorage", e);
+            return [];
+          }
+        }
 
-        // Toggle Dark Mode
-        dom.toggleDarkModeBtn.addEventListener('click', () => {
-          document.body.classList.toggle('dark-mode');
-        });
+        function saveDashboards(dashboards) {
+          try {
+            localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(dashboards));
+            return true;
+          } catch (e) {
+            console.error("Error writing to localStorage", e);
+            return false;
+          }
+        }
 
-        // Navigation (simplified for demo)
-        dom.navItems.forEach((item) => {
-          item.addEventListener('click', (e) => {
-            e.preventDefault();
-            const menu = item.dataset.menu;
+        async function saveDashboard(newDashboard) {
+          showLoading();
+          let dashboards = getDashboards();
+          const existingIndex = dashboards.findIndex(d => d.id === newDashboard.id);
 
-            // Hide all content views
-            document.querySelectorAll('.content-view').forEach((view) => {
-              view.classList.remove('active-view');
+          if (existingIndex !== -1) {
+            // Update existing dashboard
+            dashboards[existingIndex] = { ...newDashboard, updated_at: new Date().toISOString() };
+            showNotification('Dashboard berhasil diperbarui!', 'success');
+          } else {
+            // Add new dashboard
+            dashboards.push({ ...newDashboard, created_at: new Date().toISOString(), updated_at: new Date().toISOString() });
+            showNotification('Dashboard berhasil disimpan!', 'success');
+          }
+
+          const success = saveDashboards(dashboards);
+          hideLoading();
+          if (success) {
+            closeSidebar(); // Close sidebar after saving
+            loadDashboardsList(); // Refresh the list
+            switchView('dashboard-list-view'); // Ensure list view is active
+          } else {
+            showNotification('Gagal menyimpan dashboard.', 'error');
+          }
+        }
+
+        async function deleteDashboard(id) {
+          showLoading();
+          let dashboards = getDashboards();
+          const initialLength = dashboards.length;
+          dashboards = dashboards.filter(d => d.id !== id);
+
+          if (dashboards.length < initialLength) {
+            const success = saveDashboards(dashboards);
+            hideLoading();
+            if (success) {
+              showNotification('Dashboard berhasil dihapus.', 'success');
+              loadDashboardsList(); // Refresh the list
+              // If deleted dashboard was the one being edited, clear form
+              if (dom.dashboardIdInput.value === id) {
+                clearDashboardForm();
+                closeSidebar(); // Close sidebar if the edited dashboard was deleted
+              }
+            } else {
+              showNotification('Gagal menghapus dashboard.', 'error');
+            }
+          } else {
+            hideLoading();
+            showNotification('Dashboard tidak ditemukan.', 'error');
+          }
+        }
+
+        function loadDashboardsList() {
+          const dashboards = getDashboards();
+          dom.dashboardList.innerHTML = ''; // Clear current list
+
+          if (dashboards.length === 0) {
+            dom.noDashboardsPlaceholder.style.display = 'block';
+          } else {
+            dom.noDashboardsPlaceholder.style.display = 'none';
+            dashboards.forEach(dashboard => {
+              const listItem = document.createElement('li');
+              listItem.classList.add('dashboard-list-item');
+              listItem.innerHTML = `
+                <h4>${dashboard.name}</h4>
+                <p>${dashboard.description || 'Tidak ada deskripsi.'}</p>
+                <div class="dashboard-item-actions">
+                  <button class="btn btn-sm btn-primary edit-dashboard-btn" data-id="${dashboard.id}">
+                    <i class="fas fa-edit"></i> Edit
+                  </button>
+                  <button class="btn btn-sm btn-danger delete-dashboard-btn" data-id="${dashboard.id}">
+                    <i class="fas fa-trash-alt"></i> Hapus
+                  </button>
+                </div>
+              `;
+              dom.dashboardList.appendChild(listItem);
             });
 
-            // Show selected content view
-            if (menu === 'dashboard-config') {
-              dom.dashboardConfigView.classList.add('active-view');
-            }
+            // Attach event listeners to new buttons
+            dom.dashboardList.querySelectorAll('.edit-dashboard-btn').forEach(button => {
+              button.addEventListener('click', (e) => editDashboard(e.target.dataset.id));
+            });
+            dom.dashboardList.querySelectorAll('.delete-dashboard-btn').forEach(button => {
+              button.addEventListener('click', (e) => {
+                if (confirm('Apakah Anda yakin ingin menghapus dashboard ini?')) {
+                  deleteDashboard(e.target.dataset.id);
+                }
+              });
+            });
+          }
+        }
 
-            // Update active nav item
-            dom.navItems.forEach((navItem) => navItem.classList.remove('active'));
-            item.classList.add('active');
-          });
-        });
+        function editDashboard(id) {
+          const dashboards = getDashboards();
+          const dashboardToEdit = dashboards.find(d => d.id === id);
 
-        // Add Widget button
-        dom.addDashboardWidgetBtn.addEventListener('click', () => addWidget());
+          if (dashboardToEdit) {
+            clearDashboardForm(); // Clear current form state
+            dom.dashboardIdInput.value = dashboardToEdit.id;
+            dom.dashboardNameInput.value = dashboardToEdit.name;
+            dom.dashboardDescriptionInput.value = dashboardToEdit.description;
 
-        // Cancel Dashboard Config button (mocked close sidebar)
-        dom.cancelDashboardConfigBtn.addEventListener('click', () => {
-          dom.dashboardForm.reset();
-          dom.dashboardWidgetsContainer.innerHTML = '';
-          dom.noWidgetsPlaceholder.style.display = 'block';
-          widgetCounter = 0; // Reset counter for clean state
-          showNotification('Konfigurasi dashboard dibatalkan.', 'info');
-          // In a real app, you might navigate back to a list of dashboards
-        });
+            dashboardToEdit.widgets.forEach(widget => {
+              addWidget(widget); // Re-add each widget with its saved options
+            });
 
-        // Dashboard Form Submission
-        dom.dashboardForm.addEventListener('submit', async (e) => {
-          e.preventDefault();
-          showLoading();
+            openSidebar(`Edit Dashboard: ${dashboardToEdit.name}`); // Open sidebar for editing
+            switchView('dashboard-list-view'); // Keep list view active, form is in sidebar
+            showNotification(`Memuat dashboard "${dashboardToEdit.name}" untuk diedit.`, 'info');
+          } else {
+            showNotification('Dashboard tidak ditemukan.', 'error');
+          }
+        }
 
-          const isEditing = !!dom.dashboardIdInput.value;
+        function getFormDataAsDashboardObject() {
           const id = dom.dashboardIdInput.value || `dashboard-${Date.now()}`;
           const name = dom.dashboardNameInput.value.trim();
           const description = dom.dashboardDescriptionInput.value.trim();
 
-          // Collect widget data from dynamically added widget items
           const widgets = Array.from(dom.dashboardWidgetsContainer.querySelectorAll('.widget-item'))
-            .filter((item) => item !== dom.noWidgetsPlaceholder) // Exclude the placeholder
+            .filter((item) => item.id !== 'no-widgets-placeholder')
             .map((item) => {
               const widgetId = item.dataset.id;
               const nameInput = item.querySelector('.widget-name');
@@ -1281,6 +1574,11 @@
               const widgetType = typeSelect.value;
               const widgetCollection = collectionSelect.value;
               const isCollapsed = collapsibleContent.classList.contains('collapsed');
+
+              // Basic validation for widget during preview/save
+              if (!widgetName || !widgetDisplayName) {
+                  return null; // Return null to indicate an invalid widget
+              }
 
               let options = {};
               // Collect widget-specific options based on type
@@ -1397,47 +1695,144 @@
                 name: widgetName,
                 displayName: widgetDisplayName,
                 type: widgetType,
-                collection: widgetCollection === '' ? undefined : widgetCollection, // Store undefined if no collection selected
+                collection: widgetCollection === '' ? undefined : widgetCollection,
                 collapsed: isCollapsed,
                 options: options,
               };
-            })
-            .filter((item) => item !== null);
+            });
 
-          const newDashboard = {
-            id: id,
-            name: name,
-            description: description,
-            widgets: widgets,
-            created_at: new Date().toISOString(), // Simplified for demo
-            updated_at: new Date().toISOString(),
-          };
+            // Filter out any widgets that returned null due to invalid data
+            const validWidgets = widgets.filter(widget => widget !== null);
 
-          console.log('Generated Dashboard Configuration:', newDashboard); // For debugging
+            return {
+              id: id,
+              name: name,
+              description: description,
+              widgets: validWidgets,
+            };
+        }
 
-          try {
-            // In a real application, you would send this 'newDashboard' object to your backend API
-            // For this standalone demo, we just simulate saving.
-            await new Promise((resolve) => setTimeout(resolve, 500)); // Simulate API call
-            showNotification('Dashboard berhasil disimpan! (Lihat di konsol)', 'success');
-            // Reset form after successful save
-            dom.dashboardForm.reset();
-            dom.dashboardWidgetsContainer.innerHTML = '';
-            dom.noWidgetsPlaceholder.style.display = 'block';
-            widgetCounter = 0; // Reset counter
-          } catch (error) {
-            console.error('Error saving dashboard:', error);
-            showNotification(`Gagal menyimpan dashboard: ${error.message}`, 'error');
-          } finally {
-            hideLoading();
+
+        function showPreview() {
+            const dashboardData = getFormDataAsDashboardObject();
+
+            if (!dashboardData.name) {
+                showNotification('Nama Dashboard wajib diisi untuk pratinjau.', 'error');
+                return;
+            }
+            if (dashboardData.widgets.length === 0) {
+                showNotification('Tambahkan setidaknya satu widget untuk pratinjau.', 'error');
+                return;
+            }
+            if (dashboardData.widgets.includes(null)) {
+                showNotification('Beberapa widget memiliki data yang tidak lengkap. Harap periksa semua widget.', 'error');
+                return;
+            }
+
+
+            dom.previewDashboardTitle.textContent = `Pratinjau: ${dashboardData.name}`;
+            dom.previewDashboardDescription.textContent = dashboardData.description || 'Tidak ada deskripsi.';
+            dom.previewDashboardContent.innerHTML = ''; // Clear previous preview
+
+            if (dashboardData.widgets.length === 0) {
+                dom.previewDashboardContent.innerHTML = '<p class="text-muted">Tidak ada widget untuk ditampilkan.</p>';
+            } else {
+                dashboardData.widgets.forEach(widget => {
+                    const previewCard = document.createElement('div');
+                    previewCard.classList.add('preview-widget-card');
+                    previewCard.innerHTML = `
+                        <h5>${widget.displayName}</h5>
+                        <p><strong>Tipe:</strong> ${widget.type}</p>
+                        ${widget.collection ? `<p><strong>Koleksi:</strong> ${currentCollections.find(c => c.name === widget.collection)?.displayName || widget.collection}</p>` : ''}
+                        <p class="text-muted">Ini adalah representasi visual dari widget. Fungsionalitas penuh tidak tersedia dalam pratinjau.</p>
+                    `;
+                    dom.previewDashboardContent.appendChild(previewCard);
+                });
+            }
+
+            dom.dashboardPreviewModal.classList.add('show');
+            dom.dashboardPreviewModal.style.display = 'flex'; // Ensure flex display for centering
+        }
+
+        function closePreviewModal() {
+            dom.dashboardPreviewModal.classList.remove('show');
+            dom.dashboardPreviewModal.addEventListener('transitionend', () => {
+                dom.dashboardPreviewModal.style.display = 'none';
+            }, { once: true });
+        }
+
+
+        // --- Event Listeners ---
+
+        // Toggle Dark Mode
+        dom.toggleDarkModeBtn.addEventListener('click', () => {
+          document.body.classList.toggle('dark-mode');
+        });
+
+        // Navigation
+        dom.navItems.forEach((item) => {
+          item.addEventListener('click', (e) => {
+            e.preventDefault();
+            const menu = item.dataset.menu;
+
+            if (menu === 'create-dashboard-link') {
+              clearDashboardForm(); // Start clean for new dashboard
+              addWidget(); // Add an initial empty widget
+              openSidebar('Buat Dashboard Baru'); // Open sidebar for new dashboard
+            } else if (menu === 'dashboard-list-view') {
+              closeSidebar(); // Close sidebar if navigating away from form
+              loadDashboardsList(); // Ensure list is up-to-date
+            }
+
+            switchView(menu);
+          });
+        });
+
+        // Add Widget button (inside sidebar form)
+        dom.addDashboardWidgetBtn.addEventListener('click', () => addWidget());
+
+        // Close Sidebar buttons
+        dom.closeSidebarBtns.forEach(btn => {
+            btn.addEventListener('click', closeSidebar);
+        });
+
+        // Overlay click closes sidebar
+        dom.overlay.addEventListener('click', closeSidebar);
+
+        // Preview button
+        dom.previewDashboardBtn.addEventListener('click', showPreview);
+
+        // Close Preview Modal buttons
+        dom.closePreviewModalBtns.forEach(btn => {
+            btn.addEventListener('click', closePreviewModal);
+        });
+
+        // Dashboard Form Submission
+        dom.dashboardForm.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const dashboardData = getFormDataAsDashboardObject();
+
+          // Basic validation before saving
+          if (!dashboardData.name) {
+            showNotification('Nama Dashboard wajib diisi.', 'error');
+            return;
           }
+          if (dashboardData.widgets.includes(null)) {
+              showNotification('Beberapa widget memiliki data yang tidak lengkap. Harap periksa semua widget.', 'error');
+              return;
+          }
+          if (dashboardData.widgets.length === 0) {
+              showNotification('Dashboard harus memiliki setidaknya satu widget.', 'error');
+              return;
+          }
+
+          await saveDashboard(dashboardData);
         });
 
         // --- Initial Load / Setup ---
         dom.userDisplayElement.textContent = 'Guest User'; // Set default user for demo
-
-        // Automatically add one widget when the page loads
-        addWidget();
+        loadDashboardsList(); // Load and display dashboards from local storage
+        switchView('dashboard-list-view'); // Start on the dashboard list view
       });
     </script>
   </body>
