@@ -400,8 +400,8 @@ header {
 .right-form-sidebar {
   position: fixed;
   top: 0;
-  right: -500px; /* Hidden by default */
-  width: 500px; /* Increased width for more space */
+  right: -650px; /* Hidden by default */
+  width: 650px; /* Increased width for more space */
   max-width: 90%; /* Max width for responsiveness */
   height: 100%;
   background-color: var(--sidebar-bg);
@@ -492,7 +492,7 @@ header {
 }
 
 .form-group {
-  margin-bottom: 20px;
+  margin: 2px;
 }
 
 .form-group label {
@@ -1102,6 +1102,15 @@ body.loading-active {
   flex-wrap: wrap; /* Allow wrapping on smaller screens */
 }
 
+.settings-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  gap: 15px;
+  flex-wrap: wrap; /* Allow wrapping on smaller screens */
+}
+
 .search-container {
   flex-grow: 1;
   position: relative;
@@ -1228,6 +1237,10 @@ body.dark-mode .pagination-controls .btn:disabled {
 /* Adjustments for smaller screens */
 @media (max-width: 576px) {
   .collections-controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .settings-controls {
     flex-direction: column;
     align-items: stretch;
   }
@@ -1386,7 +1399,9 @@ body.dark-mode .pagination-controls .btn:disabled {
 .widget-item .collapsible-content {
   max-height: 1000px; /* Arbitrary large value */
   overflow: hidden;
-  transition: max-height 0.3s ease-out, opacity 0.3s ease-out;
+  transition:
+    max-height 0.3s ease-out,
+    opacity 0.3s ease-out;
   opacity: 1;
 }
 .widget-item .collapsible-content.collapsed {
@@ -1402,4 +1417,66 @@ body.dark-mode .pagination-controls .btn:disabled {
 }
 .widget-options-container p.text-muted {
   font-style: italic;
+}
+.settings-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
+  margin-top: 24px;
+}
+
+.settings-card {
+  background: var(--surface-1);
+  padding: 16px;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.settings-card:hover {
+  background: var(--surface-2);
+}
+
+.settings-detail {
+  display: none;
+  margin-top: 24px;
+}
+
+.settings-detail.active {
+  display: block;
+  background: var(--surface-1);
+  padding: 20px;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+}
+
+.back-btn {
+  margin-bottom: 16px;
+  background: none;
+  border: none;
+  font: inherit;
+  color: var(--text-color);
+  cursor: pointer;
+}
+
+.form-group {
+  margin-bottom: 16px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 4px;
+  font-weight: 500;
+}
+
+.form-control {
+  width: 100%;
+  padding: 8px;
+  border-radius: 4px;
+  border: 1px solid var(--border-color);
+}
+
+h2 {
+  margin-bottom: 0;
 }

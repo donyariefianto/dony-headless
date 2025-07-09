@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>
+      Pengaturan
+    </title>
+    <link rel="stylesheet" href="/resources/configs/index.css" />
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <div class="logo">
+          <h2>
+            Pengaturan
+          </h2>
+        </div>
+      </header>
+
+      <main class="main-layout">
+        <section class="content-area">
+          <!-- Grid View -->
+          <div id="gridView" class="settings-grid">
+            <div class="settings-card" onclick="openDetail('general')">
+              <h4>
+                Umum
+              </h4>
+              <p>
+                Info aplikasi & tema
+              </p>
+            </div>
+            <div class="settings-card" onclick="openDetail('account')">
+              <h4>
+                Akun
+              </h4>
+              <p>
+                Profil & sandi
+              </p>
+            </div>
+            <div class="settings-card" onclick="openDetail('notifications')">
+              <h4>
+                Notifikasi
+              </h4>
+              <p>
+                Email & sistem
+              </p>
+            </div>
+          </div>
+
+          <!-- Detail: General -->
+          <div id="detail-general" class="settings-detail">
+            <button class="back-btn" onclick="showGrid()">← Kembali</button>
+            <h3>
+              Pengaturan Umum
+            </h3>
+            <div class="form-group">
+              <label>Nama Aplikasi</label>
+              <input type="text" class="form-control" placeholder="DashboardKu" />
+            </div>
+            <div class="form-group">
+              <label>Tema</label>
+              <select class="form-control">
+                <option value="light">
+                  Terang
+                </option>
+                <option value="dark">
+                  Gelap
+                </option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Bahasa</label>
+              <select class="form-control">
+                <option value="id">
+                  Bahasa Indonesia
+                </option>
+                <option value="en">
+                  English
+                </option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Detail: Account -->
+          <div id="detail-account" class="settings-detail">
+            <button class="back-btn" onclick="showGrid()">← Kembali</button>
+            <h3>
+              Pengaturan Akun
+            </h3>
+            <div class="form-group">
+              <label>Nama Pengguna</label>
+              <input type="text" class="form-control" placeholder="Nama Anda" />
+            </div>
+            <div class="form-group">
+              <label>Email</label>
+              <input type="email" class="form-control" placeholder="nama@email.com" />
+            </div>
+            <div class="form-group">
+              <label>Kata Sandi</label>
+              <input type="password" class="form-control" placeholder="••••••••" />
+            </div>
+          </div>
+
+          <!-- Detail: Notifications -->
+          <div id="detail-notifications" class="settings-detail">
+            <button class="back-btn" onclick="showGrid()">← Kembali</button>
+            <h3>
+              Notifikasi
+            </h3>
+            <div class="form-group">
+              <label>                <input type="checkbox" />Kirim email notifikasi</label>
+            </div>
+            <div class="form-group">
+              <label>                <input type="checkbox" />Kirim notifikasi sistem</label>
+            </div>
+            <div class="form-group">
+              <label>                <input type="checkbox" />Ringkasan mingguan</label>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script>
+      function openDetail(id) {
+        document.getElementById("gridView").style.display = "none";
+        document.querySelectorAll(".settings-detail").forEach(el => el.classList.remove("active"));
+        document.getElementById("detail-" + id).classList.add("active");
+      }
+      
+      function showGrid() {
+        document.getElementById("gridView").style.display = "grid";
+        document.querySelectorAll(".settings-detail").forEach(el => el.classList.remove("active"));
+      }
+    </script>
+  </body>
+</html>

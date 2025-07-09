@@ -37,7 +37,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const collectionsView = document.getElementById('collections-view')
   const settingsView = document.getElementById('settings-view')
-  const settingsBoardView = document.getElementById('settings-dashboard-view')
   const boardsView = document.getElementById('dashboard-view')
   const navItems = document.querySelectorAll('.nav-item')
 
@@ -1584,7 +1583,6 @@ document.addEventListener('DOMContentLoaded', () => {
       collectionsView.classList.remove('active-view')
       settingsView.classList.remove('active-view')
       boardsView.classList.remove('active-view')
-      settingsBoardView.classList.remove('active-view')
       // Show selected content view
       if (menu === 'collections') {
         collectionsView.classList.add('active-view')
@@ -1593,8 +1591,6 @@ document.addEventListener('DOMContentLoaded', () => {
         settingsView.classList.add('active-view')
       } else if (menu === 'dashboard') {
         boardsView.classList.add('active-view')
-      } else if (menu === 'settings-dashboard') {
-        settingsBoardView.classList.add('active-view')
       }
     })
   })

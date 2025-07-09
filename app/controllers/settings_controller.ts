@@ -516,4 +516,7 @@ export default class SettingsController {
   async UIDash({ view }) {
     return view.render('configs/dash', { base_url: env.get('APP_URL') })
   }
+  async Test({ view }) {
+    return view.render('test', { base_url: env.get('APP_URL') })
+  }
 }
