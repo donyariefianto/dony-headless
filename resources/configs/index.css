@@ -562,6 +562,21 @@ header {
   padding: 15px;
   min-height: 80px; /* Provide some visual space even when empty */
   background-color: var(--hover-bg);
+  max-height: 400px; /* atau bisa disesuaikan */
+  overflow-y: auto;
+  scrollbar-width: thin; /* Firefox */
+  scrollbar-color: var(--border-color) transparent;
+}
+/* Chrome/Webkit scrollbar styling (minimalis) */
+.sortable-list::-webkit-scrollbar {
+  width: 6px;
+}
+.sortable-list::-webkit-scrollbar-thumb {
+  background-color: var(--border-color);
+  border-radius: 3px;
+}
+.sortable-list::-webkit-scrollbar-track {
+  background: transparent;
 }
 
 .sortable-list .field-item,
@@ -1479,4 +1494,85 @@ body.dark-mode .pagination-controls .btn:disabled {
 
 h2 {
   margin-bottom: 0;
+}
+
+/* === Choices.js Custom Theme === */
+.choices__inner {
+  background-color: var(--bg-color);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  padding: 10px 12px;
+  min-height: 42px;
+  display: flex;
+  align-items: center;
+  font-size: 1rem;
+  color: var(--text-color);
+  transition: border-color var(--transition-speed) ease;
+}
+
+.choices__placeholder {
+  color: var(--secondary-color);
+  opacity: 0.9;
+}
+
+.choices[data-type*='select-one'] .choices__inner {
+  padding-right: 2.5rem; /* space for arrow */
+}
+
+.choices__item--selectable {
+  color: var(--text-color);
+}
+
+.choices__list--dropdown,
+.choices__list[role='listbox'] {
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  box-shadow: 0 4px 10px var(--shadow-light);
+  z-index: 10;
+}
+
+.choices__list--dropdown .choices__item {
+  padding: 10px 14px;
+  font-size: 0.95rem;
+  transition: background-color var(--transition-speed) ease;
+  cursor: pointer;
+}
+
+.choices__list--dropdown .choices__item--selectable.is-highlighted {
+  background-color: var(--hover-bg);
+  color: var(--primary-color);
+}
+
+/* Remove border focus outline */
+.choices__input--cloned {
+  border: none !important;
+  background: transparent;
+  box-shadow: none !important;
+  padding: 0;
+  margin: 0;
+  color: var(--text-color);
+  font-family: inherit;
+}
+
+/* === Dark Mode Support === */
+body.dark-mode .choices__inner {
+  background-color: var(--bg-color);
+  border-color: var(--border-color);
+  color: var(--text-color);
+}
+
+body.dark-mode .choices__list--dropdown,
+body.dark-mode .choices__list[role='listbox'] {
+  background-color: var(--card-bg);
+  border-color: var(--border-color);
+}
+
+body.dark-mode .choices__item {
+  color: var(--text-color);
+}
+
+body.dark-mode .choices__item--selectable.is-highlighted {
+  background-color: var(--hover-bg);
+  color: var(--primary-color);
 }

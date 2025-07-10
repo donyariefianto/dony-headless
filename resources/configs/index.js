@@ -990,10 +990,6 @@ document.addEventListener('DOMContentLoaded', () => {
     collectionForm.classList.remove('active-form') // Show collection form
     dataItemForm.classList.remove('active-form') // Hide data item form
     dashboardForm.classList.add('active-form') // Hide dashboard form
-
-    // dataDashboardFieldsContainer = ''
-    // dataDashboardIdInput.value = dataDashboard?dataDashboard._id:''
-
     openSidebar()
   }
 

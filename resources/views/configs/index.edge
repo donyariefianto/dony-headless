@@ -22,11 +22,14 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js">
       
     </script>
-
-    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js">
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js">
       
     </script>
+
   </head>
   <body>
     <div class="container">
@@ -385,7 +388,6 @@
                   type="text"
                   id="dashboard-name"
                   class="form-control"
-                  required
                   placeholder="Contoh: Analisis Data"
                 />
               </div>
@@ -419,7 +421,7 @@
             <small class="help-text">Secara otomatis akan ditambahkan field 'id' bawaan jika tidak ada.</small>
           </div>
           <div class="form-actions">
-            <button type="submit" class="btn btn-primary" id="save-data-dashboard-btn">Simpan Data</button>
+            <button type="submit" class="btn btn-primary" id="save-dashboard-btn">Simpan Dashboard</button>
             <button type="button" class="btn btn-secondary close-sidebar-btn">Batal</button>
           </div>
         </form>

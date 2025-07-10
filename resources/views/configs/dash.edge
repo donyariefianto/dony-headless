@@ -79,7 +79,7 @@
         background-color: var(--bg-color);
         color: var(--text-color);
         transition: background-color var(--transition-speed),
-                                  color var(--transition-speed);
+                                                          color var(--transition-speed);
         min-height: 100vh;
         display: flex;
         flex-direction: column;
@@ -126,7 +126,7 @@
         cursor: pointer;
         font-weight: 500;
         transition: background-color var(--transition-speed),
-                                  color var(--transition-speed), border-color var(--transition-speed);
+                                                          color var(--transition-speed), border-color var(--transition-speed);
       }
       
       .btn-primary {
@@ -197,7 +197,7 @@
         text-decoration: none;
         border-radius: var(--border-radius);
         transition: background-color var(--transition-speed),
-                                  color var(--transition-speed);
+                                                          color var(--transition-speed);
       }
       
       nav.sidebar ul li a:hover,
@@ -1012,12 +1012,12 @@
           widgetCounter = 0; // Reset counter for clean state
         }
         /**
-                                 * Renders dynamic options for a widget based on its type.
-                                 * @param {HTMLElement} container - The container element for widget-specific options.
-                                 * @param {string} type - The type of the widget ('chart', 'table', 'single-value', etc.).
-                                 * @param {object} optionsData - Existing options data to pre-fill the form.
-                                 * @param {Array<object>} collectionFields - Fields of the selected collection to populate dropdowns.
-                                 */
+                     * Renders dynamic options for a widget based on its type.
+                     * @param {HTMLElement} container - The container element for widget-specific options.
+                     * @param {string} type - The type of the widget ('chart', 'table', 'single-value', etc.).
+                     * @param {object} optionsData - Existing options data to pre-fill the form.
+                     * @param {Array<object>} collectionFields - Fields of the selected collection to populate dropdowns.
+                     */
         function renderWidgetOptions(container, type, optionsData = {}, collectionFields = []) {
           container.innerHTML = ""; // Clear existing options
           let html = "";
@@ -1025,299 +1025,299 @@
           switch (type) {
            case "chart":
             html = `
-                                        <div class="form-group">
-                                            <label for="chart-type">Tipe Chart:</label>
-                                            <select class="form-control chart-type-select">
-                                                <option value="bar" ${optionsData.chartType === "bar" ? "selected" : ""}>Bar</option>
-                                                <option value="line" ${optionsData.chartType === "line" ? "selected" : ""}>Line</option>
-                                                <option value="pie" ${optionsData.chartType === "pie" ? "selected" : ""}>Pie</option>
-                                            </select>
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="chart-x-axis">Sumbu X (Field Kategori):</label>
-                                            <select class="form-control chart-x-axis-select">
-                                                <option value="">Pilih Field...</option>
-                                                ${fieldOptions}
-                                            </select>
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="chart-y-axis">Sumbu Y (Field Nilai):</label>
-                                            <select class="form-control chart-y-axis-select">
-                                                <option value="">Pilih Field...</option>
-                                                ${fieldOptions}
-                                            </select>
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="chart-title">Judul Chart:</label>
-                                            <input type="text" class="form-control chart-title-input" value="${optionsData.title || ""}" />
-                                        </div>
-                                    `;
+                              <div class="form-group">
+                                  <label for="chart-type">Tipe Chart:</label>
+                                  <select class="form-control chart-type-select">
+                                      <option value="bar" ${optionsData.chartType === "bar" ? "selected" : ""}>Bar</option>
+                                      <option value="line" ${optionsData.chartType === "line" ? "selected" : ""}>Line</option>
+                                      <option value="pie" ${optionsData.chartType === "pie" ? "selected" : ""}>Pie</option>
+                                  </select>
+                              </div>
+                              <div class="form-group">
+                                  <label for="chart-x-axis">Sumbu X (Field Kategori):</label>
+                                  <select class="form-control chart-x-axis-select">
+                                      <option value="">Pilih Field...</option>
+                                      ${fieldOptions}
+                                  </select>
+                              </div>
+                              <div class="form-group">
+                                  <label for="chart-y-axis">Sumbu Y (Field Nilai):</label>
+                                  <select class="form-control chart-y-axis-select">
+                                      <option value="">Pilih Field...</option>
+                                      ${fieldOptions}
+                                  </select>
+                              </div>
+                              <div class="form-group">
+                                  <label for="chart-title">Judul Chart:</label>
+                                  <input type="text" class="form-control chart-title-input" value="${optionsData.title || ""}" />
+                              </div>
+                          `;
             break;
       
            case "table":
             html = `
-                                        <div class="form-group">
-                                            <label for="table-fields">Field yang Ditampilkan (pisahkan dengan koma):</label>
-                                            <input type="text" class="form-control table-fields-input" value="${optionsData.fields ? optionsData.fields.join(", ") : ""}" placeholder="field1, field2, field3" />
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="table-limit">Batas Baris:</label>
-                                            <input type="number" class="form-control table-limit-input" value="${optionsData.limit || 10}" min="1" />
-                                        </div>
-                                    `;
+                                                                <div class="form-group">
+                                                                    <label for="table-fields">Field yang Ditampilkan (pisahkan dengan koma):</label>
+                                                                    <input type="text" class="form-control table-fields-input" value="${optionsData.fields ? optionsData.fields.join(", ") : ""}" placeholder="field1, field2, field3" />
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label for="table-limit">Batas Baris:</label>
+                                                                    <input type="number" class="form-control table-limit-input" value="${optionsData.limit || 10}" min="1" />
+                                                                </div>
+                                                            `;
             break;
       
            case "single-value":
             html = `
-                                        <div class="form-group">
-                                            <label for="single-value-field">Field untuk Ditampilkan:</label>
-                                            <select class="form-control single-value-field-select">
-                                                <option value="">Pilih Field...</option>
-                                                ${fieldOptions}
-                                            </select>
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="single-value-aggregation">Agregasi (opsional):</label>
-                                            <select class="form-control single-value-aggregation-select">
-                                                <option value="" ${optionsData.aggregation === "" ? "selected" : ""}>Tidak Ada</option>
-                                                <option value="count" ${optionsData.aggregation === "count" ? "selected" : ""}>Jumlah (Count)</option>
-                                                <option value="sum" ${optionsData.aggregation === "sum" ? "selected" : ""}>Total (Sum)</option>
-                                                <option value="avg" ${optionsData.aggregation === "avg" ? "selected" : ""}>Rata-rata (Average)</option>
-                                                <option value="min" ${optionsData.aggregation === "min" ? "selected" : ""}>Minimum</option>
-                                                <option value="max" ${optionsData.aggregation === "max" ? "selected" : ""}>Maksimum</option>
-                                            </select>
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="single-value-label">Label Nilai:</label>
-                                            <input type="text" class="form-control single-value-label-input" value="${optionsData.label || ""}" />
-                                        </div>
-                                    `;
+                                                                <div class="form-group">
+                                                                    <label for="single-value-field">Field untuk Ditampilkan:</label>
+                                                                    <select class="form-control single-value-field-select">
+                                                                        <option value="">Pilih Field...</option>
+                                                                        ${fieldOptions}
+                                                                    </select>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label for="single-value-aggregation">Agregasi (opsional):</label>
+                                                                    <select class="form-control single-value-aggregation-select">
+                                                                        <option value="" ${optionsData.aggregation === "" ? "selected" : ""}>Tidak Ada</option>
+                                                                        <option value="count" ${optionsData.aggregation === "count" ? "selected" : ""}>Jumlah (Count)</option>
+                                                                        <option value="sum" ${optionsData.aggregation === "sum" ? "selected" : ""}>Total (Sum)</option>
+                                                                        <option value="avg" ${optionsData.aggregation === "avg" ? "selected" : ""}>Rata-rata (Average)</option>
+                                                                        <option value="min" ${optionsData.aggregation === "min" ? "selected" : ""}>Minimum</option>
+                                                                        <option value="max" ${optionsData.aggregation === "max" ? "selected" : ""}>Maksimum</option>
+                                                                    </select>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label for="single-value-label">Label Nilai:</label>
+                                                                    <input type="text" class="form-control single-value-label-input" value="${optionsData.label || ""}" />
+                                                                </div>
+                                                            `;
             break;
       
            case "custom-text":
             html = `
-                                        <div class="form-group">
-                                            <label for="custom-text-content">Konten Teks/HTML:</label>
-                                            <textarea class="form-control custom-text-content" rows="5">${optionsData.content || ""}</textarea>
-                                        </div>
-                                        <div class="form-group form-check">
-                                            <input type="checkbox" class="form-check-input custom-text-is-html" id="custom-text-is-html" ${optionsData.isHtml ? "checked" : ""}>
-                                            <label class="form-check-label" for="custom-text-is-html">Interpretasi sebagai HTML</label>
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="custom-text-css-class">Kelas CSS Kustom (opsional):</label>
-                                            <input type="text" class="form-control custom-text-css-class" value="${optionsData.cssClass || ""}" />
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="custom-text-title">Judul Widget Teks (opsional):</label>
-                                            <input type="text" class="form-control custom-text-title" value="${optionsData.title || ""}" />
-                                        </div>
-                                    `;
+                                                                <div class="form-group">
+                                                                    <label for="custom-text-content">Konten Teks/HTML:</label>
+                                                                    <textarea class="form-control custom-text-content" rows="5">${optionsData.content || ""}</textarea>
+                                                                </div>
+                                                                <div class="form-group form-check">
+                                                                    <input type="checkbox" class="form-check-input custom-text-is-html" id="custom-text-is-html" ${optionsData.isHtml ? "checked" : ""}>
+                                                                    <label class="form-check-label" for="custom-text-is-html">Interpretasi sebagai HTML</label>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label for="custom-text-css-class">Kelas CSS Kustom (opsional):</label>
+                                                                    <input type="text" class="form-control custom-text-css-class" value="${optionsData.cssClass || ""}" />
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label for="custom-text-title">Judul Widget Teks (opsional):</label>
+                                                                    <input type="text" class="form-control custom-text-title" value="${optionsData.title || ""}" />
+                                                                </div>
+                                                            `;
             break;
       
            case "image":
             html = `
-                                        <div class="form-group">
-                                            <label for="image-url">URL Gambar:</label>
-                                            <input type="url" class="form-control image-url" value="${optionsData.imageUrl || ""}" required />
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="image-alt-text">Teks Alternatif Gambar:</label>
-                                            <input type="text" class="form-control image-alt-text" value="${optionsData.altText || ""}" />
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="image-link-url">URL Tautan (opsional):</label>
-                                            <input type="url" class="form-control image-link-url" value="${optionsData.linkUrl || ""}" />
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="image-width">Lebar (mis. 100%, 200px):</label>
-                                            <input type="text" class="form-control image-width" value="${optionsData.width || ""}" />
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="image-height">Tinggi (mis. 150px):</label>
-                                            <input type="text" class="form-control image-height" value="${optionsData.height || ""}" />
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="image-caption">Keterangan Gambar (opsional):</label>
-                                            <input type="text" class="form-control image-caption" value="${optionsData.caption || ""}" />
-                                        </div>
-                                    `;
+                                                                <div class="form-group">
+                                                                    <label for="image-url">URL Gambar:</label>
+                                                                    <input type="url" class="form-control image-url" value="${optionsData.imageUrl || ""}" required />
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label for="image-alt-text">Teks Alternatif Gambar:</label>
+                                                                    <input type="text" class="form-control image-alt-text" value="${optionsData.altText || ""}" />
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label for="image-link-url">URL Tautan (opsional):</label>
+                                                                    <input type="url" class="form-control image-link-url" value="${optionsData.linkUrl || ""}" />
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label for="image-width">Lebar (mis. 100%, 200px):</label>
+                                                                    <input type="text" class="form-control image-width" value="${optionsData.width || ""}" />
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label for="image-height">Tinggi (mis. 150px):</label>
+                                                                    <input type="text" class="form-control image-height" value="${optionsData.height || ""}" />
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label for="image-caption">Keterangan Gambar (opsional):</label>
+                                                                    <input type="text" class="form-control image-caption" value="${optionsData.caption || ""}" />
+                                                                </div>
+                                                            `;
             break;
       
            case "map":
             html = `
-                                        <div class="form-group">
-                                            <label for="map-provider">Penyedia Peta:</label>
-                                            <select class="form-control map-provider-select">
-                                                <option value="openstreetmap" ${optionsData.mapProvider === "openstreetmap" ? "selected" : ""}>OpenStreetMap</option>
-                                                <option value="googlemaps" ${optionsData.mapProvider === "googlemaps" ? "selected" : ""}>Google Maps (Butuh API Key)</option>
-                                            </select>
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="map-latitude-field">Bidang Lintang (Latitude):</label>
-                                            <select class="form-control map-latitude-field-select">
-                                                <option value="">Pilih Field...</option>
-                                                ${collectionFields.filter(f => f.type === "number").map(f => `<option value="${f.name}">${f.displayName || f.name}</option>`).join("")}
-                                            </select>
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="map-longitude-field">Bidang Bujur (Longitude):</label>
-                                            <select class="form-control map-longitude-field-select">
-                                                <option value="">Pilih Field...</option>
-                                                ${collectionFields.filter(f => f.type === "number").map(f => `<option value="${f.name}">${f.displayName || f.name}</option>`).join("")}
-                                            </select>
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="map-marker-title-field">Bidang Judul Marker (opsional):</label>
-                                            <select class="form-control map-marker-title-field-select">
-                                                <option value="">Pilih Field...</option>
-                                                ${fieldOptions}
-                                            </select>
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="map-initial-zoom">Zoom Awal:</label>
-                                            <input type="number" class="form-control map-initial-zoom" value="${optionsData.initialZoom || 10}" min="1" max="18" />
-                                        </div>
-                                        <div class="form-group form-check">
-                                            <input type="checkbox" class="form-check-input map-show-heatmap" id="map-show-heatmap" ${optionsData.showHeatmap ? "checked" : ""}>
-                                            <label class="form-check-label" for="map-show-heatmap">Tampilkan sebagai Heatmap</label>
-                                        </div>
-                                    `;
+                                                                <div class="form-group">
+                                                                    <label for="map-provider">Penyedia Peta:</label>
+                                                                    <select class="form-control map-provider-select">
+                                                                        <option value="openstreetmap" ${optionsData.mapProvider === "openstreetmap" ? "selected" : ""}>OpenStreetMap</option>
+                                                                        <option value="googlemaps" ${optionsData.mapProvider === "googlemaps" ? "selected" : ""}>Google Maps (Butuh API Key)</option>
+                                                                    </select>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label for="map-latitude-field">Bidang Lintang (Latitude):</label>
+                                                                    <select class="form-control map-latitude-field-select">
+                                                                        <option value="">Pilih Field...</option>
+                                                                        ${collectionFields.filter(f => f.type === "number").map(f => `<option value="${f.name}">${f.displayName || f.name}</option>`).join("")}
+                                                                    </select>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label for="map-longitude-field">Bidang Bujur (Longitude):</label>
+                                                                    <select class="form-control map-longitude-field-select">
+                                                                        <option value="">Pilih Field...</option>
+                                                                        ${collectionFields.filter(f => f.type === "number").map(f => `<option value="${f.name}">${f.displayName || f.name}</option>`).join("")}
+                                                                    </select>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label for="map-marker-title-field">Bidang Judul Marker (opsional):</label>
+                                                                    <select class="form-control map-marker-title-field-select">
+                                                                        <option value="">Pilih Field...</option>
+                                                                        ${fieldOptions}
+                                                                    </select>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label for="map-initial-zoom">Zoom Awal:</label>
+                                                                    <input type="number" class="form-control map-initial-zoom" value="${optionsData.initialZoom || 10}" min="1" max="18" />
+                                                                </div>
+                                                                <div class="form-group form-check">
+                                                                    <input type="checkbox" class="form-check-input map-show-heatmap" id="map-show-heatmap" ${optionsData.showHeatmap ? "checked" : ""}>
+                                                                    <label class="form-check-label" for="map-show-heatmap">Tampilkan sebagai Heatmap</label>
+                                                                </div>
+                                                            `;
             break;
       
            case "list":
             html = `
-                                        <div class="form-group">
-                                            <label for="list-display-fields">Bidang yang Ditampilkan (pisahkan dengan koma):</label>
-                                            <input type="text" class="form-control list-display-fields" value="${optionsData.displayFields ? optionsData.displayFields.join(", ") : ""}" placeholder="field1, field2" />
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="list-limit">Batas Item:</label>
-                                            <input type="number" class="form-control list-limit" value="${optionsData.limit || 5}" min="1" />
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="list-sort-by">Urutkan Berdasarkan Bidang:</label>
-                                            <select class="form-control list-sort-by-select">
-                                                <option value="">Pilih Field...</option>
-                                                ${fieldOptions}
-                                            </select>
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="list-sort-order">Urutan Pengurutan:</label>
-                                            <select class="form-control list-sort-order-select">
-                                                <option value="asc" ${optionsData.sortOrder === "asc" ? "selected" : ""}>Ascending</option>
-                                                <option value="desc" ${optionsData.sortOrder === "desc" ? "selected" : ""}>Descending</option>
-                                            </select>
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="list-title-field">Bidang Judul Item (opsional):</label>
-                                            <select class="form-control list-title-field-select">
-                                                <option value="">Pilih Field...</option>
-                                                ${fieldOptions}
-                                            </select>
-                                        </div>
-                                    `;
+                                                                <div class="form-group">
+                                                                    <label for="list-display-fields">Bidang yang Ditampilkan (pisahkan dengan koma):</label>
+                                                                    <input type="text" class="form-control list-display-fields" value="${optionsData.displayFields ? optionsData.displayFields.join(", ") : ""}" placeholder="field1, field2" />
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label for="list-limit">Batas Item:</label>
+                                                                    <input type="number" class="form-control list-limit" value="${optionsData.limit || 5}" min="1" />
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label for="list-sort-by">Urutkan Berdasarkan Bidang:</label>
+                                                                    <select class="form-control list-sort-by-select">
+                                                                        <option value="">Pilih Field...</option>
+                                                                        ${fieldOptions}
+                                                                    </select>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label for="list-sort-order">Urutan Pengurutan:</label>
+                                                                    <select class="form-control list-sort-order-select">
+                                                                        <option value="asc" ${optionsData.sortOrder === "asc" ? "selected" : ""}>Ascending</option>
+                                                                        <option value="desc" ${optionsData.sortOrder === "desc" ? "selected" : ""}>Descending</option>
+                                                                    </select>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label for="list-title-field">Bidang Judul Item (opsional):</label>
+                                                                    <select class="form-control list-title-field-select">
+                                                                        <option value="">Pilih Field...</option>
+                                                                        ${fieldOptions}
+                                                                    </select>
+                                                                </div>
+                                                            `;
             break;
       
            case "stat-card":
             html = `
-                                        <div class="form-group">
-                                            <label for="stat-card-metric-type">Tipe Metrik:</label>
-                                            <select class="form-control stat-card-metric-type-select">
-                                                <option value="count" ${optionsData.metricType === "count" ? "selected" : ""}>Jumlah Item (Count)</option>
-                                                <option value="sum" ${optionsData.metricType === "sum" ? "selected" : ""}>Total (Sum)</option>
-                                                <option value="avg" ${optionsData.metricType === "avg" ? "selected" : ""}>Rata-rata (Average)</option>
-                                                <option value="min" ${optionsData.metricType === "min" ? "selected" : ""}>Minimum</option>
-                                                <option value="max" ${optionsData.metricType === "max" ? "selected" : ""}>Maksimum</option>
-                                                <option value="custom-value" ${optionsData.metricType === "custom-value" ? "selected" : ""}>Nilai Kustom</option>
-                                            </select>
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="stat-card-value-field">Bidang Nilai (jika Sum/Avg/Min/Max):</label>
-                                            <select class="form-control stat-card-value-field-select">
-                                                <option value="">Pilih Field...</option>
-                                                ${collectionFields.filter(f => f.type === "number").map(f => `<option value="${f.name}">${f.displayName || f.name}</option>`).join("")}
-                                            </select>
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="stat-card-custom-value">Nilai Kustom (jika dipilih):</label>
-                                            <input type="text" class="form-control stat-card-custom-value" value="${optionsData.customValue || ""}" placeholder="Misal: 12345, atau rumus" />
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="stat-card-label">Label Metrik:</label>
-                                            <input type="text" class="form-control stat-card-label" value="${optionsData.label || ""}" required />
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="stat-card-prefix">Prefix Nilai (opsional):</label>
-                                            <input type="text" class="form-control stat-card-prefix" value="${optionsData.prefix || ""}" placeholder="Misal: $" />
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="stat-card-suffix">Suffix Nilai (opsional):</label>
-                                            <input type="text" class="form-control stat-card-suffix" value="${optionsData.suffix || ""}" placeholder="Misal: %" />
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="stat-card-icon">Ikon (FontAwesome, misal: fa-users):</label>
-                                            <input type="text" class="form-control stat-card-icon" value="${optionsData.icon || ""}" />
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="stat-card-target-value">Nilai Target (opsional, untuk progress):</label>
-                                            <input type="number" class="form-control stat-card-target-value" value="${optionsData.targetValue || ""}" />
-                                        </div>
-                                    `;
+                                                                <div class="form-group">
+                                                                    <label for="stat-card-metric-type">Tipe Metrik:</label>
+                                                                    <select class="form-control stat-card-metric-type-select">
+                                                                        <option value="count" ${optionsData.metricType === "count" ? "selected" : ""}>Jumlah Item (Count)</option>
+                                                                        <option value="sum" ${optionsData.metricType === "sum" ? "selected" : ""}>Total (Sum)</option>
+                                                                        <option value="avg" ${optionsData.metricType === "avg" ? "selected" : ""}>Rata-rata (Average)</option>
+                                                                        <option value="min" ${optionsData.metricType === "min" ? "selected" : ""}>Minimum</option>
+                                                                        <option value="max" ${optionsData.metricType === "max" ? "selected" : ""}>Maksimum</option>
+                                                                        <option value="custom-value" ${optionsData.metricType === "custom-value" ? "selected" : ""}>Nilai Kustom</option>
+                                                                    </select>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label for="stat-card-value-field">Bidang Nilai (jika Sum/Avg/Min/Max):</label>
+                                                                    <select class="form-control stat-card-value-field-select">
+                                                                        <option value="">Pilih Field...</option>
+                                                                        ${collectionFields.filter(f => f.type === "number").map(f => `<option value="${f.name}">${f.displayName || f.name}</option>`).join("")}
+                                                                    </select>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label for="stat-card-custom-value">Nilai Kustom (jika dipilih):</label>
+                                                                    <input type="text" class="form-control stat-card-custom-value" value="${optionsData.customValue || ""}" placeholder="Misal: 12345, atau rumus" />
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label for="stat-card-label">Label Metrik:</label>
+                                                                    <input type="text" class="form-control stat-card-label" value="${optionsData.label || ""}" required />
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label for="stat-card-prefix">Prefix Nilai (opsional):</label>
+                                                                    <input type="text" class="form-control stat-card-prefix" value="${optionsData.prefix || ""}" placeholder="Misal: $" />
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label for="stat-card-suffix">Suffix Nilai (opsional):</label>
+                                                                    <input type="text" class="form-control stat-card-suffix" value="${optionsData.suffix || ""}" placeholder="Misal: %" />
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label for="stat-card-icon">Ikon (FontAwesome, misal: fa-users):</label>
+                                                                    <input type="text" class="form-control stat-card-icon" value="${optionsData.icon || ""}" />
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label for="stat-card-target-value">Nilai Target (opsional, untuk progress):</label>
+                                                                    <input type="number" class="form-control stat-card-target-value" value="${optionsData.targetValue || ""}" />
+                                                                </div>
+                                                            `;
             break;
       
            case "iframe":
             html = `
-                                        <div class="form-group">
-                                            <label for="iframe-source-url">URL Sumber Iframe:</label>
-                                            <input type="url" class="form-control iframe-source-url" value="${optionsData.sourceUrl || ""}" required />
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="iframe-width">Lebar (mis. 100%, 800px):</label>
-                                            <input type="text" class="form-control iframe-width" value="${optionsData.width || ""}" />
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="iframe-height">Tinggi (mis. 400px):</label>
-                                            <input type="text" class="form-control iframe-height" value="${optionsData.height || ""}" />
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="iframe-sandbox-attributes">Atribut Sandbox (pisahkan dengan spasi, opsional):</label>
-                                            <input type="text" class="form-control iframe-sandbox-attributes" value="${optionsData.sandboxAttributes || ""}" placeholder="misal: allow-scripts allow-same-origin" />
-                                        </div>
-                                    `;
+                                                                <div class="form-group">
+                                                                    <label for="iframe-source-url">URL Sumber Iframe:</label>
+                                                                    <input type="url" class="form-control iframe-source-url" value="${optionsData.sourceUrl || ""}" required />
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label for="iframe-width">Lebar (mis. 100%, 800px):</label>
+                                                                    <input type="text" class="form-control iframe-width" value="${optionsData.width || ""}" />
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label for="iframe-height">Tinggi (mis. 400px):</label>
+                                                                    <input type="text" class="form-control iframe-height" value="${optionsData.height || ""}" />
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label for="iframe-sandbox-attributes">Atribut Sandbox (pisahkan dengan spasi, opsional):</label>
+                                                                    <input type="text" class="form-control iframe-sandbox-attributes" value="${optionsData.sandboxAttributes || ""}" placeholder="misal: allow-scripts allow-same-origin" />
+                                                                </div>
+                                                            `;
             break;
       
            case "action-button":
             html = `
-                                        <div class="form-group">
-                                            <label for="action-button-text">Teks Tombol:</label>
-                                            <input type="text" class="form-control action-button-text" value="${optionsData.buttonText || ""}" required />
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="action-button-type">Tipe Aksi:</label>
-                                            <select class="form-control action-button-type-select">
-                                                <option value="link" ${optionsData.actionType === "link" ? "selected" : ""}>Buka Tautan (Link)</option>
-                                                <option value="webhook" ${optionsData.actionType === "webhook" ? "selected" : ""}>Kirim Webhook</option>
-                                                <option value="modal" ${optionsData.actionType === "modal" ? "selected" : ""}>Tampilkan Modal</option>
-                                            </select>
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="action-button-target">URL Tujuan / ID Modal:</label>
-                                            <input type="text" class="form-control action-button-target" value="${optionsData.target || ""}" placeholder="URL atau ID Modal" />
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="action-button-payload">Payload Webhook (JSON, opsional):</label>
-                                            <textarea class="form-control action-button-payload" rows="3">${optionsData.payload || ""}</textarea>
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="action-button-style">Gaya Tombol (kelas CSS, misal: btn-primary):</label>
-                                            <input type="text" class="form-control action-button-style" value="${optionsData.buttonStyle || ""}" />
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="action-button-icon">Ikon Tombol (FontAwesome, misal: fa-plus):</label>
-                                            <input type="text" class="form-control action-button-icon" value="${optionsData.icon || ""}" />
-                                        </div>
-                                    `;
+                                                                <div class="form-group">
+                                                                    <label for="action-button-text">Teks Tombol:</label>
+                                                                    <input type="text" class="form-control action-button-text" value="${optionsData.buttonText || ""}" required />
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label for="action-button-type">Tipe Aksi:</label>
+                                                                    <select class="form-control action-button-type-select">
+                                                                        <option value="link" ${optionsData.actionType === "link" ? "selected" : ""}>Buka Tautan (Link)</option>
+                                                                        <option value="webhook" ${optionsData.actionType === "webhook" ? "selected" : ""}>Kirim Webhook</option>
+                                                                        <option value="modal" ${optionsData.actionType === "modal" ? "selected" : ""}>Tampilkan Modal</option>
+                                                                    </select>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label for="action-button-target">URL Tujuan / ID Modal:</label>
+                                                                    <input type="text" class="form-control action-button-target" value="${optionsData.target || ""}" placeholder="URL atau ID Modal" />
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label for="action-button-payload">Payload Webhook (JSON, opsional):</label>
+                                                                    <textarea class="form-control action-button-payload" rows="3">${optionsData.payload || ""}</textarea>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label for="action-button-style">Gaya Tombol (kelas CSS, misal: btn-primary):</label>
+                                                                    <input type="text" class="form-control action-button-style" value="${optionsData.buttonStyle || ""}" />
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label for="action-button-icon">Ikon Tombol (FontAwesome, misal: fa-plus):</label>
+                                                                    <input type="text" class="form-control action-button-icon" value="${optionsData.icon || ""}" />
+                                                                </div>
+                                                            `;
             break;
       
            default:
@@ -1355,9 +1355,9 @@
           }
         }
         /**
-                                 * Adds a new widget input group to the dashboard form.
-                                 * @param {object} [widget={}] - Optional widget object to pre-fill the form for editing.
-                                 */
+                                                         * Adds a new widget input group to the dashboard form.
+                                                         * @param {object} [widget={}] - Optional widget object to pre-fill the form for editing.
+                                                         */
         function addWidget(widget = {}) {
           const id = widget.id || `widget-${widgetCounter++}`;
           const widgetTemplate = document.getElementById("widget-template");
@@ -1555,17 +1555,17 @@
               const listItem = document.createElement("li");
               listItem.classList.add("dashboard-list-item");
               listItem.innerHTML = `
-                                        <h4>${dashboard.name}</h4>
-                                        <p>${dashboard.description || "Tidak ada deskripsi."}</p>
-                                        <div class="dashboard-item-actions">
-                                          <button class="btn btn-sm btn-primary edit-dashboard-btn" data-id="${dashboard.id}">
-                                            <i class="fas fa-edit"></i> Edit
-                                          </button>
-                                          <button class="btn btn-sm btn-danger delete-dashboard-btn" data-id="${dashboard.id}">
-                                            <i class="fas fa-trash-alt"></i> Hapus
-                                          </button>
-                                        </div>
-                                      `;
+                                                                <h4>${dashboard.name}</h4>
+                                                                <p>${dashboard.description || "Tidak ada deskripsi."}</p>
+                                                                <div class="dashboard-item-actions">
+                                                                  <button class="btn btn-sm btn-primary edit-dashboard-btn" data-id="${dashboard.id}">
+                                                                    <i class="fas fa-edit"></i> Edit
+                                                                  </button>
+                                                                  <button class="btn btn-sm btn-danger delete-dashboard-btn" data-id="${dashboard.id}">
+                                                                    <i class="fas fa-trash-alt"></i> Hapus
+                                                                  </button>
+                                                                </div>
+                                                              `;
               dom.dashboardList.appendChild(listItem);
             });
             // Attach event listeners to new buttons
@@ -1776,11 +1776,11 @@
               const previewCard = document.createElement("div");
               previewCard.classList.add("preview-widget-card");
               previewCard.innerHTML = `
-                                                <h5>${widget.displayName}</h5>
-                                                <p><strong>Tipe:</strong> ${widget.type}</p>
-                                                ${widget.collection ? `<p><strong>Koleksi:</strong> ${currentCollections.find(c => c.name === widget.collection)?.displayName || widget.collection}</p>` : ""}
-                                                <p class="text-muted">Ini adalah representasi visual dari widget. Fungsionalitas penuh tidak tersedia dalam pratinjau.</p>
-                                            `;
+                                                                        <h5>${widget.displayName}</h5>
+                                                                        <p><strong>Tipe:</strong> ${widget.type}</p>
+                                                                        ${widget.collection ? `<p><strong>Koleksi:</strong> ${currentCollections.find(c => c.name === widget.collection)?.displayName || widget.collection}</p>` : ""}
+                                                                        <p class="text-muted">Ini adalah representasi visual dari widget. Fungsionalitas penuh tidak tersedia dalam pratinjau.</p>
+                                                                    `;
               dom.previewDashboardContent.appendChild(previewCard);
             });
           }

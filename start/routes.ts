@@ -13,6 +13,7 @@ import { middleware } from '#start/kernel'
 router
   .group(() => {
     router.post('/create', '#controllers/settings_controller.createCollectionConfig')
+    router.get('/list', '#controllers/settings_controller.getCollectionListConfig')
     router.get('/read', '#controllers/settings_controller.getCollectionConfig')
     router.get('/read/:id', '#controllers/settings_controller.getCollectionConfigByID')
     router.put('/update', '#controllers/settings_controller.updateCollectionConfig')

@@ -1,45 +1,9 @@
 const addWidgetdBtn = document.getElementById('add-widget-btn')
-let currentCollections = [
-  {
-    name: 'products',
-    displayName: 'Produk',
-    fields: [
-      { name: 'name', displayName: 'Nama Produk', type: 'string' },
-      { name: 'price', displayName: 'Harga', type: 'number' },
-      { name: 'category', displayName: 'Kategori', type: 'string' },
-      { name: 'stock', displayName: 'Stok', type: 'number' },
-    ],
-  },
-  {
-    name: 'orders',
-    displayName: 'Pesanan',
-    fields: [
-      { name: 'orderId', displayName: 'ID Pesanan', type: 'string' },
-      { name: 'amount', displayName: 'Jumlah', type: 'number' },
-      { name: 'date', displayName: 'Tanggal', type: 'date' },
-      { name: 'status', displayName: 'Status', type: 'string' },
-    ],
-  },
-  {
-    name: 'customers',
-    displayName: 'Pelanggan',
-    fields: [
-      { name: 'customerId', displayName: 'ID Pelanggan', type: 'string' },
-      { name: 'name', displayName: 'Nama Pelanggan', type: 'string' },
-      { name: 'email', displayName: 'Email', type: 'string' },
-    ],
-  },
-  {
-    name: 'locations',
-    displayName: 'Lokasi',
-    fields: [
-      { name: 'locationName', displayName: 'Nama Lokasi', type: 'string' },
-      { name: 'latitude', displayName: 'Lintang', type: 'number' },
-      { name: 'longitude', displayName: 'Bujur', type: 'number' },
-      { name: 'population', displayName: 'Populasi', type: 'number' },
-    ],
-  },
-] // Mock data for collections
+const saveDashboardBtn = document.getElementById('data-dashboard-form')
+const errorMessage = document.getElementById('error-message')
+  const successMessage = document.getElementById('success-message')
+
+let currentCollections = [] // Mock data for collections
 document.addEventListener('DOMContentLoaded', () => {
   // --- DOM Elements ---
   const dom = {
@@ -47,7 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
     dashboardConfigView: document.getElementById('dashboard-config-view'), // This view is now implicitly handled by sidebar
     addDashboardWidgetBtn: document.getElementById('add-dashboard-widget-btn'),
     dashboardForm: document.getElementById('dashboard-form'),
-    dashboardIdInput: document.getElementById('dashboard-id'),
+    dashboardIdInput: document.getElementById('data-dashboard-id'),
     dashboardNameInput: document.getElementById('dashboard-name'),
     dashboardDescriptionInput: document.getElementById('dashboard-description'),
     dashboardWidgetsContainer: document.getElementById('dashboard-widgets-container'),
@@ -208,20 +172,14 @@ document.addEventListener('DOMContentLoaded', () => {
                   <label for="map-latitude-field">Bidang Lintang (Latitude):</label>
                   <select class="form-control map-latitude-field-select">
                       <option value="">Pilih Field...</option>
-                      ${collectionFields
-                        .filter((f) => f.type === 'number')
-                        .map((f) => `<option value="${f.name}">${f.displayName || f.name}</option>`)
-                        .join('')}
+                      ${fieldOptions}
                   </select>
               </div>
               <div class="form-group">
                   <label for="map-longitude-field">Bidang Bujur (Longitude):</label>
                   <select class="form-control map-longitude-field-select">
                       <option value="">Pilih Field...</option>
-                      ${collectionFields
-                        .filter((f) => f.type === 'number')
-                        .map((f) => `<option value="${f.name}">${f.displayName || f.name}</option>`)
-                        .join('')}
+                      ${fieldOptions}
                   </select>
               </div>
               <div class="form-group">
@@ -295,10 +253,7 @@ document.addEventListener('DOMContentLoaded', () => {
                   <label for="stat-card-value-field">Bidang Nilai (jika Sum/Avg/Min/Max):</label>
                   <select class="form-control stat-card-value-field-select">
                       <option value="">Pilih Field...</option>
-                      ${collectionFields
-                        .filter((f) => f.type === 'number')
-                        .map((f) => `<option value="${f.name}">${f.displayName || f.name}</option>`)
-                        .join('')}
+                      ${fieldOptions}
                   </select>
               </div>
               <div class="form-group">
@@ -353,35 +308,35 @@ document.addEventListener('DOMContentLoaded', () => {
       case 'action-button':
         html = `
         <div class="sortable-list">
-              <div class="form-group">
-                  <label for="action-button-text">Teks Tombol:</label>
-                  <input type="text" class="form-control action-button-text" value="${optionsData.buttonText || ''}" required />
-              </div>
-              <div class="form-group">
-                  <label for="action-button-type">Tipe Aksi:</label>
-                  <select class="form-control action-button-type-select">
-                      <option value="link" ${optionsData.actionType === 'link' ? 'selected' : ''}>Buka Tautan (Link)</option>
-                      <option value="webhook" ${optionsData.actionType === 'webhook' ? 'selected' : ''}>Kirim Webhook</option>
-                      <option value="modal" ${optionsData.actionType === 'modal' ? 'selected' : ''}>Tampilkan Modal</option>
-                  </select>
-              </div>
-              <div class="form-group">
-                  <label for="action-button-target">URL Tujuan / ID Modal:</label>
-                  <input type="text" class="form-control action-button-target" value="${optionsData.target || ''}" placeholder="URL atau ID Modal" />
-              </div>
-              <div class="form-group">
-                  <label for="action-button-payload">Payload Webhook (JSON, opsional):</label>
-                  <textarea class="form-control action-button-payload" rows="3">${optionsData.payload || ''}</textarea>
-              </div>
-              <div class="form-group">
-                  <label for="action-button-style">Gaya Tombol (kelas CSS, misal: btn-primary):</label>
-                  <input type="text" class="form-control action-button-style" value="${optionsData.buttonStyle || ''}" />
-              </div>
-              <div class="form-group">
-                  <label for="action-button-icon">Ikon Tombol (FontAwesome, misal: fa-plus):</label>
-                  <input type="text" class="form-control action-button-icon" value="${optionsData.icon || ''}" />
-              </div>
-              </div>
+          <div class="form-group">
+              <label for="action-button-text">Teks Tombol:</label>
+              <input type="text" class="form-control action-button-text" value="${optionsData.buttonText || ''}" required />
+          </div>
+          <div class="form-group">
+              <label for="action-button-type">Tipe Aksi:</label>
+              <select class="form-control action-button-type-select">
+                  <option value="link" ${optionsData.actionType === 'link' ? 'selected' : ''}>Buka Tautan (Link)</option>
+                  <option value="webhook" ${optionsData.actionType === 'webhook' ? 'selected' : ''}>Kirim Webhook</option>
+                  <option value="modal" ${optionsData.actionType === 'modal' ? 'selected' : ''}>Tampilkan Modal</option>
+              </select>
+          </div>
+          <div class="form-group">
+              <label for="action-button-target">URL Tujuan / ID Modal:</label>
+              <input type="text" class="form-control action-button-target" value="${optionsData.target || ''}" placeholder="URL atau ID Modal" />
+          </div>
+          <div class="form-group">
+              <label for="action-button-payload">Payload Webhook (JSON, opsional):</label>
+              <textarea class="form-control action-button-payload" rows="3">${optionsData.payload || ''}</textarea>
+          </div>
+          <div class="form-group">
+              <label for="action-button-style">Gaya Tombol (kelas CSS, misal: btn-primary):</label>
+              <input type="text" class="form-control action-button-style" value="${optionsData.buttonStyle || ''}" />
+          </div>
+          <div class="form-group">
+              <label for="action-button-icon">Ikon Tombol (FontAwesome, misal: fa-plus):</label>
+              <input type="text" class="form-control action-button-icon" value="${optionsData.icon || ''}" />
+          </div>
+        </div>
           `
         break
       default:
@@ -478,13 +433,18 @@ document.addEventListener('DOMContentLoaded', () => {
       .replace(/^-+/, '') // Trim - from start of text
       .replace(/-+$/, '') // Trim - from end of text
   }
+
   /**
    * Adds a new widget input group to the dashboard form.
    * @param {object} [widget={}] - Optional widget object to pre-fill the form for editing.
    */
+  let widgetCounter = 1
+  function getNextWidgetId() {
+    return `widget-${widgetCounter++}`
+  }
   async function addWidget(widget = {}) {
-    let widgetCounter = 1
-    const id = widget.id || `widget-${widgetCounter++}`
+    // const id = widget.id || `widget-${widgetCounter++}`
+    const id = widget.id || getNextWidgetId()
     const widgetTemplate = document.getElementById('widget-template')
     const widgetItem = widgetTemplate.content.firstElementChild.cloneNode(true)
     widgetItem.dataset.id = id
@@ -520,47 +480,77 @@ document.addEventListener('DOMContentLoaded', () => {
     // Populate the collection dropdown
     const collectionSelect = widgetItem.querySelector('.widget-collection-select')
 
+    let choicesInstance = null
+
     if (collectionSelect) {
-      // collectionSelect.innerHTML = '<option value="">Pilih Koleksi...</option>'
-      // ;
-      // [].forEach((col) => {
-      //   const option = document.createElement('option')
-      //   option.value = col.name // Use internal name as value
-      //   option.textContent = col.displayName
-      //   collectionSelect.appendChild(option)
-      // })
-      collectionSelect.innerHTML = '<option value="">Memuat koleksi...</option>';
-      collectionSelect.disabled = true;
+      let currentPage = 1
+      let hasMore = true
+      let searchTerm = ''
 
-  // Fetch koleksi dari API
-  await fetch('/configuration/read')
-    .then(res => res.json())
-    .then(data => {
-      collectionSelect.innerHTML = '<option value="">Pilih Koleksi...</option>';
+      // Inisialisasi Choices.js
+      choicesInstance = new Choices(collectionSelect, {
+        placeholder: true,
+        placeholderValue: 'Pilih koleksi...',
+        searchEnabled: true,
+        searchPlaceholderValue: 'Cari koleksi...',
+        shouldSort: false,
+        noResultsText: 'Tidak ditemukan',
+      })
 
-      data.data.forEach(item => {
-        const option = document.createElement('option');
-        option.value = item.name;
-        option.textContent = item.displayName;
-        collectionSelect.appendChild(option);
-      });
+      const loadCollections = async (search = '', page = 1, append = false) => {
+        try {
+          const res = await fetch(
+            `/configuration/list?skip${page - 1}&search=${encodeURIComponent(search)}`
+          )
+          const result = await res.json()
+          const options = result.data.documents.map((item) => ({
+            value: item.name,
+            label: item.displayName,
+          }))
 
-      // Jika edit mode, pre-select
-      if (widget.collection) {
-        collectionSelect.value = widget.collection;
+          if (append) {
+            choicesInstance.setChoices(options, 'value', 'label', false)
+          } else {
+            choicesInstance.clearChoices()
+            choicesInstance.setChoices(options, 'value', 'label', true)
+          }
+          currentPage = page
+          searchTerm = search
+          hasMore = result.data.currentPage < result.data.totalPages
+        } catch (err) {
+          console.error('Gagal ambil koleksi:', err)
+        }
       }
 
-      collectionSelect.disabled = false;
-    })
-    .catch(err => {
-      collectionSelect.innerHTML = '<option value="">Gagal memuat data</option>';
-      console.error('Gagal ambil koleksi:', err);
-    });
+      // Inisialisasi awal
+      await loadCollections()
 
-      // Set selected collection if editing
-      if (widget.collection) {
-        collectionSelect.value = widget.collection
-      }
+      // Tambahkan pencarian manual (Choices tidak support AJAX penuh)
+      collectionSelect.addEventListener('search', (e) => {
+        const searchTerm = e.detail.value
+        loadCollections(searchTerm, 1)
+      })
+      // Tangkap scroll ke bawah → load more
+      document.querySelector('.choices__list--dropdown').addEventListener('scroll', (e) => {
+        const el = e.target
+        if (hasMore && el.scrollTop + el.clientHeight >= el.scrollHeight - 5) {
+          loadCollections(searchTerm, currentPage + 1, true)
+        }
+      })
+      // Saat koleksi dipilih → ambil field dari API
+      collectionSelect.addEventListener('change', async () => {
+        const selected = collectionSelect.value
+        if (!selected) return renderWidgetOptions(optionsContainer, typeSelect.value, {}, [])
+        try {
+          const res = await fetch(`/configuration/read/${selected}`)
+          const detail = await res.json()
+          const fields = detail.data?.fields || []
+          renderWidgetOptions(optionsContainer, typeSelect.value, {}, fields)
+        } catch (err) {
+          console.error('Gagal ambil field:', err)
+          renderWidgetOptions(optionsContainer, typeSelect.value, {}, [])
+        }
+      })
     }
 
     // Get references to elements within the new widget item
@@ -615,31 +605,34 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       })
     }
-
     // IMPORTANT: Re-attach event listener for type change to re-render options
-    typeSelect.addEventListener('change', () => {
-      const selectedCollection = currentCollections.find(
-        (col) => col.name === collectionSelect.value
-      )
-      const collectionFields = selectedCollection ? selectedCollection.fields : []
-      renderWidgetOptions(optionsContainer, typeSelect.value, {}, collectionFields)
-    })
-
-    collectionSelect.addEventListener('change', () => {
-      const selectedCollection = currentCollections.find(
-        (col) => col.name === collectionSelect.value
-      )
-      const collectionFields = selectedCollection ? selectedCollection.fields : []
-      renderWidgetOptions(optionsContainer, typeSelect.value, {}, collectionFields)
+    typeSelect.addEventListener('change', async () => {
+      const selected = collectionSelect.value
+      if (!selected) return renderWidgetOptions(optionsContainer, typeSelect.value, {}, [])
+      try {
+        const res = await fetch(`/configuration/read/${selected}`)
+        const detail = await res.json()
+        const fields = detail.data?.fields || []
+        renderWidgetOptions(optionsContainer, typeSelect.value, {}, fields)
+      } catch (err) {
+        console.error('Gagal ambil field:', err)
+        renderWidgetOptions(optionsContainer, typeSelect.value, {}, [])
+      }
     })
 
     // Initial render of options based on type and pre-fill if editing
     if (widget.type) {
-      const selectedCollection = currentCollections.find(
-        (col) => col.name === collectionSelect.value
-      )
-      const collectionFields = selectedCollection ? selectedCollection.fields : []
-      renderWidgetOptions(optionsContainer, widget.type, widget.options || {}, collectionFields)
+      const selected = collectionSelect.value
+      if (!selected) return renderWidgetOptions(optionsContainer, typeSelect.value, {}, [])
+      try {
+        const res = await fetch(`/configuration/read/${selected}`)
+        const detail = await res.json()
+        const fields = detail.data?.fields || []
+        renderWidgetOptions(optionsContainer, typeSelect.value, {}, fields)
+      } catch (err) {
+        console.error('Gagal ambil field:', err)
+        renderWidgetOptions(optionsContainer, typeSelect.value, {}, [])
+      }
     } else {
       renderWidgetOptions(optionsContainer, typeSelect.value, {}, []) // Render default empty for new
     }
@@ -647,10 +640,217 @@ document.addEventListener('DOMContentLoaded', () => {
     // Set initial display name in header
     widgetDisplayNameHeader.textContent = widget.displayName || widget.name || 'Widget Baru'
   }
+  function getFormDataAsDashboardObject() {
+    const id = dom.dashboardIdInput.value || `dashboard-${Date.now()}`
+    const name = dom.dashboardNameInput.value.trim()
+    const description = dom.dashboardDescriptionInput.value.trim()
+    const widgets = Array.from(dom.dashboardWidgetsContainer.querySelectorAll('.widget-item'))
+      .filter((item) => item.id !== 'no-widgets-placeholder')
+      .map((item) => {
+        const widgetId = item.dataset.id
+        const nameInput = item.querySelector('.widget-name')
+        const displayNameInput = item.querySelector('.widget-display-name-input')
+        const typeSelect = item.querySelector('.widget-type-select')
+        const collectionSelect = item.querySelector('.widget-collection-select')
+        const optionsContainer = item.querySelector('.widget-options-container')
+        const collapsibleContent = item.querySelector('.collapsible-content')
+        if (
+          !nameInput ||
+          !displayNameInput ||
+          !typeSelect ||
+          !collectionSelect ||
+          !optionsContainer ||
+          !collapsibleContent
+        ) {
+          console.error(`Error: Missing elements for widget ID: ${widgetId}`)
+          return null
+        }
+        const widgetName = nameInput.value.trim()
+        const widgetDisplayName = displayNameInput.value.trim()
+        const widgetType = typeSelect.value
+        const widgetCollection = collectionSelect.value
+        const isCollapsed = collapsibleContent.classList.contains('collapsed')
+        // Basic validation for widget during preview/save
+        if (!widgetName || !widgetDisplayName) {
+          return null // Return null to indicate an invalid widget
+        }
+        let options = {}
+        // Collect widget-specific options based on type
+        if (widgetType === 'chart') {
+          const chartTypeSelect = optionsContainer.querySelector('.chart-type-select')
+          const xAxisSelect = optionsContainer.querySelector('.chart-x-axis-select')
+          const yAxisSelect = optionsContainer.querySelector('.chart-y-axis-select')
+          const titleInput = optionsContainer.querySelector('.chart-title-input')
+          options.chartType = chartTypeSelect ? chartTypeSelect.value : ''
+          options.xAxis = xAxisSelect ? xAxisSelect.value : ''
+          options.yAxis = yAxisSelect ? yAxisSelect.value : ''
+          options.title = titleInput ? titleInput.value.trim() : ''
+        } else if (widgetType === 'table') {
+          const fieldsInput = optionsContainer.querySelector('.table-fields-input')
+          const limitInput = optionsContainer.querySelector('.table-limit-input')
+          options.fields = fieldsInput
+            ? fieldsInput.value
+                .split(',')
+                .map((f) => f.trim())
+                .filter((f) => f)
+            : []
+          options.limit = limitInput ? parseInt(limitInput.value) : 10
+        } else if (widgetType === 'single-value') {
+          const fieldSelect = optionsContainer.querySelector('.single-value-field-select')
+          const aggregationSelect = optionsContainer.querySelector(
+            '.single-value-aggregation-select'
+          )
+          const labelInput = optionsContainer.querySelector('.single-value-label-input')
+          options.field = fieldSelect ? fieldSelect.value : ''
+          options.aggregation = aggregationSelect ? aggregationSelect.value : ''
+          options.label = labelInput ? labelInput.value.trim() : ''
+        } else if (widgetType === 'custom-text') {
+          const contentInput = optionsContainer.querySelector('.custom-text-content')
+          const isHtmlCheckbox = optionsContainer.querySelector('.custom-text-is-html')
+          const cssClassInput = optionsContainer.querySelector('.custom-text-css-class')
+          const titleInput = optionsContainer.querySelector('.custom-text-title')
+          options.content = contentInput ? contentInput.value.trim() : ''
+          options.isHtml = isHtmlCheckbox ? isHtmlCheckbox.checked : false
+          options.cssClass = cssClassInput ? cssClassInput.value.trim() : ''
+          options.title = titleInput ? titleInput.value.trim() : ''
+        } else if (widgetType === 'image') {
+          const imageUrlInput = optionsContainer.querySelector('.image-url')
+          const altTextInput = optionsContainer.querySelector('.image-alt-text')
+          const linkUrlInput = optionsContainer.querySelector('.image-link-url')
+          const widthInput = optionsContainer.querySelector('.image-width')
+          const heightInput = optionsContainer.querySelector('.image-height')
+          const captionInput = optionsContainer.querySelector('.image-caption')
+          options.imageUrl = imageUrlInput ? imageUrlInput.value.trim() : ''
+          options.altText = altTextInput ? altTextInput.value.trim() : ''
+          options.linkUrl = linkUrlInput ? linkUrlInput.value.trim() : ''
+          options.width = widthInput ? widthInput.value.trim() : ''
+          options.height = heightInput ? heightInput.value.trim() : ''
+          options.caption = captionInput ? captionInput.value.trim() : ''
+        } else if (widgetType === 'map') {
+          const mapProviderSelect = optionsContainer.querySelector('.map-provider-select')
+          const latitudeFieldSelect = optionsContainer.querySelector('.map-latitude-field-select')
+          const longitudeFieldSelect = optionsContainer.querySelector('.map-longitude-field-select')
+          const markerTitleFieldSelect = optionsContainer.querySelector(
+            '.map-marker-title-field-select'
+          )
+          const initialZoomInput = optionsContainer.querySelector('.map-initial-zoom')
+          const showHeatmapCheckbox = optionsContainer.querySelector('.map-show-heatmap')
+          options.mapProvider = mapProviderSelect ? mapProviderSelect.value : ''
+          options.latitudeField = latitudeFieldSelect ? latitudeFieldSelect.value : ''
+          options.longitudeField = longitudeFieldSelect ? longitudeFieldSelect.value : ''
+          options.markerTitleField = markerTitleFieldSelect ? markerTitleFieldSelect.value : ''
+          options.initialZoom = initialZoomInput ? parseInt(initialZoomInput.value) : 10
+          options.showHeatmap = showHeatmapCheckbox ? showHeatmapCheckbox.checked : false
+        } else if (widgetType === 'list') {
+          const displayFieldsInput = optionsContainer.querySelector('.list-display-fields')
+          const limitInput = optionsContainer.querySelector('.list-limit')
+          const sortBySelect = optionsContainer.querySelector('.list-sort-by-select')
+          const sortOrderSelect = optionsContainer.querySelector('.list-sort-order-select')
+          const titleFieldSelect = optionsContainer.querySelector('.list-title-field-select')
+          options.displayFields = displayFieldsInput
+            ? displayFieldsInput.value
+                .split(',')
+                .map((f) => f.trim())
+                .filter((f) => f)
+            : []
+          options.limit = limitInput ? parseInt(limitInput.value) : 5
+          options.sortBy = sortBySelect ? sortBySelect.value : ''
+          options.sortOrder = sortOrderSelect ? sortOrderSelect.value : 'asc'
+          options.titleField = titleFieldSelect ? titleFieldSelect.value : ''
+        } else if (widgetType === 'stat-card') {
+          const metricTypeSelect = optionsContainer.querySelector('.stat-card-metric-type-select')
+          const valueFieldSelect = optionsContainer.querySelector('.stat-card-value-field-select')
+          const customValueInput = optionsContainer.querySelector('.stat-card-custom-value')
+          const labelInput = optionsContainer.querySelector('.stat-card-label')
+          const prefixInput = optionsContainer.querySelector('.stat-card-prefix')
+          const suffixInput = optionsContainer.querySelector('.stat-card-suffix')
+          const iconInput = optionsContainer.querySelector('.stat-card-icon')
+          const targetValueInput = optionsContainer.querySelector('.stat-card-target-value')
+          options.metricType = metricTypeSelect ? metricTypeSelect.value : 'count'
+          options.valueField = valueFieldSelect ? valueFieldSelect.value : ''
+          options.customValue = customValueInput ? customValueInput.value.trim() : ''
+          options.label = labelInput ? labelInput.value.trim() : ''
+          options.prefix = prefixInput ? prefixInput.value.trim() : ''
+          options.suffix = suffixInput ? suffixInput.value.trim() : ''
+          options.icon = iconInput ? iconInput.value.trim() : ''
+          options.targetValue = targetValueInput ? parseInt(targetValueInput.value) : undefined
+        } else if (widgetType === 'iframe') {
+          const sourceUrlInput = optionsContainer.querySelector('.iframe-source-url')
+          const widthInput = optionsContainer.querySelector('.iframe-width')
+          const heightInput = optionsContainer.querySelector('.iframe-height')
+          const sandboxAttributesInput = optionsContainer.querySelector(
+            '.iframe-sandbox-attributes'
+          )
+          options.sourceUrl = sourceUrlInput ? sourceUrlInput.value.trim() : ''
+          options.width = widthInput ? widthInput.value.trim() : ''
+          options.height = heightInput ? heightInput.value.trim() : ''
+          options.sandboxAttributes = sandboxAttributesInput
+            ? sandboxAttributesInput.value.trim()
+            : ''
+        } else if (widgetType === 'action-button') {
+          const buttonTextInput = optionsContainer.querySelector('.action-button-text')
+          const actionTypeSelect = optionsContainer.querySelector('.action-button-type-select')
+          const targetInput = optionsContainer.querySelector('.action-button-target')
+          const payloadInput = optionsContainer.querySelector('.action-button-payload')
+          const buttonStyleInput = optionsContainer.querySelector('.action-button-style')
+          const iconInput = optionsContainer.querySelector('.action-button-icon')
+          options.buttonText = buttonTextInput ? buttonTextInput.value.trim() : ''
+          options.actionType = actionTypeSelect ? actionTypeSelect.value : 'link'
+          options.target = targetInput ? targetInput.value.trim() : ''
+          options.payload = payloadInput ? payloadInput.value.trim() : ''
+          options.buttonStyle = buttonStyleInput ? buttonStyleInput.value.trim() : ''
+          options.icon = iconInput ? iconInput.value.trim() : ''
+        }
+        return {
+          id: widgetId,
+          name: widgetName,
+          displayName: widgetDisplayName,
+          type: widgetType,
+          collection: widgetCollection === '' ? undefined : widgetCollection,
+          collapsed: isCollapsed,
+          options: options,
+        }
+      })
+    // Filter out any widgets that returned null due to invalid data
+    const validWidgets = widgets.filter((widget) => widget !== null)
+    return {
+      id: id,
+      name: name,
+      description: description,
+      widgets: validWidgets,
+    }
+  }
 
   addWidgetdBtn.addEventListener('click', () => addWidget())
+  saveDashboardBtn.addEventListener('submit', async (e) => {
+    e.preventDefault()
+    const dashboardData = getFormDataAsDashboardObject();
+    // Basic validation before saving
+    if (!dashboardData.name) {
+      showNotification("Nama Dashboard wajib diisi.", "error");
+      return;
+    }
+    if (dashboardData.widgets.includes(null)) {
+      showNotification("Beberapa widget memiliki data yang tidak lengkap. Harap periksa semua widget.", "error");
+      return;
+    }
+    if (dashboardData.widgets.length === 0) {
+      showNotification("Dashboard harus memiliki setidaknya satu widget.", "error");
+      return;
+    }
+    console.log(dashboardData)
+  })
 })
 
+function showNotification(message, type) {
+  const notificationElement = type === 'success' ? successMessage : errorMessage
+  notificationElement.textContent = message
+  notificationElement.style.display = 'block'
+  setTimeout(() => {
+    notificationElement.style.display = 'none'
+    notificationElement.textContent = '' // Clear message
+  }, 5000) // Hide after 5 seconds
+}
 function openDetail(id) {
   document.getElementById('gridView').style.display = 'none'
   document.querySelectorAll('.settings-detail').forEach((el) => el.classList.remove('active'))
