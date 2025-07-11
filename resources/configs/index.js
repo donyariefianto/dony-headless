@@ -448,7 +448,7 @@ document.addEventListener('DOMContentLoaded', () => {
     try {
       const skip = (collectionCurrentPage - 1) * collectionPerPage // Hitung 'skip'
       const limit = collectionPerPage // 'limit' adalah itemsPerPage
-      let url = `${baseUrl}configuration/read?skip=${skip}&paging=${limit}` // Sesuaikan dengan endpoint API Anda
+      let url = `${baseUrl}configuration/collection/read?skip=${skip}&paging=${limit}` // Sesuaikan dengan endpoint API Anda
       if (search) {
         url += `&search=${search}` // Tambahkan parameter pencarian jika ada
       }
@@ -530,7 +530,7 @@ document.addEventListener('DOMContentLoaded', () => {
     closeModal(deleteConfirmModal)
     showLoading()
     try {
-      await fetch(`${baseUrl}configuration/delete`, {
+      await fetch(`${baseUrl}configuration/collection/delete`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
@@ -1177,8 +1177,8 @@ document.addEventListener('DOMContentLoaded', () => {
     try {
       // Simulate API call
       let url_collections = isEditing
-        ? `${baseUrl}configuration/update`
-        : `${baseUrl}configuration/create`
+        ? `${baseUrl}configuration/collection/update`
+        : `${baseUrl}configuration/collection/create`
       let data_collections = isEditing
         ? { id: `${name}_config`, query: newCollection }
         : { collectionConfigData: newCollection }
@@ -1759,7 +1759,6 @@ document.addEventListener('DOMContentLoaded', () => {
       showNotification('Data item berhasil disimpan!', 'success')
       closeSidebar()
       loadDataItems(currentSelectedCollection, currentDataItemPage, 4, currentDataItemSearchTerm)
-      // loadDataItems(collectionSchema) // Reload table for the current collection
     } catch (error) {
       console.error('Error saving data item:', error)
       showNotification('Gagal menyimpan data item.', 'error')

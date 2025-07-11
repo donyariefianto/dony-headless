@@ -1,9 +1,11 @@
 const addWidgetdBtn = document.getElementById('add-widget-btn')
 const saveDashboardBtn = document.getElementById('data-dashboard-form')
 const errorMessage = document.getElementById('error-message')
-  const successMessage = document.getElementById('success-message')
-
+const successMessage = document.getElementById('success-message')
+loadingIndicator = document.getElementById('loading-indicator')
 let currentCollections = [] // Mock data for collections
+const MIN_LOADING_TIME = 300 // Milidetik, waktu minimum loader ditampilkan
+
 document.addEventListener('DOMContentLoaded', () => {
   // --- DOM Elements ---
   const dom = {
@@ -18,6 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
     noWidgetsPlaceholder: document.getElementById('no-widgets-placeholder'),
     saveDashboardBtn: document.getElementById('save-dashboard-btn'),
     previewDashboardBtn: document.getElementById('preview-dashboard-btn'), // New preview button
+    dataDashboardTable: document.getElementById('data-dashboard-table'),
   }
   /**
    * Renders dynamic options for a widget based on its type.
@@ -433,7 +436,6 @@ document.addEventListener('DOMContentLoaded', () => {
       .replace(/^-+/, '') // Trim - from start of text
       .replace(/-+$/, '') // Trim - from end of text
   }
-
   /**
    * Adds a new widget input group to the dashboard form.
    * @param {object} [widget={}] - Optional widget object to pre-fill the form for editing.
@@ -500,7 +502,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const loadCollections = async (search = '', page = 1, append = false) => {
         try {
           const res = await fetch(
-            `/configuration/list?skip${page - 1}&search=${encodeURIComponent(search)}`
+            `/configuration/collection/list?page=${page}&search=${encodeURIComponent(search)}`
           )
           const result = await res.json()
           const options = result.data.documents.map((item) => ({
@@ -542,7 +544,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const selected = collectionSelect.value
         if (!selected) return renderWidgetOptions(optionsContainer, typeSelect.value, {}, [])
         try {
-          const res = await fetch(`/configuration/read/${selected}`)
+          const res = await fetch(`/configuration/collection/read/${selected}`)
           const detail = await res.json()
           const fields = detail.data?.fields || []
           renderWidgetOptions(optionsContainer, typeSelect.value, {}, fields)
@@ -610,7 +612,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const selected = collectionSelect.value
       if (!selected) return renderWidgetOptions(optionsContainer, typeSelect.value, {}, [])
       try {
-        const res = await fetch(`/configuration/read/${selected}`)
+        const res = await fetch(`/configuration/collection/read/${selected}`)
         const detail = await res.json()
         const fields = detail.data?.fields || []
         renderWidgetOptions(optionsContainer, typeSelect.value, {}, fields)
@@ -625,7 +627,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const selected = collectionSelect.value
       if (!selected) return renderWidgetOptions(optionsContainer, typeSelect.value, {}, [])
       try {
-        const res = await fetch(`/configuration/read/${selected}`)
+        const res = await fetch(`/configuration/collection/read/${selected}`)
         const detail = await res.json()
         const fields = detail.data?.fields || []
         renderWidgetOptions(optionsContainer, typeSelect.value, {}, fields)
@@ -824,24 +826,93 @@ document.addEventListener('DOMContentLoaded', () => {
   addWidgetdBtn.addEventListener('click', () => addWidget())
   saveDashboardBtn.addEventListener('submit', async (e) => {
     e.preventDefault()
-    const dashboardData = getFormDataAsDashboardObject();
+    const dashboardData = getFormDataAsDashboardObject()
     // Basic validation before saving
     if (!dashboardData.name) {
-      showNotification("Nama Dashboard wajib diisi.", "error");
-      return;
+      showNotification('Nama Dashboard wajib diisi.', 'error')
+      return
     }
     if (dashboardData.widgets.includes(null)) {
-      showNotification("Beberapa widget memiliki data yang tidak lengkap. Harap periksa semua widget.", "error");
-      return;
+      showNotification(
+        'Beberapa widget memiliki data yang tidak lengkap. Harap periksa semua widget.',
+        'error'
+      )
+      return
     }
     if (dashboardData.widgets.length === 0) {
-      showNotification("Dashboard harus memiliki setidaknya satu widget.", "error");
-      return;
+      showNotification('Dashboard harus memiliki setidaknya satu widget.', 'error')
+      return
     }
     console.log(dashboardData)
   })
 })
 
+async function loadDashboard(page = 1, limit = 4, searchQuery = '') {
+  showLoading()
+  try {
+    let url = `/configuration/dashboard/list?limit=${limit}&page=${page}`
+    if (searchQuery) {
+      url += `&search=${encodeURIComponent(search)}`
+    }
+    const response = await fetch(url)
+  } catch (error) {
+  } finally {
+    hideLoading()
+  }
+}
+let loadingCounter = 0 // Menghitung berapa banyak operasi yang sedang loading
+let loadingStartTime = 0 // Waktu saat loading dimulai (untuk min display time)
+// --- Utility Functions ---
+// ---- NEW: Fungsi showLoading yang diperbarui ----
+function showLoading() {
+  loadingCounter++
+  if (loadingCounter === 1) {
+    // Hanya tampilkan jika ini panggilan loading pertama
+    loadingStartTime = Date.now()
+    if (loadingIndicator) {
+      loadingIndicator.style.display = 'flex' // Set display agar elemen punya dimensi dan bisa transisi
+      // Gunakan requestAnimationFrame atau setTimeout kecil untuk memastikan DOM direfresh
+      // sebelum transisi opacity dimulai. Ini mencegah glitch awal.
+      requestAnimationFrame(() => {
+        loadingIndicator.style.opacity = '1'
+        loadingIndicator.style.pointerEvents = 'auto' // Aktifkan interaksi (jika ada, misal tombol batal) saat terlihat
+      })
+    }
+    document.body.classList.add('loading-active') // Nonaktifkan scroll body
+  }
+}
+// ----------------------------------------------------
+
+// ---- NEW: Fungsi hideLoading yang diperbarui ----
+function hideLoading() {
+  loadingCounter--
+  if (loadingCounter <= 0) {
+    // Hanya sembunyikan jika semua operasi loading selesai
+    loadingCounter = 0 // Pastikan counter tidak negatif
+
+    const timeElapsed = Date.now() - loadingStartTime
+    const delay = Math.max(0, MIN_LOADING_TIME - timeElapsed) // Hitung delay untuk memenuhi MIN_LOADING_TIME
+
+    setTimeout(() => {
+      if (loadingIndicator) {
+        loadingIndicator.style.opacity = '0' // Mulai fade out
+        loadingIndicator.style.pointerEvents = 'none' // Nonaktifkan interaksi selama fade out
+
+        // Tunggu transisi opacity selesai sebelum mengatur display: none
+        // Mengambil durasi transisi dari CSS yang diterapkan
+        const transitionDuration =
+          parseFloat(getComputedStyle(loadingIndicator).transitionDuration) * 1000
+        setTimeout(() => {
+          // Pastikan opacity masih 0 sebelum menyetel display: none (untuk menghindari kondisi balapan)
+          if (loadingIndicator.style.opacity === '0') {
+            loadingIndicator.style.display = 'none'
+          }
+        }, transitionDuration || 300) // Gunakan durasi transisi CSS, default 300ms jika gagal didapatkan
+      }
+      document.body.classList.remove('loading-active') // Aktifkan scroll body kembali
+    }, delay) // Terapkan delay untuk MIN_LOADING_TIME
+  }
+}
 function showNotification(message, type) {
   const notificationElement = type === 'success' ? successMessage : errorMessage
   notificationElement.textContent = message
@@ -855,8 +926,10 @@ function openDetail(id) {
   document.getElementById('gridView').style.display = 'none'
   document.querySelectorAll('.settings-detail').forEach((el) => el.classList.remove('active'))
   document.getElementById('detail-' + id).classList.add('active')
+  if (id === 'dashboard') {
+    loadDashboard()
+  }
 }
-
 function showGrid() {
   document.getElementById('gridView').style.display = 'grid'
   document.querySelectorAll('.settings-detail').forEach((el) => el.classList.remove('active'))

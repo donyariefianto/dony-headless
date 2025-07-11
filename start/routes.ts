@@ -10,17 +10,32 @@
 import router from '@adonisjs/core/services/router'
 import { middleware } from '#start/kernel'
 
+router.get('/', '#controllers/settings_controller.UIdash')
+router.get('/login', '#controllers/settings_controller.AuthenticationUI')
+
 router
   .group(() => {
-    router.post('/create', '#controllers/settings_controller.createCollectionConfig')
-    router.get('/list', '#controllers/settings_controller.getCollectionListConfig')
-    router.get('/read', '#controllers/settings_controller.getCollectionConfig')
-    router.get('/read/:id', '#controllers/settings_controller.getCollectionConfigByID')
-    router.put('/update', '#controllers/settings_controller.updateCollectionConfig')
-    router.delete('/delete', '#controllers/settings_controller.deleteCollectionConfig')
+    // API CRUD COLLECTION
+    router
+      .group(() => {
+        router.post('/create', '#controllers/settings_controller.createCollectionConfig')
+        router.get('/list', '#controllers/settings_controller.getCollectionListConfig')
+        router.get('/read', '#controllers/settings_controller.getCollectionConfig')
+        router.get('/read/:id', '#controllers/settings_controller.getCollectionConfigByID')
+        router.put('/update', '#controllers/settings_controller.updateCollectionConfig')
+        router.delete('/delete', '#controllers/settings_controller.deleteCollectionConfig')
+      })
+      .prefix('collection')
+
+    // API CRUD DASHBOARD
+    router
+      .group(() => {
+        router.get('/list', '#controllers/settings_controller.getCollectionListConfig')
+      })
+      .prefix('/dashboard')
   })
   .prefix('/configuration')
-router.get('/', '#controllers/settings_controller.UIdash')
+
 router
   .group(() => {
     router.get('/', '#controllers/settings_controller.UI')
@@ -29,7 +44,6 @@ router
   })
   .prefix('/manages')
 
-router.get('/login', '#controllers/settings_controller.AuthenticationUI')
 router
   .group(() => {
     router.post('/login', '#controllers/settings_controller.AuthenticationLogin')

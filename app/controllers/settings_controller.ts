@@ -218,6 +218,56 @@ export default class SettingsController {
       })
     }
   }
+  async getDashboardListConfig({ request, response }: HttpContext) {
+    let { page, limit, sort, search } = request.all()
+    try {
+      let query = {}
+      if (search) {
+        query = {
+          $or: [
+            { name: { $regex: search, $options: 'i' } },
+            { displayName: { $regex: search, $options: 'i' } },
+            { description: { $regex: search, $options: 'i' } },
+          ],
+        }
+      }
+      page = Number(page) > 0 ? Number(page) : 1
+      limit = Number(limit) > 0 ? Number(limit) : 5
+      let skip = (page - 1) * limit
+      let data = await MongoDBModels.FindWithPaging(
+        query,
+        skip,
+        limit,
+        sort ? sort : { _id: -1 },
+        settings_collections
+      )
+      data = data.map((x) => {
+        return {
+          name: x.name,
+          displayName: x.displayName,
+        }
+      })
+      let totalCount = await MongoDBModels.GetLength(query, settings_collections)
+      return response.ok({
+        status: true,
+        message_id: 'sukses',
+        message_en: 'success',
+        data: {
+          documents: data,
+          totalCount: totalCount,
+          totalPages: Math.ceil(totalCount / limit),
+          currentPage: page,
+          limit: limit,
+        },
+      })
+    } catch (error) {
+      return response.internalServerError({
+        status: false,
+        status_code: 500,
+        message: error.message,
+      })
+    }
+  }
   // GET a single document by ID for this collection, with relations
   async CollectionsWithID({ request, response }: HttpContext) {
     const collections = request.param('collections')
