@@ -1,0 +1,982 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generator Form Dinamis dengan Live Preview</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .main-container {
+            display: flex;
+            gap: 20px;
+            width: 100%;
+            max-width: 1500px;
+        }
+        .generator-panel, .preview-panel {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            flex: 1;
+        }
+        .preview-panel {
+            min-height: 800px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            overflow-y: auto;
+        }
+        h2, h3 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+        }
+        hr {
+            margin: 20px 0;
+            border: 0;
+            border-top: 1px solid #eee;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+            font-weight: bold;
+        }
+        .form-group input[type="text"],
+        .form-group input[type="number"],
+        .form-group textarea,
+        .form-group select {
+            width: calc(100% - 22px);
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+        .form-group input[type="checkbox"] {
+            margin-right: 8px;
+        }
+        .field-card {
+            background-color: #f0f8ff;
+            border: 1px solid #cceeff;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 10px;
+            position: relative;
+        }
+        .field-card .remove-field-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 25px;
+            height: 25px;
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            line-height: 1;
+        }
+        .add-field-btn {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 10px;
+            display: block;
+            width: fit-content;
+        }
+        .json-output-area {
+            margin-top: 30px;
+            border-top: 1px solid #eee;
+            padding-top: 20px;
+        }
+        .json-output-area textarea {
+            width: calc(100% - 22px);
+            height: 200px;
+            background-color: #f8f8f8;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 10px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 14px;
+            resize: vertical;
+        }
+        button.generate-btn, button.copy-btn, button.save-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-right: 10px;
+            margin-top: 15px;
+        }
+        button.generate-btn {
+            background-color: #007bff;
+            color: white;
+        }
+        button.generate-btn:hover {
+            background-color: #0056b3;
+        }
+        button.copy-btn {
+            background-color: #6c757d;
+            color: white;
+        }
+        button.copy-btn:hover {
+            background-color: #5a6268;
+        }
+        button.save-btn {
+            background-color: #17a2b8;
+            color: white;
+        }
+        button.save-btn:hover {
+            background-color: #138496;
+        }
+
+        /* --- Styling untuk Live Preview Form --- */
+        #liveFormPreview {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 600px;
+            box-sizing: border-box;
+        }
+        #liveFormPreview h2 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        #liveFormPreview p.description {
+            text-align: center;
+            color: #666;
+            margin-bottom: 25px;
+            font-style: italic;
+        }
+        #liveFormPreview .form-group {
+            margin-bottom: 18px;
+        }
+        #liveFormPreview .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: bold;
+        }
+        #liveFormPreview .form-group input[type="text"],
+        #liveFormPreview .form-group input[type="email"],
+        #liveFormPreview .form-group input[type="number"],
+        #liveFormPreview .form-group select,
+        #liveFormPreview .form-group textarea {
+            width: calc(100% - 20px);
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        #liveFormPreview .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+        #liveFormPreview .form-group .radio-group,
+        #liveFormPreview .form-group .checkbox-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        #liveFormPreview .form-group .radio-group label,
+        #liveFormPreview .form-group .checkbox-group label {
+            display: inline-flex;
+            align-items: center;
+            font-weight: normal;
+            margin-bottom: 0;
+        }
+        #liveFormPreview .form-group input[type="radio"],
+        #liveFormPreview .form-group input[type="checkbox"] {
+            margin-right: 8px;
+            width: auto;
+        }
+        #liveFormPreview .repeater-container {
+            border: 1px solid #ccc;
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 5px;
+        }
+        #liveFormPreview .repeater-container h4 {
+            margin-top: 0;
+            color: #555;
+        }
+        #liveFormPreview .product-item {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: flex-end;
+            margin-bottom: 15px;
+            padding: 15px;
+            border: 1px solid #e0e0e0;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+        #liveFormPreview .product-item div {
+            flex: 1;
+            min-width: 150px;
+        }
+        #liveFormPreview .product-item button.remove-item-btn {
+            flex-shrink: 0;
+            width: auto;
+            padding: 8px 12px;
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s ease;
+        }
+        #liveFormPreview .product-item button.remove-item-btn:hover {
+            background-color: #c82333;
+        }
+        #liveFormPreview button.add-item-btn {
+            width: 100%;
+            padding: 10px;
+            background-color: #17a2b8;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-bottom: 10px;
+        }
+        #liveFormPreview button.add-item-btn:hover {
+            background-color: #138496;
+        }
+        #liveFormPreview button[type="submit"] {
+            width: 100%;
+            padding: 12px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-top: 20px;
+        }
+        #liveFormPreview button[type="submit"]:hover {
+            background-color: #218838;
+        }
+        #liveFormPreview .live-response-message {
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+        }
+        #liveFormPreview .success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        #liveFormPreview .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <div class="generator-panel">
+            <h2>Generator Konfigurasi Form</h2>
+            <p>Buat dan sesuaikan konfigurasi JSON untuk form dinamis Anda. Preview form fungsional akan muncul di panel sebelah kanan.</p>
+
+            <div class="form-section">
+                <h3>Informasi Form Umum</h3>
+                <div class="form-group">
+                    <label for="formTitle">Judul Form:</label>
+                    <input type="text" id="formTitle" value="Form Pemesanan Produk Lanjutan">
+                </div>
+                <div class="form-group">
+                    <label for="formDescription">Deskripsi Form:</label>
+                    <textarea id="formDescription">Isi detail pesanan Anda di bawah ini, termasuk daftar produk yang dapat ditambahkan.</textarea>
+                </div>
+                <div class="form-group">
+                    <label for="tableName">Nama Tabel (untuk penyimpanan data):</label>
+                    <input type="text" id="tableName" value="product_orders_advanced">
+                </div>
+            </div>
+
+            <hr>
+
+            <div class="form-section">
+                <h3>Field Umum Form (di luar Repeater)</h3>
+                <div id="generalFieldsContainer">
+                    </div>
+                <button type="button" id="addGeneralFieldBtn" class="add-field-btn">➕ Tambah Field Umum</button>
+            </div>
+
+            <hr>
+
+            <div class="form-section">
+                <h3>Konfigurasi Repeater Field (Item List)</h3>
+                <div class="form-group">
+                    <label for="repeaterId">ID Repeater Field:</label>
+                    <input type="text" id="repeaterId" value="products" placeholder="e.g., products">
+                </div>
+                <div class="form-group">
+                    <label for="repeaterLabel">Label Repeater Field:</label>
+                    <input type="text" id="repeaterLabel" value="Detail Produk" placeholder="e.g., Detail Produk">
+                </div>
+                <div class="form-group">
+                    <label for="repeaterMinItems">Minimum Item (0 untuk opsional):</label>
+                    <input type="number" id="repeaterMinItems" value="1" min="0">
+                </div>
+                <div class="form-group">
+                    <label for="repeaterMaxItems">Maximum Item (kosongkan untuk tak terbatas):</label>
+                    <input type="number" id="repeaterMaxItems" value="" min="1">
+                </div>
+
+                <h4>Field di Dalam Setiap Item Repeater</h4>
+                <div id="repeaterFieldsContainer">
+                    </div>
+                <button type="button" id="addRepeaterFieldBtn" class="add-field-btn">➕ Tambah Field Repeater</button>
+            </div>
+
+            <div class="json-output-area">
+                <h3>Output JSON Konfigurasi</h3>
+                <textarea id="jsonOutput" readonly></textarea>
+                <button type="button" id="generateJsonBtn" class="generate-btn">Generate JSON</button>
+                <button type="button" id="copyJsonBtn" class="copy-btn">Salin JSON</button>
+                <button type="button" id="saveConfigBtn" class="save-btn">Simpan ke LocalStorage</button>
+            </div>
+        </div>
+
+        <div class="preview-panel">
+            <h2>Live Preview Form Dinamis</h2>
+            <p>Ini adalah form fungsional yang digenerate langsung dari konfigurasi JSON Anda. Coba isi dan tambahkan produk!</p>
+            <div id="liveFormPreview">
+                </div>
+        </div>
+    </div>
+
+    <script>
+        // --- Bagian JavaScript Generator Konfigurasi ---
+        const generalFieldsContainer = document.getElementById('generalFieldsContainer');
+        const addGeneralFieldBtn = document.getElementById('addGeneralFieldBtn');
+        const repeaterFieldsContainer = document.getElementById('repeaterFieldsContainer');
+        const addRepeaterFieldBtn = document.getElementById('addRepeaterFieldBtn');
+        const jsonOutput = document.getElementById('jsonOutput');
+        const generateJsonBtn = document.getElementById('generateJsonBtn');
+        const copyJsonBtn = document.getElementById('copyJsonBtn');
+        const saveConfigBtn = document.getElementById('saveConfigBtn');
+
+        const COMMON_OPTIONS_PRODUCTS = ["Smartphone X", "Laptop Pro", "Smartwatch Gen 2", "Headphone Bass"];
+        const COMMON_OPTIONS_PAYMENT = ["Transfer Bank", "Kartu Kredit/Debit", "COD (Cash On Delivery)"];
+
+        // Default fields untuk form umum (sesuai JSON Anda sebelumnya) - DITETAPKAN DI SINI
+        const defaultGeneralFields = [
+            { id: "orderId", type: "text", label: "ID Pesanan", placeholder: "Contoh: ORD-20250712-001", required: true },
+            { id: "customerName", type: "text", label: "Nama Pelanggan", placeholder: "Nama lengkap Anda", required: true },
+            { id: "customerEmail", type: "email", label: "Email Pelanggan", placeholder: "email@contoh.com", required: true },
+            { id: "shippingAddress", type: "textarea", label: "Alamat Pengiriman", placeholder: "Alamat lengkap dan kode pos", required: true },
+            { id: "paymentMethod", type: "radio", label: "Metode Pembayaran", placeholder: "", required: true, options: COMMON_OPTIONS_PAYMENT },
+            { id: "promoCode", type: "text", label: "Kode Promo (Opsional)", placeholder: "Masukkan kode promo jika ada", required: false },
+            { id: "notes", type: "textarea", label: "Catatan Tambahan (Opsional)", placeholder: "Contoh: Mohon dikirim setelah jam 5 sore", required: false }
+        ];
+
+        // Default fields untuk repeater (produk) - DITETAPKAN DI SINI
+        const defaultRepeaterFields = [
+            { id: "productName", type: "select", label: "Pilih Produk", placeholder: "", required: true, options: COMMON_OPTIONS_PRODUCTS },
+            { id: "quantity", type: "number", label: "Jumlah", placeholder: "Contoh: 1, 2, 3", required: true, min: 1 }
+        ];
+
+        let generalFieldCount = 0;
+        let repeaterFieldCount = 0;
+
+        function addField(container, isRepeaterField = false, defaultField = null) {
+            const fieldIdPrefix = isRepeaterField ? 'repeaterField' : 'generalField';
+            const currentFieldCount = isRepeaterField ? ++repeaterFieldCount : ++generalFieldCount;
+
+            const fieldCard = document.createElement('div');
+            fieldCard.className = 'field-card';
+            fieldCard.id = `${fieldIdPrefix}-${currentFieldCount}`;
+            fieldCard.innerHTML = `
+                <button type="button" class="remove-field-btn">X</button>
+                <div class="form-group">
+                    <label>ID:</label>
+                    <input type="text" class="field-id" value="${defaultField ? defaultField.id : ''}" placeholder="e.g., productName">
+                </div>
+                <div class="form-group">
+                    <label>Label:</label>
+                    <input type="text" class="field-label" value="${defaultField ? defaultField.label : ''}" placeholder="e.g., Nama Produk">
+                </div>
+                <div class="form-group">
+                    <label>Tipe:</label>
+                    <select class="field-type">
+                        <option value="text" ${defaultField && defaultField.type === 'text' ? 'selected' : ''}>Text</option>
+                        <option value="email" ${defaultField && defaultField.type === 'email' ? 'selected' : ''}>Email</option>
+                        <option value="number" ${defaultField && defaultField.type === 'number' ? 'selected' : ''}>Number</option>
+                        <option value="textarea" ${defaultField && defaultField.type === 'textarea' ? 'selected' : ''}>Textarea</option>
+                        <option value="select" ${defaultField && defaultField.type === 'select' ? 'selected' : ''}>Select (Dropdown)</option>
+                        <option value="radio" ${defaultField && defaultField.type === 'radio' ? 'selected' : ''}>Radio Button</option>
+                        <option value="checkbox" ${defaultField && defaultField.type === 'checkbox' ? 'selected' : ''}>Checkbox</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Placeholder:</label>
+                    <input type="text" class="field-placeholder" value="${defaultField && defaultField.placeholder ? defaultField.placeholder : ''}" placeholder="e.g., Masukkan nama produk">
+                </div>
+                <div class="form-group">
+                    <label>Required:</label>
+                    <input type="checkbox" class="field-required" ${defaultField && defaultField.required ? 'checked' : ''}>
+                </div>
+                <div class="form-group field-options" style="display: none;">
+                    <label>Opsi (pisahkan dengan koma):</label>
+                    <textarea class="field-options-text" placeholder="e.g., Opsi 1, Opsi 2">${defaultField && defaultField.options ? defaultField.options.join(', ') : ''}</textarea>
+                </div>
+                <div class="form-group field-minmax" style="display: none;">
+                    <label>Min (untuk Number):</label>
+                    <input type="number" class="field-min" value="${defaultField && defaultField.min ? defaultField.min : ''}">
+                    <label>Max (untuk Number):</label>
+                    <input type="number" class="field-max" value="${defaultField && defaultField.max ? defaultField.max : ''}">
+                </div>
+            `;
+            container.appendChild(fieldCard);
+
+            const fieldTypeSelect = fieldCard.querySelector('.field-type');
+            const fieldOptionsDiv = fieldCard.querySelector('.field-options');
+            const fieldOptionsTextarea = fieldCard.querySelector('.field-options-text');
+            const fieldMinMaxDiv = fieldCard.querySelector('.field-minmax');
+
+            const toggleOptionsAndMinMax = () => {
+                const selectedType = fieldTypeSelect.value;
+                fieldOptionsDiv.style.display = (selectedType === 'select' || selectedType === 'radio' || selectedType === 'checkbox') ? 'block' : 'none';
+                fieldMinMaxDiv.style.display = (selectedType === 'number') ? 'block' : 'none';
+            };
+
+            toggleOptionsAndMinMax();
+            fieldTypeSelect.addEventListener('change', toggleOptionsAndMinMax);
+            fieldCard.querySelector('.remove-field-btn').addEventListener('click', function() {
+                fieldCard.remove();
+                generateAndRenderLiveForm(); // Panggil render setelah menghapus field
+            });
+
+            fieldCard.querySelectorAll('input, select, textarea').forEach(input => {
+                input.addEventListener('input', generateAndRenderLiveForm);
+                input.addEventListener('change', generateAndRenderLiveForm); // Untuk select/checkbox/radio
+            });
+        }
+
+        function getFieldsData(container) {
+            const fieldsData = [];
+            container.querySelectorAll('.field-card').forEach(fieldCard => {
+                const id = fieldCard.querySelector('.field-id').value.trim();
+                const label = fieldCard.querySelector('.field-label').value.trim();
+                const type = fieldCard.querySelector('.field-type').value;
+                const placeholder = fieldCard.querySelector('.field-placeholder').value.trim();
+                const required = fieldCard.querySelector('.field-required').checked;
+
+                const field = { id, type, label, placeholder, required };
+
+                if (type === 'select' || type === 'radio' || type === 'checkbox') {
+                    const optionsText = fieldCard.querySelector('.field-options-text').value.trim();
+                    field.options = optionsText ? optionsText.split(',').map(opt => opt.trim()).filter(opt => opt !== '') : [];
+                }
+                if (type === 'number') {
+                    const min = fieldCard.querySelector('.field-min').value;
+                    const max = fieldCard.querySelector('.field-max').value;
+                    if (min !== '') field.min = parseInt(min);
+                    if (max !== '') field.max = parseInt(max);
+                }
+                fieldsData.push(field);
+            });
+            return fieldsData;
+        }
+
+        function generateConfigJson() {
+            const formTitle = document.getElementById('formTitle').value.trim();
+            const formDescription = document.getElementById('formDescription').value.trim();
+            const tableName = document.getElementById('tableName').value.trim();
+
+            const generalFields = getFieldsData(generalFieldsContainer);
+            const repeaterFields = getFieldsData(repeaterFieldsContainer);
+
+            const repeaterId = document.getElementById('repeaterId').value.trim();
+            const repeaterLabel = document.getElementById('repeaterLabel').value.trim();
+            const repeaterMinItems = document.getElementById('repeaterMinItems').value.trim();
+            const repeaterMaxItems = document.getElementById('repeaterMaxItems').value.trim();
+
+            const formConfig = {
+                formTitle: formTitle,
+                formDescription: formDescription,
+                tableName: tableName,
+                fields: generalFields
+            };
+
+            if (repeaterId && repeaterLabel && repeaterFields.length > 0) {
+                const repeaterConfig = {
+                    id: repeaterId,
+                    type: "repeater",
+                    label: repeaterLabel,
+                    fields: repeaterFields
+                };
+                if (repeaterMinItems !== '') {
+                    repeaterConfig.minItems = parseInt(repeaterMinItems);
+                }
+                if (repeaterMaxItems !== '') {
+                    repeaterConfig.maxItems = parseInt(repeaterMaxItems);
+                }
+                formConfig.fields.push(repeaterConfig);
+            }
+            return formConfig;
+        }
+
+        // --- Bagian JavaScript Render Live Form (Fungsional) ---
+        const liveFormPreview = document.getElementById('liveFormPreview');
+        
+        // Map untuk menyimpan penghitung item repeater secara dinamis per ID repeater
+        const repeaterItemCounts = {}; 
+
+        function renderLiveForm(config) {
+            liveFormPreview.innerHTML = ''; // Bersihkan konten preview sebelumnya
+
+            const formElement = document.createElement('form');
+            formElement.id = 'liveDynamicForm';
+            formElement.innerHTML = `
+                <h2>${config.formTitle}</h2>
+                <p class="description">${config.formDescription}</p>
+            `;
+
+            config.fields.forEach(field => {
+                if (field.type === 'repeater') {
+                    const repeaterContainerDiv = document.createElement('div');
+                    repeaterContainerDiv.className = 'repeater-container';
+                    repeaterContainerDiv.innerHTML = `
+                        <h4>${field.label}</h4>
+                        <div id="liveRepeaterItems-${field.id}"></div>
+                        <button type="button" class="add-item-btn" data-repeater-id="${field.id}">➕ Tambah Item</button>
+                    `;
+                    formElement.appendChild(repeaterContainerDiv);
+
+                    const itemsContainer = repeaterContainerDiv.querySelector(`#liveRepeaterItems-${field.id}`);
+                    
+                    // Initialize repeater item count for this specific repeater
+                    repeaterItemCounts[field.id] = 0; 
+
+                    // Add initial items based on minItems
+                    const initialItems = field.minItems || 1; // Default to 1 if minItems is not specified or 0
+                    for (let i = 0; i < initialItems; i++) {
+                        addLiveRepeaterItem(itemsContainer, field.fields, field.id, field.maxItems);
+                    }
+
+                    // Add event listener for the "Add Item" button of this repeater
+                    repeaterContainerDiv.querySelector(`.add-item-btn[data-repeater-id="${field.id}"]`).addEventListener('click', () => {
+                        addLiveRepeaterItem(itemsContainer, field.fields, field.id, field.maxItems);
+                    });
+
+                } else {
+                    const formGroup = document.createElement('div');
+                    formGroup.className = 'form-group';
+                    let inputElement;
+
+                    const labelHtml = `${field.label} ${field.required ? '<span style="color: red;">*</span>' : ''}`;
+
+                    switch (field.type) {
+                        case 'text':
+                        case 'email':
+                        case 'number':
+                            inputElement = document.createElement('input');
+                            inputElement.type = field.type;
+                            inputElement.id = field.id;
+                            inputElement.name = field.id;
+                            inputElement.placeholder = field.placeholder || '';
+                            inputElement.required = field.required || false;
+                            if (field.type === 'number') {
+                                if (field.min !== undefined) inputElement.min = field.min;
+                                if (field.max !== undefined) inputElement.max = field.max;
+                            }
+                            break;
+                        case 'textarea':
+                            inputElement = document.createElement('textarea');
+                            inputElement.id = field.id;
+                            inputElement.name = field.id;
+                            inputElement.placeholder = field.placeholder || '';
+                            inputElement.required = field.required || false;
+                            break;
+                        case 'select':
+                            inputElement = document.createElement('select');
+                            inputElement.id = field.id;
+                            inputElement.name = field.id;
+                            inputElement.required = field.required || false;
+                            const defaultOption = document.createElement('option');
+                            defaultOption.value = "";
+                            defaultOption.textContent = field.placeholder || `-- Pilih ${field.label} --`;
+                            inputElement.appendChild(defaultOption);
+                            field.options.forEach(optionText => {
+                                const option = document.createElement('option');
+                                option.value = optionText;
+                                option.textContent = optionText;
+                                inputElement.appendChild(option);
+                            });
+                            break;
+                        case 'radio':
+                            formGroup.innerHTML = `<label>${labelHtml}</label><div class="radio-group"></div>`;
+                            field.options.forEach((optionText, index) => {
+                                const radioLabel = document.createElement('label');
+                                const radioInput = document.createElement('input');
+                                radioInput.type = 'radio';
+                                radioInput.id = `${field.id}-${index}`;
+                                radioInput.name = field.id;
+                                radioInput.value = optionText;
+                                radioInput.required = field.required || false;
+                                radioLabel.appendChild(radioInput);
+                                radioLabel.appendChild(document.createTextNode(` ${optionText}`));
+                                formGroup.querySelector('.radio-group').appendChild(radioLabel);
+                            });
+                            inputElement = null;
+                            break;
+                        case 'checkbox':
+                            if (field.options && field.options.length > 1) {
+                                formGroup.innerHTML = `<label>${labelHtml}</label><div class="checkbox-group"></div>`;
+                                field.options.forEach((optionText, index) => {
+                                    const checkboxLabel = document.createElement('label');
+                                    const checkboxInput = document.createElement('input');
+                                    checkboxInput.type = 'checkbox';
+                                    checkboxInput.id = `${field.id}-${index}`;
+                                    checkboxInput.name = `${field.id}[]`;
+                                    checkboxInput.value = optionText;
+                                    checkboxLabel.appendChild(checkboxInput);
+                                    checkboxLabel.appendChild(document.createTextNode(` ${optionText}`));
+                                    formGroup.querySelector('.checkbox-group').appendChild(checkboxLabel);
+                                });
+                                inputElement = null;
+                            } else {
+                                formGroup.innerHTML = `
+                                    <label>
+                                        <input type="checkbox" id="${field.id}" name="${field.id}" ${field.required ? 'required' : ''}>
+                                        ${field.label} ${field.required ? '<span style="color: red;">*</span>' : ''}
+                                    </label>
+                                `;
+                                inputElement = null;
+                            }
+                            break;
+                        default:
+                            console.warn(`Tipe field tidak dikenal atau tidak didukung di preview: ${field.type}`);
+                            break;
+                    }
+
+                    if (inputElement) {
+                        const labelElement = document.createElement('label');
+                        labelElement.htmlFor = field.id;
+                        labelElement.innerHTML = labelHtml;
+                        formGroup.appendChild(labelElement);
+                        formGroup.appendChild(inputElement);
+                    }
+                    if (inputElement || field.type === 'radio' || (field.type === 'checkbox' && field.options && field.options.length > 1) ) {
+                        formElement.appendChild(formGroup);
+                    }
+                }
+            });
+
+            const submitButton = document.createElement('button');
+            submitButton.type = 'submit';
+            submitButton.textContent = 'Kirim Pesanan (Live Preview)';
+            formElement.appendChild(submitButton);
+
+            const liveResponseMessage = document.createElement('div');
+            liveResponseMessage.id = 'liveResponseMessage';
+            liveResponseMessage.className = 'live-response-message';
+            formElement.appendChild(liveResponseMessage);
+
+            liveFormPreview.appendChild(formElement);
+
+            // Add dummy submit handler to live preview form
+            formElement.addEventListener('submit', function(e) {
+                e.preventDefault();
+                liveResponseMessage.classList.remove('error', 'success');
+                liveResponseMessage.textContent = '';
+
+                // Manual validation for live preview
+                let validationErrors = [];
+                const formInputs = formElement.querySelectorAll('[name]');
+                const formDataOutput = {};
+
+                formInputs.forEach(input => {
+                    const name = input.name;
+                    // For checkboxes, collect value only if checked
+                    if (input.type === 'checkbox') {
+                        if (input.checked) {
+                            if (input.name.endsWith('[]')) { // Multiple checkboxes with same name
+                                const baseName = input.name.slice(0, -2);
+                                if (!formDataOutput[baseName]) {
+                                    formDataOutput[baseName] = [];
+                                }
+                                formDataOutput[baseName].push(input.value);
+                            } else { // Single checkbox
+                                formDataOutput[name] = input.checked;
+                            }
+                        }
+                    } else if (input.type === 'radio') {
+                         if (input.checked) {
+                             formDataOutput[name] = input.value;
+                         }
+                    } else if (name.includes('-item-') && name.includes('-field-')) {
+                        // This pattern is for repeater fields: repeaterId-item-itemIndex-field-fieldId
+                        const parts = name.split('-item-');
+                        const repeaterId = parts[0];
+                        const itemPart = parts[1]; // e.g., "1-field-productName"
+                        const itemIndex = parseInt(itemPart.split('-field-')[0]);
+                        const fieldId = itemPart.split('-field-')[1];
+
+                        if (!formDataOutput[repeaterId]) {
+                            formDataOutput[repeaterId] = [];
+                        }
+                        if (!formDataOutput[repeaterId][itemIndex]) {
+                            formDataOutput[repeaterId][itemIndex] = {};
+                        }
+                        formDataOutput[repeaterId][itemIndex][fieldId] = input.value;
+                    } else {
+                        formDataOutput[name] = input.value;
+                    }
+
+                    // Basic validation for required fields
+                    if (input.required && (input.value.trim() === '' && input.type !== 'checkbox' && input.type !== 'radio')) {
+                        validationErrors.push(`Field "${input.labels[0]?.textContent.replace('*', '').trim() || input.name}" wajib diisi.`);
+                    }
+                    // Handle required for radio buttons
+                    if (input.type === 'radio' && input.required) {
+                        const radioGroup = formElement.querySelector(`input[name="${input.name}"]:checked`);
+                        if (!radioGroup) {
+                            validationErrors.push(`Pilih salah satu opsi untuk "${input.labels[0]?.textContent.replace('*', '').trim() || input.name}".`);
+                        }
+                    }
+
+                    if (input.type === 'email' && input.value.trim() !== '' && !/\S+@\S+\.\S+/.test(input.value)) {
+                        validationErrors.push(`Email "${input.value}" tidak valid.`);
+                    }
+                    if (input.type === 'number') {
+                        const numValue = parseInt(input.value);
+                        if (input.min && numValue < parseInt(input.min)) {
+                            validationErrors.push(`Jumlah untuk "${input.labels[0]?.textContent.replace('*', '').trim() || input.name}" harus minimal ${input.min}.`);
+                        }
+                        if (input.max && numValue > parseInt(input.max)) {
+                            validationErrors.push(`Jumlah untuk "${input.labels[0]?.textContent.replace('*', '').trim() || input.name}" harus maksimal ${input.max}.`);
+                        }
+                    }
+                });
+
+                // Clean up repeater array in formDataOutput to remove empty/null items
+                for (const key in formDataOutput) {
+                    if (Array.isArray(formDataOutput[key]) && key.includes('-item-')) { // This shouldn't happen with new naming
+                        // If there are issues, this cleans up.
+                        formDataOutput[key] = formDataOutput[key].filter(item => item !== null && typeof item === 'object' && Object.keys(item).length > 0);
+                    } else if (Array.isArray(formDataOutput[key])) { // Actual repeater data
+                         formDataOutput[key] = formDataOutput[key].filter(item => item !== null && typeof item === 'object' && Object.keys(item).length > 0);
+                    }
+                }
+
+
+                // Final check for repeater minItems
+                const configRepeater = config.fields.find(f => f.type === 'repeater');
+                if (configRepeater && configRepeater.minItems > 0) {
+                    const actualItems = formDataOutput[configRepeater.id] ? formDataOutput[configRepeater.id].length : 0; // Check length of filtered array
+                    if (actualItems < configRepeater.minItems) {
+                        validationErrors.push(`Anda harus menambahkan setidaknya ${configRepeater.minItems} item di bagian "${configRepeater.label}".`);
+                    }
+                }
+
+                if (validationErrors.length > 0) {
+                    liveResponseMessage.classList.add('error');
+                    liveResponseMessage.innerHTML = 'Validasi Gagal:<br>' + [...new Set(validationErrors)].join('<br>'); // Use Set to remove duplicates
+                } else {
+                    liveResponseMessage.classList.add('success');
+                    liveResponseMessage.innerHTML = 'Data Form (JSON Output):<br><pre>' + JSON.stringify(formDataOutput, null, 2) + '</pre>';
+                    // You could save this to localStorage here if desired for the live form
+                }
+            });
+        }
+
+        // Fungsi untuk menambahkan satu item ke repeater di live preview
+        function addLiveRepeaterItem(container, repeaterFieldsConfig, repeaterId, maxItems) {
+            const currentItemsInContainer = container.querySelectorAll('.product-item').length;
+            if (maxItems && currentItemsInContainer >= maxItems) {
+                alert(`Maksimum ${maxItems} item untuk ${repeaterId} telah tercapai.`);
+                return;
+            }
+
+            // Gunakan penghitung global untuk repeater ini untuk mendapatkan indeks unik
+            repeaterItemCounts[repeaterId] = (repeaterItemCounts[repeaterId] || 0) + 1;
+            const itemIndex = repeaterItemCounts[repeaterId];
+
+            const itemDiv = document.createElement('div');
+            itemDiv.className = 'product-item';
+            
+            repeaterFieldsConfig.forEach(field => {
+                const fieldGroup = document.createElement('div');
+                const labelHtml = `${field.label} ${field.required ? '<span style="color: red;">*</span>' : ''}`;
+                
+                // Name attributes for repeater fields must be unique per item,
+                // and identifiable as part of the repeater.
+                // Using "repeaterId-item-[index]-field-fieldId" pattern
+                const fieldName = `${repeaterId}-item-${itemIndex}-field-${field.id}`;
+                const fieldIdUnique = `${field.id}-item-${itemIndex}`; // ID for label "for" attribute
+
+                switch (field.type) {
+                    case 'text':
+                    case 'email':
+                    case 'number':
+                        fieldGroup.innerHTML = `
+                            <label for="${fieldIdUnique}">${labelHtml}</label>
+                            <input type="${field.type}" id="${fieldIdUnique}" name="${fieldName}" placeholder="${field.placeholder || ''}" ${field.required ? 'required' : ''}
+                                ${field.type === 'number' && field.min !== undefined ? `min="${field.min}"` : ''}
+                                ${field.type === 'number' && field.max !== undefined ? `max="${field.max}"` : ''}>
+                        `;
+                        break;
+                    case 'select':
+                        let optionsHtml = `<option value="">${field.placeholder || `-- Pilih ${field.label} --`}</option>`;
+                        if (field.options) {
+                            optionsHtml += field.options.map(opt => `<option value="${opt}">${opt}</option>`).join('');
+                        }
+                        fieldGroup.innerHTML = `
+                            <label for="${fieldIdUnique}">${labelHtml}</label>
+                            <select id="${fieldIdUnique}" name="${fieldName}" ${field.required ? 'required' : ''}>
+                                ${optionsHtml}
+                            </select>
+                        `;
+                        break;
+                    case 'textarea':
+                        fieldGroup.innerHTML = `
+                            <label for="${fieldIdUnique}">${labelHtml}</label>
+                            <textarea id="${fieldIdUnique}" name="${fieldName}" placeholder="${field.placeholder || ''}" ${field.required ? 'required' : ''}></textarea>
+                        `;
+                        break;
+                    case 'radio':
+                        let radioOptionsHtml = '';
+                        if (field.options) {
+                            field.options.forEach((opt, idx) => {
+                                radioOptionsHtml += `
+                                    <label>
+                                        <input type="radio" name="${fieldName}" value="${opt}" ${field.required && idx === 0 ? 'required' : ''}> ${opt}
+                                    </label>
+                                `;
+                            });
+                        }
+                        fieldGroup.innerHTML = `
+                            <label>${labelHtml}</label>
+                            <div class="radio-group">${radioOptionsHtml}</div>
+                        `;
+                        break;
+                    case 'checkbox':
+                        let checkboxOptionsHtml = '';
+                        if (field.options && field.options.length > 1) {
+                            field.options.forEach((opt, idx) => {
+                                checkboxOptionsHtml += `
+                                    <label>
+                                        <input type="checkbox" name="${fieldName}[]" value="${opt}" ${field.required && idx === 0 ? 'required' : ''}> ${opt}
+                                    </label>
+                                `;
+                            });
+                            fieldGroup.innerHTML = `
+                                <label>${labelHtml}</label>
+                                <div class="checkbox-group">${checkboxOptionsHtml}</div>
+                            `;
+                        } else {
+                            fieldGroup.innerHTML = `
+                                <label>
+                                    <input type="checkbox" id="${fieldIdUnique}" name="${fieldName}" ${field.required ? 'required' : ''}> ${field.label} ${field.required ? '<span style="color: red;">*</span>' : ''}
+                                </label>
+                            `;
+                        }
+                        break;
+                    default:
+                        fieldGroup.innerHTML = `<div><label>Tipe tidak didukung: ${field.type}</label></div>`;
+                        break;
+                }
+                itemDiv.appendChild(fieldGroup);
+            });
+
+            const removeButton = document.createElement('button');
+            removeButton.type = 'button';
+            removeButton.className = 'remove-item-btn';
+            removeButton.textContent = '🗑️ Hapus';
+            removeButton.addEventListener('click', () => {
+                itemDiv.remove();
+            });
+            itemDiv.appendChild(removeButton);
+
+            container.appendChild(itemDiv);
+        }
+
+        // Fungsi utama untuk generate JSON dan render live form secara bersamaan
+        function generateAndRenderLiveForm() {
+            const config = generateConfigJson();
+            jsonOutput.value = JSON.stringify(config, null, 2);
+            renderLiveForm(config);
+        }
+
+        // Inisialisasi awal saat DOM siap
+        document.addEventListener('DOMContentLoaded', function() {
+            // Tambahkan field default untuk generator
+            defaultGeneralFields.forEach(field => addField(generalFieldsContainer, false, field));
+            defaultRepeaterFields.forEach(field => addField(repeaterFieldsContainer, true, field));
+
+            // Tambahkan event listener untuk input umum di generator agar live preview update
+            document.getElementById('formTitle').addEventListener('input', generateAndRenderLiveForm);
+            document.getElementById('formDescription').addEventListener('input', generateAndRenderLiveForm);
+            document.getElementById('tableName').addEventListener('input', generateAndRenderLiveForm);
+            document.getElementById('repeaterId').addEventListener('input', generateAndRenderLiveForm);
+            document.getElementById('repeaterLabel').addEventListener('input', generateAndRenderLiveForm);
+            document.getElementById('repeaterMinItems').addEventListener('input', generateAndRenderLiveForm);
+            document.getElementById('repeaterMaxItems').addEventListener('input', generateAndRenderLiveForm);
+
+            // Panggil generate dan render live form pertama kali
+            generateAndRenderLiveForm();
+        });
+
+        // Tombol salin JSON
+        copyJsonBtn.addEventListener('click', function() {
+            jsonOutput.select();
+            jsonOutput.setSelectionRange(0, 99999);
+            document.execCommand("copy");
+            alert("JSON berhasil disalin ke clipboard!");
+        });
+
+        // Tombol simpan ke localStorage
+        saveConfigBtn.addEventListener('click', function() {
+            const configToSave = jsonOutput.value;
+            if (configToSave) {
+                try {
+                    localStorage.setItem('formConfig', configToSave);
+                    alert("Konfigurasi JSON berhasil disimpan ke LocalStorage dengan kunci 'formConfig'!");
+                } catch (e) {
+                    alert("Gagal menyimpan ke LocalStorage: " + e.message);
+                }
+            } else {
+                alert("Harap generate JSON terlebih dahulu!");
+            }
+        });
+    </script>
+</body>
+</html>

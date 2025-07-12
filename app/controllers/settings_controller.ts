@@ -613,6 +613,9 @@ export default class SettingsController {
   async UI({ view }) {
     return view.render('configs/index', { base_url: env.get('APP_URL') })
   }
+  async UIDynamicsForm({ view }) {
+    return view.render('configs/form_dinamis', { base_url: env.get('APP_URL') })
+  }
   async UIDash({ view }) {
     return view.render('configs/dash', { base_url: env.get('APP_URL') })
   }

@@ -58,6 +58,9 @@
               <li class="nav-item active" data-menu="dashboard">
                 <span>Dashboard</span>
               </li>
+              <li class="nav-item" data-menu="shortcut">
+                <span>Pintasan</span>
+              </li>
               <li class="nav-item" data-menu="collections">
                 <span>Koleksi</span>
               </li>
@@ -223,6 +226,17 @@
             </div>
             <div class="settings-content">
               @include('configs/settings')
+            </div>
+          </div>
+
+          <div id="shortcut-view" class="content-view">
+            <div class="content-header">
+              <h3>
+                Pintasan
+              </h3>
+            </div>
+            <div class="shortcut-content">
+              @include('configs/shortcut')
             </div>
           </div>
 

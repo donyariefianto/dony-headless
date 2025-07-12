@@ -38,6 +38,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const collectionsView = document.getElementById('collections-view')
   const settingsView = document.getElementById('settings-view')
   const boardsView = document.getElementById('dashboard-view')
+  const shortcutView = document.getElementById('shortcut-view')
   const navItems = document.querySelectorAll('.nav-item')
 
   const noCollectionSelectedMessage = document.getElementById('no-collection-selected')
@@ -1587,6 +1588,8 @@ document.addEventListener('DOMContentLoaded', () => {
         settingsView.classList.add('active-view')
       } else if (menu === 'dashboard') {
         boardsView.classList.add('active-view')
+      } else if (menu === 'pintasan') {
+        shortcutView.classList.add('active-view')
       }
     })
   })
