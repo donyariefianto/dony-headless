@@ -12,7 +12,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // Dashboard specific elements
     dashboardConfigView: document.getElementById('dashboard-config-view'), // This view is now implicitly handled by sidebar
     addDashboardWidgetBtn: document.getElementById('add-dashboard-widget-btn'),
-    dashboardForm: document.getElementById('dashboard-form'),
     dashboardIdInput: document.getElementById('data-dashboard-id'),
     dashboardNameInput: document.getElementById('dashboard-name'),
     dashboardDescriptionInput: document.getElementById('dashboard-description'),

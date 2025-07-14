@@ -4,12 +4,18 @@ document.addEventListener('DOMContentLoaded', () => {
   const collectionsList = document.getElementById('collections-list')
   const addCollectionBtn = document.getElementById('add-collection-btn')
   const addDashboardnBtn = document.getElementById('add-dashboard-btn')
+  const addFormBuildernBtn = document.getElementById('add-formbuilder-btn')
   const rightFormSidebar = document.getElementById('right-form-sidebar')
   const closeSidebarBtns = document.querySelectorAll('.close-sidebar-btn')
   const overlay = document.getElementById('overlay')
   const sidebarFormTitle = document.getElementById('sidebar-form-title')
   const userDisplayElement = document.getElementById('user-display')
   const logoutBtn = document.getElementById('logout-btn')
+
+  // Generate BuilderForm Element
+  const formbuilderForm = document.getElementById('data-formbuilder-form')
+  const dataformbuilderIdInput = document.getElementById('data-formbuilder-id')
+  const dataformbuilderFieldsContainer = document.getElementById('data-item-fields-container')
 
   // Generate Dashboard Elements
   const dashboardForm = document.getElementById('data-dashboard-form')
@@ -986,11 +992,21 @@ document.addEventListener('DOMContentLoaded', () => {
     openSidebar()
   }
 
-  async function populateDataDashboardForm(dataDashboard = null) {
+  function populateDataDashboardForm(dataDashboard = null) {
     sidebarFormTitle.textContent = dataDashboard ? `Edit Dashboard` : `Tambah Dashboard`
     collectionForm.classList.remove('active-form') // Show collection form
     dataItemForm.classList.remove('active-form') // Hide data item form
+    formbuilderForm.classList.remove('active-form')
     dashboardForm.classList.add('active-form') // Hide dashboard form
+    openSidebar()
+  }
+
+  function populateDataBuilderForm(dataBuilder = null) {
+    sidebarFormTitle.textContent = dataBuilder ? `Edit Form Builder` : `Tambah Form Builder`
+    collectionForm.classList.remove('active-form') // Show collection form
+    dataItemForm.classList.remove('active-form') // Hide data item form
+    dashboardForm.classList.remove('active-form') // Hide dashboard form
+    formbuilderForm.classList.add('active-form')
     openSidebar()
   }
 
@@ -1006,6 +1022,15 @@ document.addEventListener('DOMContentLoaded', () => {
     fieldsContainer.innerHTML = ''
     relationsContainer.innerHTML = ''
 
+    addField({
+      name: '_id',
+      type: 'id',
+      required: false,
+      unique: false,
+      readOnly: true,
+      collapsed: true,
+      options: {},
+    })
     addField({
       name: 'created_at',
       type: 'datetime',
@@ -1409,10 +1434,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
   let relationCounter = 0
   const relationTypes = [
-    { value: 'one-to-one', label: 'Satu-ke-Satu' },
-    { value: 'one-to-many', label: 'Satu-ke-Banyak' },
-    { value: 'many-to-one', label: 'Banyak-ke-Satu' },
-    { value: 'many-to-many', label: 'Banyak-ke-Banyak' },
+    { value: 'one-to-one', label: 'One-to-One' },
+    { value: 'one-to-many', label: 'One-to-Many' },
+    { value: 'many-to-one', label: 'Many-to-One' },
+    { value: 'many-to-many', label: 'Many-to-Many' },
   ]
 
   function addRelation(relationData = null) {
@@ -1420,9 +1445,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const defaultRelationData = {
       id: generatedId,
       name: '',
+      label: '',
       type: 'one-to-one',
       targetCollection: '',
-      collapsed: false,
+      collapsed: true,
     }
 
     const finalRelationData = { ...defaultRelationData, ...relationData }
@@ -1610,6 +1636,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   addDashboardnBtn.addEventListener('click', () => {
     populateDataDashboardForm()
+  })
+  addFormBuildernBtn.addEventListener('click', () => {
+    populateDataBuilderForm()
   })
   // Handle Data Item Form Submission
   dataItemForm.addEventListener('submit', async (e) => {
