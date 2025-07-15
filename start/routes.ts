@@ -33,6 +33,13 @@ router
         router.get('/list', '#controllers/settings_controller.getCollectionListConfig')
       })
       .prefix('/dashboard')
+
+    // API CRUD FORMBUILDER
+    router
+      .group(() => {
+        router.get('/list', '#controllers/settings_controller.getFormBuilderListConfig')
+      })
+      .prefix('/formbuilder')
   })
   .prefix('/configuration')
 

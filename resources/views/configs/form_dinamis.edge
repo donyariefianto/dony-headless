@@ -36,23 +36,33 @@
         color: white;
         border-color: #007bff;
       }
+      
+      .form-group {
+        margin-bottom: 10px;
+      }
+      
+      .extra-options {
+        margin-top: 10px;
+        padding: 10px;
+        background: #f8f9fa;
+        border: 1px dashed #ccc;
+        border-radius: 5px;
+      }
     </style>
   </head>
   <body>
     <div class="sidebar-content">
       <form id="formbuilder-generator-form" class="active-form">
-        <input type="hidden" id="formbuilder-id" />
-
         <div class="form-section">
           <h4>
             Info Form Builder
           </h4>
           <div class="form-group">
-            <label for="form-name">Nama Form <span class="required">*</span></label>
+            <label for="form-name">Nama Form</label>
             <input type="text" id="form-name" class="form-control" required />
           </div>
           <div class="form-group">
-            <label for="form-slug">Slug Form <span class="required">*</span></label>
+            <label for="form-slug">Slug Form</label>
             <input type="text" id="form-slug" class="form-control" required />
           </div>
           <div class="form-group">
@@ -76,23 +86,11 @@
 
         <div class="form-section">
           <h4>
-            Subform
+            Subforms
           </h4>
-          <div class="form-group">
-            <label for="subform-table">Nama Tabel Detail</label>
-            <input type="text" id="subform-table" class="form-control" />
+          <div id="subform-panels" class="sortable-list">
           </div>
-          <div class="form-group">
-            <label for="subform-fk">Foreign Key ke Tabel Utama</label>
-            <input type="text" id="subform-fk" class="form-control" />
-          </div>
-          <div class="form-group">
-            <label for="subform-label">Label Subform</label>
-            <input type="text" id="subform-label" class="form-control" />
-          </div>
-          <div id="subform-fields" class="sortable-list">
-          </div>
-          <button type="button" onclick="addSubField()" class="btn btn-outline-primary btn-add-item">+ Tambah Field Subform</button>
+          <button type="button" onclick="addSubform()" class="btn btn-outline-primary btn-add-item">+ Tambah Subform</button>
         </div>
 
         <div class="form-section">
@@ -116,42 +114,32 @@
     </div>
 
     <script>
-      function addMainField() {
-        const container = document.getElementById("main-fields");
-        container.appendChild(buildFieldWidget("main"));
-      }
-      
-      function addSubField() {
-        const container = document.getElementById("subform-fields");
-        container.appendChild(buildFieldWidget("sub"));
-      }
-      
       function buildFieldWidget(type) {
         const fieldId = `field-${Date.now()}-${Math.floor(Math.random() * 1e3)}`;
         const wrapper = document.createElement("div");
         wrapper.className = "field-item";
         wrapper.dataset.id = fieldId;
         wrapper.innerHTML = `
-                    <div class="field-header">
-                      <span class="title"><span class="field-name-display">Field Baru</span></span>
-                      <div class="item-actions">
-                        <button type="button" class="remove-item-btn" onclick="this.closest('.field-item').remove()"><i class="fas fa-trash"></i></button>
-                        <button type="button" class="toggle-collapse-btn" onclick="toggleCollapse(this)"><i class="fas fa-chevron-up"></i></button>
-                      </div>
-                    </div>
-                    <div class="collapsible-content">
-                      <div class="form-group">
-                        <label for="${fieldId}-name">Nama Field <span class="required">*</span></label>
-                        <input type="text" id="${fieldId}-name" class="field-name form-control" required />
-                      </div>
-                      <div class="form-group">
-                        <label for="${fieldId}-label">Label Field</label>
-                        <input type="text" id="${fieldId}-label" class="field-label form-control" />
-                      </div>
-                      <div class="form-group">
-                        <label>Tipe Field</label>
-                        <div class="type-options">
-                          ${[ "text", "number", "date", "select", "boolean", "media", "enum", ...type === "main" ? [ "calculated" ] : [] ].map((t, i) => {
+                                                                      <div class="field-header">
+                                                                        <span class="title"><span class="field-name-display">Field Baru</span></span>
+                                                                        <div class="item-actions">
+                                                                          <button type="button" class="remove-item-btn" onclick="this.closest('.field-item').remove()"><i class="fas fa-trash"></i></button>
+                                                                          <button type="button" class="toggle-collapse-btn" onclick="toggleCollapse(this)"><i class="fas fa-chevron-up"></i></button>
+                                                                        </div>
+                                                                      </div>
+                                                                      <div class="collapsible-content">
+                                                                        <div class="form-group">
+                                                                          <label>Nama Field</label>
+                                                                          <input type="text" class="field-name form-control" />
+                                                                        </div>
+                                                                        <div class="form-group">
+                                                                          <label>Label</label>
+                                                                          <input type="text" class="field-label form-control" />
+                                                                        </div>
+                                                                        <div class="form-group">
+                                                                          <label>Tipe Field</label>
+                                                                          <div class="type-options">
+                                                                            ${[ "text", "number", "date", "select", "boolean", "media", "enum", "calculated" ].map((t, i) => {
           const icons = {
             text: "fa-font",
             number: "fa-hashtag",
@@ -163,29 +151,111 @@
             calculated: "fa-equals"
           };
           const labels = {
-            text: "Teks Pendek",
+            text: "Teks",
             number: "Angka",
-            date: "Tanggal & Waktu",
+            date: "Tanggal",
             select: "Select",
             boolean: "Boolean",
             media: "Media",
             enum: "Enum",
-            calculated: "Hitung Otomatis"
+            calculated: "Hitung"
           };
           return `
-                            <label class="type-option ${i === 0 ? "selected" : ""}" onclick="selectType(this)">
-                              <i class="fas ${icons[t]}"></i> ${labels[t]}
-                              <input type="radio" name="${fieldId}-type-radio" value="${t}" style="display:none;" ${i === 0 ? "checked" : ""}>
-                            </label>`;
+                                                                              <label class="type-option ${i === 0 ? "selected" : ""}" onclick="selectType(this)">
+                                                                                <i class="fas ${icons[t]}"></i> ${labels[t]}
+                                                                                <input type="radio" name="${fieldId}-type" value="${t}" style="display:none;" ${i === 0 ? "checked" : ""}>
+                                                                              </label>`;
         }).join("")}
-                        </div>
-                      </div>
-                      <div class="form-group checkbox-group">
-                        <input type="checkbox" id="${fieldId}-required" class="field-required" />
-                        <label for="${fieldId}-required">Wajib Diisi</label>
-                      </div>
-                    </div>`;
+                                                                          </div>
+                                                                        </div>
+                                                                        <div class="form-group checkbox-group">
+                                                                          <input type="checkbox" class="field-required" /> <label>Wajib Diisi</label>
+                                                                        </div>
+                                                                        <div class="extra-options"></div>
+                                                                      </div>`;
         return wrapper;
+      }
+      
+      function handleSelectFieldMode(typeContainer) {
+        const selectedType = typeContainer.querySelector("input[type=radio]:checked").value;
+        const extraOptionsContainer = typeContainer.closest(".collapsible-content").querySelector(".extra-options");
+        if (!extraOptionsContainer) return;
+        if (selectedType === "select") {
+          extraOptionsContainer.innerHTML = `
+                                                                        <div class="form-group">
+                                                                          <label>Mode Select</label>
+                                                                          <select class="select-mode form-control" onchange="toggleSelectModeOptions(this)">
+                                                                            <option value="static">Static</option>
+                                                                            <option value="relation">Relasi</option>
+                                                                          </select>
+                                                                        </div>
+                                                                        <div class="select-mode-options static-options">
+                                                                          <label>Opsi Static (pisahkan dengan koma)</label>
+                                                                          <input type="text" class="form-control select-static-values" placeholder="cth: Aktif, Tidak Aktif" />
+                                                                        </div>
+                                                                      `;
+        } else {
+          extraOptionsContainer.innerHTML = "";
+        }
+      }
+      
+      function toggleSelectModeOptions(selectEl) {
+        const container = selectEl.closest(".extra-options");
+        const staticHTML = `
+                                                                      <label>Opsi Static (pisahkan dengan koma)</label>
+                                                                      <input type="text" class="form-control select-static-values" placeholder="cth: Aktif, Tidak Aktif" />
+                                                                    `;
+        const relationHTML = `
+                                                                      <label>Nama Tabel Relasi</label>
+                                                                      <input type="text" class="form-control relation-table" placeholder="users" />
+                                                                      <label>Kolom Value</label>
+                                                                      <input type="text" class="form-control relation-value" placeholder="id" />
+                                                                      <label>Kolom Label</label>
+                                                                      <input type="text" class="form-control relation-label" placeholder="name" />
+                                                                    `;
+        container.querySelector(".select-mode-options").innerHTML = selectEl.value === "static" ? staticHTML : relationHTML;
+      }
+      
+      function addMainField() {
+        document.getElementById("main-fields").appendChild(buildFieldWidget("main"));
+      }
+      
+      function addSubform() {
+        const container = document.getElementById("subform-panels");
+        const id = `subform-${Date.now()}-${Math.floor(Math.random() * 1e3)}`;
+        const wrapper = document.createElement("div");
+        wrapper.className = "field-item";
+        wrapper.dataset.id = id;
+        wrapper.innerHTML = `
+                                                                      <div class="field-header">
+                                                                        <span class="title"><span class="field-name-display">Subform Baru</span></span>
+                                                                        <div class="item-actions">
+                                                                          <button type="button" class="remove-item-btn" onclick="this.closest('.field-item').remove()"><i class="fas fa-trash"></i></button>
+                                                                          <button type="button" class="toggle-collapse-btn" onclick="toggleCollapse(this)"><i class="fas fa-chevron-up"></i></button>
+                                                                        </div>
+                                                                      </div>
+                                                                      <div class="collapsible-content">
+                                                                        <div class="form-group">
+                                                                          <label>Nama Tabel Detail</label>
+                                                                          <input type="text" class="subform-table form-control" />
+                                                                        </div>
+                                                                        <div class="form-group">
+                                                                          <label>Foreign Key</label>
+                                                                          <input type="text" class="subform-fk form-control" />
+                                                                        </div>
+                                                                        <div class="form-group">
+                                                                          <label>Label Subform</label>
+                                                                          <input type="text" class="subform-label form-control" />
+                                                                        </div>
+                                                                        <div class="form-subfields"></div>
+                                                                        <button type="button" class="btn btn-outline-primary btn-add-item" onclick="addSubField(this)">+ Tambah Field Subform</button>
+                                                                      </div>`;
+        container.appendChild(wrapper);
+      }
+      
+      function addSubField(btn) {
+        const container = btn.closest(".field-item").querySelector(".form-subfields");
+        container.appendChild(buildFieldWidget("sub"));
       }
       
       function addCalculation() {
@@ -195,25 +265,32 @@
         wrapper.className = "field-item";
         wrapper.dataset.id = id;
         wrapper.innerHTML = `
-                    <div class="field-header">
-                      <span class="title"><span class="field-name-display">Formula Baru</span></span>
-                      <div class="item-actions">
-                        <button type="button" class="remove-item-btn" onclick="this.closest('.field-item').remove()"><i class="fas fa-trash"></i></button>
-                        <button type="button" class="toggle-collapse-btn" onclick="toggleCollapse(this)"><i class="fas fa-chevron-up"></i></button>
-                      </div>
-                    </div>
-                    <div class="collapsible-content">
-                      <div class="form-group">
-                        <label for="${id}-field">Nama Field Output</label>
-                        <input type="text" class="calc-name form-control" id="${id}-field" placeholder="Contoh: total" />
-                      </div>
-                      <div class="form-group">
-                        <label for="${id}-formula">Formula</label>
-                        <input type="text" class="calc-formula form-control" id="${id}-formula" placeholder="jumlah * harga_satuan" />
-                      </div>
-                    </div>
-                  `;
+                                                                      <div class="field-header">
+                                                                        <span class="title"><span class="field-name-display">Formula Baru</span></span>
+                                                                        <div class="item-actions">
+                                                                          <button type="button" class="remove-item-btn" onclick="this.closest('.field-item').remove()"><i class="fas fa-trash"></i></button>
+                                                                          <button type="button" class="toggle-collapse-btn" onclick="toggleCollapse(this)"><i class="fas fa-chevron-up"></i></button>
+                                                                        </div>
+                                                                      </div>
+                                                                      <div class="collapsible-content">
+                                                                        <div class="form-group">
+                                                                          <label>Nama Field Output</label>
+                                                                          <input type="text" class="calc-name form-control" />
+                                                                        </div>
+                                                                        <div class="form-group">
+                                                                          <label>Formula</label>
+                                                                          <input type="text" class="calc-formula form-control" />
+                                                                        </div>
+                                                                      </div>`;
         container.appendChild(wrapper);
+      }
+      
+      function selectType(el) {
+        const group = el.closest(".type-options");
+        group.querySelectorAll(".type-option").forEach(opt => opt.classList.remove("selected"));
+        el.classList.add("selected");
+        el.querySelector("input[type=radio]").checked = true;
+        handleSelectFieldMode(group);
       }
       
       function toggleCollapse(btn) {
@@ -224,47 +301,53 @@
         icon.classList.toggle("fa-chevron-down");
       }
       
-      function selectType(el) {
-        const group = el.closest(".type-options");
-        group.querySelectorAll(".type-option").forEach(opt => opt.classList.remove("selected"));
-        el.classList.add("selected");
-        el.querySelector("input[type=radio]").checked = true;
-      }
-      
       function generateSchema() {
         const schema = {
           slug: document.getElementById("form-slug").value,
           name: document.getElementById("form-name").value,
           table_name: document.getElementById("form-table").value,
           submit_label: document.getElementById("form-submit-label").value,
-          fields: [],
-          subform: {
-            table_name: document.getElementById("subform-table").value,
-            foreign_key: document.getElementById("subform-fk").value,
-            label: document.getElementById("subform-label").value,
-            fields: []
-          },
+          fields: Array.from(document.querySelectorAll("#main-fields .field-item")).map(div => {
+            const type = div.querySelector(".type-option.selected input").value;
+            const options = {};
+            if (type === "select") {
+              const extra = div.querySelector(".extra-options");
+              const mode = extra.querySelector(".select-mode").value;
+              options.mode = mode;
+              if (mode === "static") {
+                options.values = extra.querySelector(".select-static-values").value.split(",").map(v => v.trim());
+              } else {
+                options.relation = {
+                  table: extra.querySelector(".relation-table").value,
+                  value_column: extra.querySelector(".relation-value").value,
+                  label_column: extra.querySelector(".relation-label").value
+                };
+              }
+            }
+            return {
+              name: div.querySelector(".field-name").value,
+              label: div.querySelector(".field-label").value,
+              type: type,
+              required: div.querySelector(".field-required").checked,
+              options: options
+            };
+          }),
+          subforms: Array.from(document.querySelectorAll("#subform-panels .field-item")).map(sf => ({
+            table_name: sf.querySelector(".subform-table").value,
+            foreign_key: sf.querySelector(".subform-fk").value,
+            label: sf.querySelector(".subform-label").value,
+            fields: Array.from(sf.querySelectorAll(".form-subfields .field-item")).map(f => ({
+              name: f.querySelector(".field-name").value,
+              label: f.querySelector(".field-label").value,
+              type: f.querySelector(".type-option.selected input").value
+            }))
+          })),
           calculations: Array.from(document.querySelectorAll("#calculation-fields .field-item")).map(div => ({
             field: div.querySelector(".calc-name").value,
             from: "subform",
             formula: div.querySelector(".calc-formula").value
           }))
         };
-        document.querySelectorAll("#main-fields .field-item").forEach(div => {
-          schema.fields.push({
-            name: div.querySelector(".field-name").value,
-            label: div.querySelector(".field-label").value,
-            type: div.querySelector(".type-option.selected input").value,
-            required: div.querySelector(".field-required").checked
-          });
-        });
-        document.querySelectorAll("#subform-fields .field-item").forEach(div => {
-          schema.subform.fields.push({
-            name: div.querySelector(".field-name").value,
-            label: div.querySelector(".field-label").value,
-            type: div.querySelector(".type-option.selected input").value
-          });
-        });
         document.getElementById("schema-output").textContent = JSON.stringify(schema, null, 2);
       }
     </script>

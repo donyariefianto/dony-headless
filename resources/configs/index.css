@@ -400,8 +400,8 @@ header {
 .right-form-sidebar {
   position: fixed;
   top: 0;
-  right: -650px; /* Hidden by default */
-  width: 650px; /* Increased width for more space */
+  right: -750px; /* Hidden by default */
+  width: 750px; /* Increased width for more space */
   max-width: 90%; /* Max width for responsiveness */
   height: 100%;
   background-color: var(--sidebar-bg);
@@ -445,6 +445,7 @@ header {
 }
 
 .sidebar-content {
+  max-height: 100vh;
   flex-grow: 1;
   padding: 30px;
   overflow-y: auto; /* Enable scrolling for long forms */
@@ -463,6 +464,9 @@ header {
 #data-item-form.active-form,
 #data-dashboard-form.active-form {
   display: block;
+  max-height: calc(100vh - 50px);
+  overflow-y: auto;
+  padding-bottom: 60px;
 }
 
 .form-section {
@@ -1575,4 +1579,13 @@ body.dark-mode .choices__item {
 body.dark-mode .choices__item--selectable.is-highlighted {
   background-color: var(--hover-bg);
   color: var(--primary-color);
+}
+
+.auto-fill-item {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+.auto-fill-item input {
+  flex: 1;
 }
