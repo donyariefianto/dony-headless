@@ -4,6 +4,9 @@ import moment from 'moment'
 
 class MongoDBModels {
   async FindOne(query: object, collection: string) {
+    // if (query._id) {
+    //   query._id = new ObjectId(query._id)
+    // }
     const collections = database.data?.collection(collection)
     return await collections.findOne(query)
   }

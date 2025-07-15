@@ -399,6 +399,9 @@ document.addEventListener('DOMContentLoaded', () => {
     dashboardForm.reset()
     dataDashboardFieldsContainer.innerHTML = ''
     dataDashboardIdInput.value = ''
+
+    formbuilderForm.classList.remove('active-form')
+    formbuilderForm.reset()
   }
 
   closeSidebarBtns.forEach((btn) => btn.addEventListener('click', closeSidebar))
@@ -807,6 +810,7 @@ document.addEventListener('DOMContentLoaded', () => {
     dashboardForm.classList.remove('active-form')
     collectionForm.classList.remove('active-form') // Hide collection form
     dataItemForm.classList.add('active-form') // Show data item form
+    formbuilderForm.classList.remove('active-form')
 
     dataItemFieldsContainer.innerHTML = '' // Clear previous fields
     dataItemIdInput.value = dataItem ? dataItem._id : ''
@@ -976,7 +980,7 @@ document.addEventListener('DOMContentLoaded', () => {
     collectionForm.classList.add('active-form') // Show collection form
     dataItemForm.classList.remove('active-form') // Hide data item form
     dashboardForm.classList.remove('active-form') // Hide dashboard form
-
+    formbuilderForm.classList.remove('active-form')
     collectionIdInput.value = collection.id
     collectionDisplayNameInput.value = collection.displayName
     collectionNameInput.value = collection.name
@@ -1012,10 +1016,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
   addCollectionBtn.addEventListener('click', () => {
     sidebarFormTitle.textContent = 'Tambah Koleksi Baru'
-
     collectionForm.classList.add('active-form') // Show collection form
     dataItemForm.classList.remove('active-form') // Hide data item form
     dashboardForm.classList.remove('active-form') // Hide dashboard form
+    formbuilderForm.classList.remove('active-form')
 
     collectionForm.reset()
     collectionIdInput.value = ''

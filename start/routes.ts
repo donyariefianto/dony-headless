@@ -38,6 +38,7 @@ router
     router
       .group(() => {
         router.get('/list', '#controllers/settings_controller.getFormBuilderListConfig')
+        router.get('/read/:id', '#controllers/settings_controller.getFormBuilderConfigByID')
       })
       .prefix('/formbuilder')
   })

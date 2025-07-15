@@ -5,7 +5,7 @@ import moment from 'moment'
 import env from '#start/env'
 import hash from '@adonisjs/core/services/hash'
 import jwt from 'jsonwebtoken'
-
+import { ObjectId } from 'mongodb'
 const settings_collections = '_collectionConfigs'
 
 export default class SettingsController {
@@ -313,6 +313,25 @@ export default class SettingsController {
           currentPage: page,
           limit: limit,
         },
+      })
+    } catch (error) {
+      return response.internalServerError({
+        status: false,
+        status_code: 500,
+        message: error.message,
+      })
+    }
+  }
+  async getFormBuilderConfigByID({ request, response }: HttpContext) {
+    let collection_formbuilder = '_FormBuilder'
+    const id = request.param('id')
+    try {
+      let data = await MongoDBModels.FindOne({ _id: new ObjectId(id) }, collection_formbuilder)
+      return response.ok({
+        status: true,
+        message_id: 'sukses',
+        message_en: 'success',
+        data: data,
       })
     } catch (error) {
       return response.internalServerError({

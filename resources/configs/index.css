@@ -454,13 +454,13 @@ header {
 /* Form Styling */
 /* Use .active-form to show/hide forms within sidebar */
 #collection-form,
-#data-item-form {
-  display: none;
-}
+#data-formbuilder-form,
+#data-item-form,
 #data-dashboard-form {
   display: none;
 }
 #collection-form.active-form,
+#data-formbuilder-form.active,
 #data-item-form.active-form,
 #data-dashboard-form.active-form {
   display: block;
@@ -1588,4 +1588,41 @@ body.dark-mode .choices__item--selectable.is-highlighted {
 }
 .auto-fill-item input {
   flex: 1;
+}
+.collapsible-content.collapsed {
+  display: none;
+}
+
+.type-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.type-option {
+  padding: 6px 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.type-option.selected {
+  background-color: #007bff;
+  color: white;
+  border-color: #007bff;
+}
+
+.form-group {
+  margin-bottom: 10px;
+}
+
+.extra-options {
+  margin-top: 10px;
+  padding: 10px;
+  background: #f8f9fa;
+  border: 1px dashed #ccc;
+  border-radius: 5px;
 }

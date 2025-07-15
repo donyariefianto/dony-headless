@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const collectionSelect = document.getElementById('formbuilder-collection-select')
   const dom = {
     saveFormBuilderBtn: document.getElementById('data-formbuilder-form'),
-    dataDashboardIdInput:document.getElementById('data-dashboard-id'),
+    dataDashboardIdInput: document.getElementById('data-dashboard-id'),
   }
   let choicesInstance = null
   if (collectionSelect) {
@@ -80,7 +80,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     e.preventDefault()
     let schema = generateSchema()
     const isEditing = !!dom.dataDashboardIdInput.value
-    
   })
 })
 function buildFieldWidget(type) {
@@ -418,8 +417,8 @@ function generateSchema() {
     //   })
     // ),
   }
-//   document.getElementById('schema-output').textContent = JSON.stringify(schema, null, 2)
-return schema
+  //   document.getElementById('schema-output').textContent = JSON.stringify(schema, null, 2)
+  return schema
 }
 
 function addAutoFillItem(btn) {
