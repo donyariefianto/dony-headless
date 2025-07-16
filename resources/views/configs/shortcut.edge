@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Manajemen Form Builder</title>
+    <link rel="stylesheet" href="/resources/configs/index.css" />
+  </head>
+  <body>
+    <div class="content-area">
+      <div class="content-header">
+        <h3>Manajemen Form Builder</h3>
+        <div class="search-container">
+          <input class="form-control" type="text" id="search" placeholder="Cari form..." />
+          <span class="search-icon">🔍</span>
+        </div>
+      </div>
+
+      <div class="collections-grid" id="form-list"></div>
+
+      <div class="pagination-controls" id="pagination"></div>
+    </div>
+
+    <script>
+      const listContainer = document.getElementById("form-list");
+      const paginationContainer = document.getElementById("pagination");
+      const searchInput = document.getElementById("search");
+
+      let currentPage = 1;
+      const pageSize = 5;
+
+      async function fetchFormList(page = 1, search = "") {
+        const res = await fetch(`/configuration/formbuilder/list?page=${page}&limit=${pageSize}&search=${encodeURIComponent(search)}`);
+        const json = await res.json();
+        return json;
+      }
+
+      function renderList(forms) {
+        listContainer.innerHTML = "";
+        forms.forEach(form => {
+          const card = document.createElement("div");
+          card.className = "collection-card";
+
+          const title = document.createElement("h4");
+          title.textContent = form.name;
+
+          const desc = document.createElement("div");
+          desc.className = "description";
+          desc.textContent = form.description || "(Tidak ada deskripsi)";
+
+          const actions = document.createElement("div");
+          actions.className = "card-actions";
+
+          const previewBtn = document.createElement("button");
+          previewBtn.textContent = "Tampilkan Data";
+          previewBtn.className = "btn btn-outline-info";
+          previewBtn.onclick = async () => {
+            const detail = await fetch(`/configuration/formbuilder/read/${form._id}`).then(res => res.json());
+            alert(JSON.stringify(detail, null, 2));
+          };
+
+          const openBtn = document.createElement("button");
+          openBtn.textContent = "Isi Form";
+          openBtn.className = "btn btn-secondary";
+          openBtn.onclick = () => {
+            alert(`Form \"${form.name}\" dipilih (id: ${form._id})`);
+          };
+
+          actions.appendChild(previewBtn);
+          actions.appendChild(openBtn);
+
+          card.appendChild(title);
+          card.appendChild(desc);
+          card.appendChild(actions);
+
+          listContainer.appendChild(card);
+        });
+      }
+
+      function renderPagination(meta) {
+        const { currentPage, totalPages } = meta;
+        paginationContainer.innerHTML = "";
+
+        const prevBtn = document.createElement("button");
+        prevBtn.textContent = "← Sebelumnya";
+        prevBtn.className = "btn btn-outline-primary";
+        prevBtn.disabled = currentPage === 1;
+        prevBtn.onclick = () => {
+          if (currentPage > 1) loadAndRender(currentPage - 1);
+        };
+
+        const pageInfo = document.createElement("span");
+        pageInfo.textContent = `Halaman ${currentPage} dari ${totalPages}`;
+
+        const nextBtn = document.createElement("button");
+        nextBtn.textContent = "Berikutnya →";
+        nextBtn.className = "btn btn-outline-primary";
+        nextBtn.disabled = currentPage >= totalPages;
+        nextBtn.onclick = () => {
+          if (currentPage < totalPages) loadAndRender(currentPage + 1);
+        };
+
+        paginationContainer.appendChild(prevBtn);
+        paginationContainer.appendChild(pageInfo);
+        paginationContainer.appendChild(nextBtn);
+      }
+
+      async function loadAndRender(page = currentPage) {
+        const keyword = searchInput.value.trim();
+        let result = await fetchFormList(page, keyword);
+        result = result.data
+        currentPage = result.currentPage || page;
+        renderList(result.documents || []);
+        renderPagination({ currentPage, totalPages: result.totalPages || 1 });
+      }
+
+      searchInput.addEventListener("input", () => {
+        currentPage = 1;
+        loadAndRender();
+      });
+
+      loadAndRender();
+    </script>
+  </body>
+</html>

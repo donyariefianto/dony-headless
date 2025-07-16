@@ -51,6 +51,8 @@ body.dark-mode {
 }
 
 body {
+  height: 100%;
+  margin: 0;
   font-family: var(--font-family);
   background-color: var(--bg-color);
   color: var(--text-color);
@@ -156,6 +158,7 @@ header {
   display: flex;
   flex-direction: column;
   min-width: 0; /* Important for shrinking content */
+  min-height: 100vh;
 }
 
 .content-view {
@@ -187,6 +190,8 @@ header {
 
 .collections-main-content {
   display: flex;
+  flex: 1;
+  overflow: hidden;
   gap: 30px; /* Space between list and detail */
   flex-wrap: wrap; /* Allow wrapping on smaller screens */
 }
@@ -194,18 +199,25 @@ header {
 .collection-list-cards {
   flex: 2; /* Takes 2 parts of available space */
   min-width: 300px; /* Minimum width before wrapping */
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
 .collection-detail-wrapper {
-  flex: 3; /* Takes 3 parts of available space */
-  min-width: 400px; /* Minimum width before wrapping */
+  width: 50%;
+  overflow-y: auto;
 }
 
 /* Collection Cards */
 .collections-grid {
+  flex: 1;
   display: grid;
+  overflow-y: auto;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 20px;
+  gap: 1.25rem;
+  padding: 1rem 0;
+  align-content: start;
 }
 
 .collection-card {
@@ -1200,9 +1212,10 @@ body.dark-mode .search-container input::placeholder {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 10px;
-  margin-top: 20px;
+  gap: 1rem;
+  margin-top: auto;
   padding-top: 15px;
+  padding-bottom: 1rem;
   border-top: 1px solid var(--border-color);
   width: 100%;
 }
