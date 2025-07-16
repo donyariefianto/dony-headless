@@ -1626,3 +1626,29 @@ body.dark-mode .choices__item--selectable.is-highlighted {
   border: 1px dashed #ccc;
   border-radius: 5px;
 }
+
+.number-input-wrapper {
+  position: relative;
+}
+.number-input-wrapper input.form-control {
+  padding-left: 35px;
+  padding-right: 35px;
+}
+.number-input-wrapper button {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 2;
+}
+.number-input-wrapper button:first-child {
+  left: 5px;
+}
+.number-input-wrapper button:last-child {
+  right: 5px;
+}
+
+.number-input-wrapper .btn {
+  padding: 6px 10px;
+  font-size: 0.9rem;
+  height: 38px;
+}

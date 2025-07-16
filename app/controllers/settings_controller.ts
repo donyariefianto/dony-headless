@@ -9,6 +9,10 @@ import { ObjectId } from 'mongodb'
 const settings_collections = '_collectionConfigs'
 
 export default class SettingsController {
+  async Beacon({ request, response }) {
+    let body = request.all()
+    console.log(body)
+  }
   async createCollectionConfig({ request, response }: HttpContext) {
     let { collectionConfigData } = request.all()
     if (!configurations_services.validateCollectionConfig(collectionConfigData)) {

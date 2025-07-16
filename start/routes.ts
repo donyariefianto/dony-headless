@@ -70,3 +70,5 @@ router
     router.delete('/:collections/:id', '#controllers/settings_controller.deleteCollections')
   })
   .prefix('/api')
+
+router.post('/beacon', '#controllers/settings_controller.Beacon')

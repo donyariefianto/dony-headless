@@ -1,262 +1,294 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Form Builder Renderer</title>
-  <link rel="stylesheet" href="/resources/configs/index.css" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <style>
-    .form-wrapper { padding: 2rem; max-width: 800px; margin: auto; }
-    .form-group { margin-bottom: 1rem; }
-    .subform-container { border: 1px solid #ccc; padding: 1rem; border-radius: 8px; margin-top: 1rem; }
-    .repeat-button { margin-top: 1rem; }
-    .subform-item { position: relative; padding-bottom: 2rem; }
-    .remove-subfield-btn {
-      position: absolute;
-      bottom: 0;
-      right: 0;
-      background-color: #dc3545;
-      color: white;
-      border: none;
-      padding: 4px 8px;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-  </style>
-</head>
-<body>
-  <div class="form-wrapper">
-    <h2>Pilih Form Builder</h2>
-    <select id="form-selector">
-      <option disabled selected>Memuat daftar form...</option>
-    </select>
-
-    <div id="form-container"></div>
-  </div>
-
-  <script>
-    const apiBase = 'http://localhost:3333';
-
-    async function fetchFormList() {
-      const selector = document.getElementById('form-selector');
-      try {
-        const res = await fetch(`${apiBase}/configuration/formbuilder/list`);
-        const json = await res.json();
-        selector.innerHTML = '<option disabled selected>Pilih form...</option>';
-        json.data.documents.forEach(form => {
-          const opt = document.createElement('option');
-          opt.value = form._id;
-          opt.textContent = form.name;
-          selector.appendChild(opt);
-        });
-      } catch (err) {
-        selector.innerHTML = '<option disabled>Error memuat form</option>';
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Form Builder Dinamis</title>
+    <link rel="stylesheet" href="/resources/configs/index.css" />
+    <style>
+      .number-input-wrapper .btn {
+        padding: 6px 10px;
+        font-size: 0.9rem;
+        height: 38px;
       }
-    }
-
-    async function loadFormBuilder(id) {
-      const container = document.getElementById('form-container');
-      container.innerHTML = '<p>Memuat form...</p>';
-      try {
-        const res = await fetch(`${apiBase}/configuration/formbuilder/read/${id}`);
-        const { data } = await res.json();
-        const formHtml = renderFormFromSchema(data);
-        container.innerHTML = '';
-        container.appendChild(formHtml);
-        attachAutoFetch(data, formHtml);
-        attachCalculated(formHtml);
-      } catch (err) {
-        container.innerHTML = '<p>Gagal memuat form</p>';
+      .card-subform {
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        position: relative;
+        background: #fafafa;
       }
-    }
+      .card-subform .btn-remove {
+        position: absolute;
+        top: 0.5rem;
+        right: 0.5rem;
+        background: transparent;
+        border: none;
+        color: red;
+        font-size: 1.2rem;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body class="content-area">
+    <div class="form-sections-data-item">
+      <form id="dynamic-form"></form>
+    </div>
 
-    function renderFormFromSchema(schema) {
-      const form = document.createElement('form');
-      form.id = 'dynamic-form';
-
-      const title = document.createElement('h3');
-      title.textContent = `Form: ${schema.name}`;
-      form.appendChild(title);
-
-      schema.fields.forEach(field => {
-        const el = renderField(field, field.name);
-        form.appendChild(el);
-
-        if (field.options?.auto_fill) {
-          Object.keys(field.options.auto_fill).forEach(targetName => {
-            if (!schema.fields.find(f => f.name === targetName)) {
-              const ghostField = {
-                name: targetName,
-                label: targetName.charAt(0).toUpperCase() + targetName.slice(1),
-                type: 'number',
-                readonly: true
-              };
-              form.appendChild(renderField(ghostField, targetName));
+    <script>
+      const schema = {
+        slug: "penjualan",
+        name: "Transaksi",
+        table_name: "transaksi",
+        submit_label: "Simpan",
+        fields: [
+          {
+            name: "pelanggan",
+            label: "Pelanggan",
+            type: "select",
+            options: {
+              mode: "relation",
+              relation: {
+                table: "pelanggan",
+                value_column: "_id",
+                label_column: "nama"
+              }
             }
+          },
+          {
+            name: "total",
+            label: "Total Semua",
+            type: "calculated",
+            formula: {
+              aggregate: true,
+              target: "detail_order",
+              field: "total"
+            }
+          }
+        ],
+        subforms: [
+          {
+            table_name: "detail_order",
+            label: "Items",
+            fields: [
+              {
+                name: "produk",
+                label: "Produk",
+                type: "select",
+                options: {
+                  mode: "relation",
+                  relation: {
+                    table: "produk",
+                    value_column: "_id",
+                    label_column: "nama"
+                  },
+                  auto_fill: {
+                    harga: "harga"
+                  }
+                }
+              },
+              {
+                name: "harga",
+                label: "Harga",
+                type: "number",
+                readonly: true
+              },
+              {
+                name: "jumlah",
+                label: "Jumlah",
+                type: "number"
+              },
+              {
+                name: "total",
+                label: "Total",
+                type: "calculated",
+                formula: {
+                  formula: "jumlah * harga"
+                }
+              }
+            ]
+          }
+        ]
+      };
+
+      const relationData = {
+        pelanggan: [
+          { _id: 1, nama: "Budi" },
+          { _id: 2, nama: "Sari" }
+        ],
+        produk: [
+          { _id: 1, nama: "Pensil", harga: 1000 },
+          { _id: 2, nama: "Buku", harga: 5000 }
+        ]
+      };
+
+      function renderField(field, prefix = "", isReadonly = false) {
+        const wrapper = document.createElement("div");
+        wrapper.className = "form-group";
+
+        const label = document.createElement("label");
+        label.textContent = field.label;
+        label.setAttribute("for", prefix + field.name);
+        wrapper.appendChild(label);
+
+        const input = document.createElement(field.type === "select" ? "select" : "input");
+        input.className = "form-control";
+        input.name = prefix + field.name;
+        input.id = prefix + field.name;
+
+        if (field.type === "number" || field.type === "calculated") input.type = "number";
+        if (field.type === "text") input.type = "text";
+
+        if (field.type === "select" && field.options?.mode === "relation") {
+          const relation = relationData[field.options.relation.table] || [];
+          const defaultOpt = document.createElement("option");
+          defaultOpt.textContent = "-- Pilih --";
+          defaultOpt.value = "";
+          input.appendChild(defaultOpt);
+
+          relation.forEach(item => {
+            const opt = document.createElement("option");
+            opt.value = item[field.options.relation.value_column];
+            opt.textContent = item[field.options.relation.label_column];
+            input.appendChild(opt);
           });
+
+          if (field.options.auto_fill) {
+            input.addEventListener("change", () => {
+              const selected = relation.find(r => r[field.options.relation.value_column] == input.value);
+              for (const target in field.options.auto_fill) {
+                const sourceKey = field.options.auto_fill[target];
+                const targetInput = wrapper.closest(".subform-item")?.querySelector(`[name$="${target}"]`);
+                if (targetInput) {
+                  targetInput.value = selected?.[sourceKey] || "";
+                  targetInput.disabled = true;
+                }
+              }
+            });
+          }
         }
-      });
 
-      schema.subforms.filter(Boolean).forEach(subform => {
-        const subContainer = document.createElement('div');
-        subContainer.className = 'subform-container';
+        if (field.type === "calculated" || isReadonly || field.readonly) {
+          input.readOnly = true;
+          input.disabled = true;
+        }
 
-        const label = document.createElement('h4');
-        label.textContent = subform.label;
-        subContainer.appendChild(label);
+        wrapper.appendChild(input);
+        return wrapper;
+      }
 
-        const listWrapper = document.createElement('div');
-        listWrapper.className = 'subform-list';
+      function renderSubform(subform, container) {
+        const wrapper = document.createElement("div");
+        wrapper.className = "subform-row";
 
-        const addButton = document.createElement('button');
-        addButton.textContent = '+ Tambah Baris';
-        addButton.type = 'button';
-        addButton.className = 'repeat-button';
-        addButton.onclick = () => {
-          const group = document.createElement('div');
-          group.className = 'subform-item';
+        const title = document.createElement("h4");
+        title.textContent = subform.label;
+        wrapper.appendChild(title);
+
+        const addBtn = document.createElement("button");
+        addBtn.type = "button";
+        addBtn.className = "btn btn-sm btn-outline-primary";
+        addBtn.textContent = "+ Tambah";
+        wrapper.appendChild(addBtn);
+
+        const rowsContainer = document.createElement("div");
+        wrapper.appendChild(rowsContainer);
+
+        function addRow() {
+          const card = document.createElement("div");
+          card.className = "subform-item card-subform";
+
+          const removeBtn = document.createElement("button");
+          removeBtn.type = "button";
+          removeBtn.innerHTML = "&times;";
+          removeBtn.className = "btn-remove";
+          removeBtn.title = "Hapus baris";
+          removeBtn.onclick = () => {
+            card.remove();
+            form.dispatchEvent(new Event("input"));
+          };
+          card.appendChild(removeBtn);
 
           subform.fields.forEach(field => {
-            const el = renderField(field, `${subform.table_name}[].${field.name}`);
-            group.appendChild(el);
-
-            if (field.options?.auto_fill) {
-              Object.entries(field.options.auto_fill).forEach(([targetName, sourceField]) => {
-                const exists = subform.fields.some(f => f.name === targetName);
-                if (!exists) {
-                  const ghostField = {
-                    name: targetName,
-                    label: targetName.charAt(0).toUpperCase() + targetName.slice(1),
-                    type: 'number',
-                    readonly: true,
-                  };
-                  group.appendChild(renderField(ghostField, `${subform.table_name}[].${targetName}`));
-                }
-              });
-            }
+            card.appendChild(renderField(field, `${subform.table_name}[]_`, field.type === "calculated" || field.readonly));
           });
 
-          const delBtn = document.createElement('button');
-          delBtn.textContent = 'Hapus';
-          delBtn.type = 'button';
-          delBtn.className = 'remove-subfield-btn';
-          delBtn.onclick = () => group.remove();
+          rowsContainer.appendChild(card);
+        }
 
-          group.appendChild(delBtn);
-          listWrapper.appendChild(group);
-
-          attachAutoFetch({ fields: subform.fields }, group);
-          attachCalculated(group);
-        };
-
-        subContainer.appendChild(listWrapper);
-        subContainer.appendChild(addButton);
-        form.appendChild(subContainer);
-
-        addButton.click();
-      });
-
-      return form;
-    }
-
-    function renderField(field, name) {
-      const group = document.createElement('div');
-      group.className = 'form-group';
-      const label = document.createElement('label');
-      label.textContent = field.label;
-      group.appendChild(label);
-
-      if (field.type === 'select') {
-        const select = document.createElement('select');
-        select.name = name;
-        if (field.options?.relation) select.dataset.relation = JSON.stringify(field.options.relation);
-        if (field.options?.auto_fill) select.dataset.autofill = JSON.stringify(field.options.auto_fill);
-        select.innerHTML = '<option disabled selected>Memuat data...</option>';
-        group.appendChild(select);
-      } else if (field.type === 'calculated') {
-        const input = document.createElement('input');
-        input.type = 'text';
-        input.name = name;
-        input.readOnly = true;
-        input.placeholder = field.formula?.formula || '';
-        input.dataset.formula = field.formula?.formula || '';
-        group.appendChild(input);
-      } else {
-        const input = document.createElement('input');
-        input.type = field.type;
-        input.name = name;
-        if (field.readonly) input.readOnly = true;
-        group.appendChild(input);
+        addBtn.addEventListener("click", addRow);
+        addRow();
+        container.appendChild(wrapper);
       }
 
-      return group;
-    }
+      function renderForm(schema) {
+        const form = document.getElementById("dynamic-form");
 
-    function attachAutoFetch(schema, container = document) {
-      container.querySelectorAll('select[data-relation]').forEach(select => {
-        const relation = JSON.parse(select.dataset.relation);
-        if (!relation?.table) return;
-        fetch(`${apiBase}/api/${relation.table}`)
-          .then(r => r.json())
-          .then(data => {
-            select.innerHTML = '<option disabled selected>Pilih...</option>';
-            data.data.documents.forEach(row => {
-              const opt = document.createElement('option');
-              opt.value = row[relation.value_column];
-              opt.textContent = row[relation.label_column];
-              opt.dataset.row = JSON.stringify(row);
-              select.appendChild(opt);
-            });
-            attachAutoFill(container);
-          });
-      });
-    }
-
-    function attachAutoFill(container) {
-      container.querySelectorAll('select[data-autofill]').forEach(select => {
-        const autofill = JSON.parse(select.dataset.autofill);
-        const relation = JSON.parse(select.dataset.relation || '{}');
-        if (!relation?.table) return;
-
-        select.addEventListener('change', e => {
-          const selected = select.options[select.selectedIndex];
-          const rowData = JSON.parse(selected.dataset.row || '{}');
-          Object.entries(autofill).forEach(([targetName, sourceField]) => {
-            const input = container.querySelector(`[name$='.${targetName}']`);
-            if (input) input.value = rowData[sourceField] ?? '';
-          });
-          attachCalculated(container);
+        schema.fields.forEach(field => {
+          form.appendChild(renderField(field));
         });
-      });
-    }
 
-    function attachCalculated(container) {
-      container.querySelectorAll('input[data-formula]').forEach(input => {
-        const formula = input.dataset.formula;
-        const vars = formula.match(/[a-zA-Z0-9_]+/g) || [];
-        const updateValue = () => {
-          try {
-            let val = formula;
-            vars.forEach(v => {
-              const f = container.querySelector(`[name$='.${v}']`);
-              val = val.replaceAll(v, parseFloat(f?.value || 0));
+        if (schema.subforms) {
+          schema.subforms.forEach(sub => renderSubform(sub, form));
+        }
+
+        const btn = document.createElement("button");
+        btn.type = "submit";
+        btn.className = "btn btn-primary";
+        btn.textContent = schema.submit_label || "Simpan";
+        form.appendChild(btn);
+
+        form.addEventListener("submit", e => {
+          e.preventDefault();
+          const data = {};
+
+          schema.fields.forEach(f => {
+            const el = form.querySelector(`[name="${f.name}"]`);
+            data[f.name] = el?.value;
+          });
+
+          if (schema.subforms) {
+            schema.subforms.forEach(sub => {
+              const rows = form.querySelectorAll(`.subform-row .subform-item`);
+              data[sub.table_name] = [];
+              rows.forEach(row => {
+                const rowData = {};
+                sub.fields.forEach(f => {
+                  const el = row.querySelector(`[name^="${sub.table_name}[]_${f.name}"]`);
+                  rowData[f.name] = el?.value;
+                });
+                data[sub.table_name].push(rowData);
+              });
             });
-            input.value = eval(val);
-          } catch (e) {
-            console.warn('Error kalkulasi:', e);
           }
-        };
-        vars.forEach(v => {
-          const el = container.querySelector(`[name$='.${v}']`);
-          if (el) el.addEventListener('input', updateValue);
-        });
-        updateValue();
-      });
-    }
 
-    document.getElementById('form-selector').addEventListener('change', e => loadFormBuilder(e.target.value));
-    fetchFormList();
-  </script>
-</body>
+          console.log(data);
+          alert(JSON.stringify(data, null, 2));
+        });
+
+        form.addEventListener("input", () => {
+          document.querySelectorAll(".subform-row").forEach(subform => {
+            subform.querySelectorAll(".subform-item").forEach(row => {
+              const jumlah = parseFloat(row.querySelector("[name*='jumlah']")?.value || 0);
+              const harga = parseFloat(row.querySelector("[name*='harga']")?.value || 0);
+              const total = row.querySelector("[name*='total']");
+              if (total) total.value = jumlah * harga;
+            });
+          });
+
+          const totalField = document.querySelector("[name='total']");
+          if (totalField) {
+            let grandTotal = 0;
+            document.querySelectorAll("[name*='detail_order[]_total']").forEach(el => {
+              grandTotal += parseFloat(el.value || 0);
+            });
+            totalField.value = grandTotal;
+          }
+        });
+      }
+
+      renderForm(schema);
+    </script>
+  </body>
 </html>
