@@ -17,6 +17,7 @@ const nextBtn = document.getElementById('next-page')
 
 const listView = document.getElementById('formbuilder-list-view')
 const detailView = document.getElementById('formbuilder-detail-view')
+
 const dashboardForm = document.getElementById('data-dashboard-form')
 const dataDashboardIdInput = document.getElementById('data-dashboard-id')
 const dataDashboardFieldsContainer = document.getElementById('data-item-fields-container')
@@ -27,6 +28,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const dom = {
     saveFormBuilderBtn: document.getElementById('data-formbuilder-form'),
     dataDashboardIdInput: document.getElementById('data-dashboard-id'),
+    rightFormSidebar:document.getElementById('right-form-sidebar'),
   }
   let choicesInstance = null
   if (collectionSelect) {
@@ -104,12 +106,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     e.preventDefault()
     let schema = generateSchema()
     console.log(schema)
-    console.log(dashboardForm);
     overlay.style.display = 'none'
-    dashboardForm.classList.remove('active-form')
-    dashboardForm.reset()
-    dataDashboardFieldsContainer.innerHTML = ''
-    dataDashboardIdInput.value = ''
+    dom.rightFormSidebar.classList.remove('open')
+    dom.saveFormBuilderBtn.classList.remove('active-form')
+    dom.saveFormBuilderBtn.reset()
+    // dataDashboardFieldsContainer.innerHTML = ''
+    // dataDashboardIdInput.value = ''
     const isEditing = !!dom.dataDashboardIdInput.value
   })
   // loadAndRender();
