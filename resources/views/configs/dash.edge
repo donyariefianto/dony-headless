@@ -3,7 +3,9 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Form Builder Dinamis</title>
+    <title>
+      Form Builder Dinamis
+    </title>
     <link rel="stylesheet" href="/resources/configs/index.css" />
     <style>
       .number-input-wrapper .btn {
@@ -11,6 +13,7 @@
         font-size: 0.9rem;
         height: 38px;
       }
+      
       .card-subform {
         border: 1px solid #ddd;
         border-radius: 8px;
@@ -19,6 +22,7 @@
         position: relative;
         background: #fafafa;
       }
+      
       .card-subform .btn-remove {
         position: absolute;
         top: 0.5rem;
@@ -33,7 +37,8 @@
   </head>
   <body class="content-area">
     <div class="form-sections-data-item">
-      <form id="dynamic-form"></form>
+      <form id="dynamic-form">
+      </form>
     </div>
 
     <script>
@@ -42,118 +47,110 @@
         name: "Transaksi",
         table_name: "transaksi",
         submit_label: "Simpan",
-        fields: [
-          {
-            name: "pelanggan",
-            label: "Pelanggan",
+        fields: [ {
+          name: "pelanggan",
+          label: "Pelanggan",
+          type: "select",
+          options: {
+            mode: "relation",
+            relation: {
+              table: "pelanggan",
+              value_column: "_id",
+              label_column: "nama"
+            }
+          }
+        }, {
+          name: "total",
+          label: "Total Semua",
+          type: "calculated",
+          formula: {
+            aggregate: true,
+            target: "detail_order",
+            field: "total"
+          }
+        } ],
+        subforms: [ {
+          table_name: "detail_order",
+          label: "Items",
+          fields: [ {
+            name: "produk",
+            label: "Produk",
             type: "select",
             options: {
               mode: "relation",
               relation: {
-                table: "pelanggan",
+                table: "produk",
                 value_column: "_id",
                 label_column: "nama"
+              },
+              auto_fill: {
+                harga: "harga"
               }
             }
-          },
-          {
+          }, {
+            name: "harga",
+            label: "Harga",
+            type: "number",
+            readonly: true
+          }, {
+            name: "jumlah",
+            label: "Jumlah",
+            type: "number"
+          }, {
             name: "total",
-            label: "Total Semua",
+            label: "Total",
             type: "calculated",
             formula: {
-              aggregate: true,
-              target: "detail_order",
-              field: "total"
+              formula: "jumlah * harga"
             }
-          }
-        ],
-        subforms: [
-          {
-            table_name: "detail_order",
-            label: "Items",
-            fields: [
-              {
-                name: "produk",
-                label: "Produk",
-                type: "select",
-                options: {
-                  mode: "relation",
-                  relation: {
-                    table: "produk",
-                    value_column: "_id",
-                    label_column: "nama"
-                  },
-                  auto_fill: {
-                    harga: "harga"
-                  }
-                }
-              },
-              {
-                name: "harga",
-                label: "Harga",
-                type: "number",
-                readonly: true
-              },
-              {
-                name: "jumlah",
-                label: "Jumlah",
-                type: "number"
-              },
-              {
-                name: "total",
-                label: "Total",
-                type: "calculated",
-                formula: {
-                  formula: "jumlah * harga"
-                }
-              }
-            ]
-          }
-        ]
+          } ]
+        } ]
       };
-
+      
       const relationData = {
-        pelanggan: [
-          { _id: 1, nama: "Budi" },
-          { _id: 2, nama: "Sari" }
-        ],
-        produk: [
-          { _id: 1, nama: "Pensil", harga: 1000 },
-          { _id: 2, nama: "Buku", harga: 5000 }
-        ]
+        pelanggan: [ {
+          _id: 1,
+          nama: "Budi"
+        }, {
+          _id: 2,
+          nama: "Sari"
+        } ],
+        produk: [ {
+          _id: 1,
+          nama: "Pensil",
+          harga: 1e3
+        }, {
+          _id: 2,
+          nama: "Buku",
+          harga: 5e3
+        } ]
       };
-
+      
       function renderField(field, prefix = "", isReadonly = false) {
         const wrapper = document.createElement("div");
         wrapper.className = "form-group";
-
         const label = document.createElement("label");
         label.textContent = field.label;
         label.setAttribute("for", prefix + field.name);
         wrapper.appendChild(label);
-
         const input = document.createElement(field.type === "select" ? "select" : "input");
         input.className = "form-control";
         input.name = prefix + field.name;
         input.id = prefix + field.name;
-
         if (field.type === "number" || field.type === "calculated") input.type = "number";
         if (field.type === "text") input.type = "text";
-
         if (field.type === "select" && field.options?.mode === "relation") {
           const relation = relationData[field.options.relation.table] || [];
           const defaultOpt = document.createElement("option");
           defaultOpt.textContent = "-- Pilih --";
           defaultOpt.value = "";
           input.appendChild(defaultOpt);
-
           relation.forEach(item => {
             const opt = document.createElement("option");
             opt.value = item[field.options.relation.value_column];
             opt.textContent = item[field.options.relation.label_column];
             input.appendChild(opt);
           });
-
           if (field.options.auto_fill) {
             input.addEventListener("change", () => {
               const selected = relation.find(r => r[field.options.relation.value_column] == input.value);
@@ -168,37 +165,30 @@
             });
           }
         }
-
         if (field.type === "calculated" || isReadonly || field.readonly) {
           input.readOnly = true;
           input.disabled = true;
         }
-
         wrapper.appendChild(input);
         return wrapper;
       }
-
+      
       function renderSubform(subform, container) {
         const wrapper = document.createElement("div");
         wrapper.className = "subform-row";
-
         const title = document.createElement("h4");
         title.textContent = subform.label;
         wrapper.appendChild(title);
-
         const addBtn = document.createElement("button");
         addBtn.type = "button";
         addBtn.className = "btn btn-sm btn-outline-primary";
         addBtn.textContent = "+ Tambah";
         wrapper.appendChild(addBtn);
-
         const rowsContainer = document.createElement("div");
         wrapper.appendChild(rowsContainer);
-
         function addRow() {
           const card = document.createElement("div");
           card.className = "subform-item card-subform";
-
           const removeBtn = document.createElement("button");
           removeBtn.type = "button";
           removeBtn.innerHTML = "&times;";
@@ -209,45 +199,36 @@
             form.dispatchEvent(new Event("input"));
           };
           card.appendChild(removeBtn);
-
           subform.fields.forEach(field => {
             card.appendChild(renderField(field, `${subform.table_name}[]_`, field.type === "calculated" || field.readonly));
           });
-
           rowsContainer.appendChild(card);
         }
-
         addBtn.addEventListener("click", addRow);
         addRow();
         container.appendChild(wrapper);
       }
-
+      
       function renderForm(schema) {
         const form = document.getElementById("dynamic-form");
-
         schema.fields.forEach(field => {
           form.appendChild(renderField(field));
         });
-
         if (schema.subforms) {
           schema.subforms.forEach(sub => renderSubform(sub, form));
         }
-
         const btn = document.createElement("button");
         btn.type = "submit";
         btn.className = "btn btn-primary";
         btn.textContent = schema.submit_label || "Simpan";
         form.appendChild(btn);
-
         form.addEventListener("submit", e => {
           e.preventDefault();
           const data = {};
-
           schema.fields.forEach(f => {
             const el = form.querySelector(`[name="${f.name}"]`);
             data[f.name] = el?.value;
           });
-
           if (schema.subforms) {
             schema.subforms.forEach(sub => {
               const rows = form.querySelectorAll(`.subform-row .subform-item`);
@@ -262,11 +243,9 @@
               });
             });
           }
-
           console.log(data);
           alert(JSON.stringify(data, null, 2));
         });
-
         form.addEventListener("input", () => {
           document.querySelectorAll(".subform-row").forEach(subform => {
             subform.querySelectorAll(".subform-item").forEach(row => {
@@ -276,7 +255,6 @@
               if (total) total.value = jumlah * harga;
             });
           });
-
           const totalField = document.querySelector("[name='total']");
           if (totalField) {
             let grandTotal = 0;
@@ -287,7 +265,7 @@
           }
         });
       }
-
+      
       renderForm(schema);
     </script>
   </body>

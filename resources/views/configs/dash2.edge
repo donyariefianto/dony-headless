@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>
+      Form Builder Dinamis
+    </title>
+    <link rel="stylesheet" href="/resources/configs/index.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css"
+    />
+  </head>
+  <body class="content-area">
+    <div class="form-sections-data-item">
+      <form id="dynamic-form">
+      </form>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js">
+      
+    </script>
+    <script>
+      async function loadFormSchema(formId) {
+        try {
+          const res = await fetch(`/configuration/formbuilder/read/${formId}`);
+          const json = await res.json();
+          if (!json.status) throw new Error("Gagal ambil schema");
+          return json.data;
+        } catch (err) {
+          console.error(err);
+          alert("Gagal mengambil form schema");
+        }
+      }
+      
+      function setupCollapsible(container) {
+        const content = container.querySelector(".collapsible-content");
+        const toggleBtn = container.querySelector(".toggle-collapse-btn");
+        toggleBtn?.addEventListener("click", () => {
+          content.classList.toggle("collapsed");
+          toggleBtn.querySelector("i")?.classList.toggle("fa-chevron-down");
+          toggleBtn.querySelector("i")?.classList.toggle("fa-chevron-up");
+        });
+      }
+      
+      async function renderField(field, prefix = "", isReadonly = false) {
+        const wrapper = document.createElement("div");
+        wrapper.className = "form-group";
+        const label = document.createElement("label");
+        label.textContent = field.label;
+        label.setAttribute("for", prefix + field.name);
+        wrapper.appendChild(label);
+        const isRelationSelect = field.type === "select" && field.options?.mode === "relation";
+        const input = document.createElement(isRelationSelect ? "select" : "input");
+        input.className = "form-control";
+        input.name = prefix + field.name;
+        input.id = prefix + field.name;
+        input.type = field.type === "number" || field.type === "calculated" ? "number" : "text";
+        if (isReadonly || field.readonly) {
+          input.readOnly = true;
+          input.disabled = true;
+        }
+        wrapper.appendChild(input);
+        if (isRelationSelect) {
+          const {
+            table,
+            value_column,
+            label_column
+          } = field.options.relation;
+          const choicesInstance = new Choices(input, {
+            placeholderValue: "-- Pilih --",
+            searchEnabled: true,
+            shouldSort: false,
+            noResultsText: "Tidak ditemukan"
+          });
+          async function loadOptions(search = "", page = 1) {
+            try {
+              const url = `/api/${table}?page=${page}&limit=10&search=${encodeURIComponent(search)}`;
+              const res = await fetch(url);
+              const json = await res.json();
+              const items = (json?.data?.documents || []).map(item => ({
+                value: item[value_column],
+                label: item[label_column],
+                customProperties: item
+              }));
+              choicesInstance.clearChoices();
+              choicesInstance.setChoices(items, "value", "label", true);
+            } catch (err) {
+              console.error("Gagal load relasi:", err);
+            }
+          }
+          await loadOptions();
+          input.addEventListener("search", e => {
+            loadOptions(e.detail.value);
+          });
+          if (field.options.auto_fill) {
+            input.addEventListener("change", () => {
+              const selectedOption = choicesInstance.getValue(true);
+              const selectedData = Array.isArray(selectedOption) && selectedOption.length > 0 ? selectedOption[0].customProperties : selectedOption?.customProperties;
+              if (!selectedData) return;
+              for (const target in field.options.auto_fill) {
+                const sourceKey = field.options.auto_fill[target];
+                let targetInput = document.querySelector(`[name="${target}"]`);
+                if (!targetInput) {
+                  targetInput = input.closest(".subform-item")?.querySelector(`[name$="${target}"]`);
+                }
+                if (targetInput) {
+                  targetInput.value = selectedData[sourceKey] || "";
+                  targetInput.disabled = true;
+                }
+              }
+            });
+          }
+        }
+        return wrapper;
+      }
+      
+      async function renderSubform(subform, container) {
+        if (!subform) return;
+        const wrapper = document.createElement("div");
+        wrapper.className = "subform-wrapper";
+        wrapper.dataset.subform = subform.label;
+        const title = document.createElement("h4");
+        title.textContent = subform.name;
+        wrapper.appendChild(title);
+        const rowsContainer = document.createElement("div");
+        rowsContainer.dataset.rowsContainer = subform.label;
+        wrapper.appendChild(rowsContainer);
+        const addBtn = document.createElement("button");
+        addBtn.type = "button";
+        addBtn.className = "btn btn-sm btn-outline-primary btn-add-item";
+        addBtn.textContent = "+ Tambah";
+        addBtn.addEventListener("click", () => addRow());
+        wrapper.appendChild(addBtn);
+        async function addRow() {
+          const item = document.createElement("div");
+          item.className = "field-item subform-item";
+          const header = document.createElement("div");
+          header.className = "field-header";
+          const titleSpan = document.createElement("span");
+          titleSpan.className = "title";
+          titleSpan.innerHTML = `<span class="field-name-display">${subform.name}</span>`;
+          header.appendChild(titleSpan);
+          const actions = document.createElement("div");
+          actions.className = "item-actions";
+          const collapseBtn = document.createElement("button");
+          collapseBtn.type = "button";
+          collapseBtn.className = "toggle-collapse-btn";
+          collapseBtn.title = "Toggle Detail";
+          collapseBtn.innerHTML = '<i class="fas fa-chevron-down"></i>';
+          actions.appendChild(collapseBtn);
+          const removeBtn = document.createElement("button");
+          removeBtn.type = "button";
+          removeBtn.className = "remove-item-btn";
+          removeBtn.title = "Hapus Field";
+          removeBtn.innerHTML = '<i class="fas fa-trash"></i>';
+          removeBtn.addEventListener("click", () => {
+            item.remove();
+            document.getElementById("dynamic-form").dispatchEvent(new Event("input"));
+          });
+          actions.appendChild(removeBtn);
+          header.appendChild(actions);
+          item.appendChild(header);
+          const content = document.createElement("div");
+          content.className = "collapsible-content collapsed";
+          for (const field of subform.fields) {
+            const el = await renderField(field, `${subform.table_name}[]_`, field.type === "calculated" || field.readonly);
+            content.appendChild(el);
+          }
+          item.appendChild(content);
+          rowsContainer.appendChild(item);
+          setupCollapsible(item);
+        }
+        await addRow();
+        container.appendChild(wrapper);
+      }
+      
+      async function renderForm(schema) {
+        const form = document.getElementById("dynamic-form");
+        form.innerHTML = "";
+        for (const field of schema.fields) {
+          const el = await renderField(field);
+          form.appendChild(el);
+        }
+        if (schema.subforms) {
+          for (const sub of schema.subforms) {
+            await renderSubform(sub, form);
+          }
+        }
+        const btn = document.createElement("button");
+        btn.type = "submit";
+        btn.className = "btn btn-primary";
+        btn.textContent = schema.submit_label || "Simpan";
+        const btnGroup = document.createElement("div");
+        btnGroup.className = "form-group text-right";
+        btnGroup.appendChild(btn);
+        form.appendChild(btnGroup);
+        form.addEventListener("input", () => {
+          document.querySelectorAll(".subform-wrapper").forEach(subform => {
+            subform.querySelectorAll(".subform-item").forEach(row => {
+              const jumlah = parseFloat(row.querySelector("[name*='jumlah']")?.value || 0);
+              const harga = parseFloat(row.querySelector("[name*='harga']")?.value || 0);
+              const total = row.querySelector("[name*='total']");
+              if (total) total.value = jumlah * harga;
+            });
+          });
+          if (Array.isArray(schema.fields)) {
+            for (const field of schema.fields) {
+              if (field.type === "calculated" && field.formula?.aggregate) {
+                const targetSubform = field.formula.target;
+                const targetField = field.formula.field;
+                const method = field.formula.method || "sum";
+                const allValues = Array.from(form.querySelectorAll(`.subform-wrapper[data-subform="${targetSubform}"] [name^="${targetSubform}[]_${targetField}"]`)).map(el => parseFloat(el.value || 0)).filter(v => !isNaN(v));
+                let result = 0;
+                if (method === "sum") {
+                  result = allValues.reduce((acc, val) => acc + val, 0);
+                } else if (method === "avg") {
+                  result = allValues.length ? allValues.reduce((a, b) => a + b, 0) / allValues.length : 0;
+                } else if (method === "min") {
+                  result = allValues.length ? Math.min(...allValues) : 0;
+                } else if (method === "max") {
+                  result = allValues.length ? Math.max(...allValues) : 0;
+                } else if (method === "count") {
+                  result = allValues.length;
+                }
+                const outputField = form.querySelector(`[name="${field.name}"]`);
+                if (outputField) outputField.value = result;
+              }
+            }
+          }
+        });
+      }
+      
+      window.addEventListener("DOMContentLoaded", async () => {
+        const schema = await loadFormSchema("6879f2a16924869d10de961f");
+        if (schema) renderForm(schema);
+      });
+    </script>
+  </body>
+</html>

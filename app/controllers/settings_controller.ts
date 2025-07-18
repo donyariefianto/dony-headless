@@ -303,6 +303,7 @@ export default class SettingsController {
           _id: x._id,
           name: x.name,
           displayName: x.displayName,
+          description: x.description ? x.description : '-',
         }
       })
       let totalCount = await MongoDBModels.GetLength(query, collection_formbuilder)
@@ -629,7 +630,7 @@ export default class SettingsController {
       })
     }
     const token = jwt.sign({ id: user._id, username: user.username }, 'default_secret', {
-      expiresIn: '1h',
+      expiresIn: '24h',
     })
     return response.ok({
       status: true,
@@ -694,7 +695,10 @@ export default class SettingsController {
     return view.render('configs/form_dinamis', { base_url: env.get('APP_URL') })
   }
   async UIDash({ view }) {
-    return view.render('configs/shortcut', { base_url: env.get('APP_URL') })
+    return view.render('configs/dash', { base_url: env.get('APP_URL') })
+  }
+  async UIDashV2({ view }) {
+    return view.render('configs/dash2', { base_url: env.get('APP_URL') })
   }
   async Test({ view }) {
     return view.render('test', { base_url: env.get('APP_URL') })

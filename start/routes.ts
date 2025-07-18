@@ -48,6 +48,7 @@ router
   .group(() => {
     router.get('/', '#controllers/settings_controller.UI')
     router.get('/dash', '#controllers/settings_controller.UIDash')
+    router.get('/dash2', '#controllers/settings_controller.UIDashV2')
     router.get('/dynamic-form', '#controllers/settings_controller.UIDynamicsForm')
     router.get('/test', '#controllers/settings_controller.Test')
   })

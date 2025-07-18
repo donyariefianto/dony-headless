@@ -6,10 +6,6 @@
     <title>
       CMS Koleksi Profesional
     </title>
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
-      rel="stylesheet"
-    />
     <link rel="stylesheet" href="/resources/configs/index.css" />
     <link
       rel="stylesheet"
@@ -61,6 +57,9 @@
               <li class="nav-item" data-menu="shortcut">
                 <span>Pintasan</span>
               </li>
+              <li class="nav-item" data-menu="formbuilder">
+                <span>Form</span>
+              </li>
               <li class="nav-item" data-menu="collections">
                 <span>Koleksi</span>
               </li>
@@ -72,6 +71,7 @@
         </aside>
 
         <section class="content-area">
+
           <div id="collections-view" class="content-view">
             <div class="content-header">
               <h3>
@@ -308,14 +308,22 @@
             </div>
           </div>
 
+          <div id="formbuilder-view" class="content-view">
+            <div class="formbuilder-content">
+              @include('configs/formbuilder')
+            </div>
+          </div>
+
           <div id="loading-indicator" class="loading-spinner" style="display: none;">
           </div>
+
           <div id="notification-area">
             <div id="error-message" class="notification error" style="display: none;">
             </div>
             <div id="success-message" class="notification success" style="display: none;">
             </div>
           </div>
+
         </section>
       </main>
     </div>
@@ -453,8 +461,12 @@
               <input type="text" id="form-table" class="form-control" />
             </div>
             <div class="form-group">
-              <label for="form-submit-label">Label Tombol Submit</label>
+              <label for="form-submit-label">Label Tombol Submit Mainform</label>
               <input type="text" id="form-submit-label" class="form-control" value="Simpan" />
+            </div>
+            <div class="form-group">
+              <label for="form-submit-subform-label">Label Tombol Submit Subform</label>
+              <input type="text" id="form-submit-subform-label" class="form-control" value="Simpan" />
             </div>
           </div>
 

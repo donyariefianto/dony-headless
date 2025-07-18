@@ -45,6 +45,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const settingsView = document.getElementById('settings-view')
   const boardsView = document.getElementById('dashboard-view')
   const shortcutView = document.getElementById('shortcut-view')
+  const formbuilderView = document.getElementById('formbuilder-view')
   const navItems = document.querySelectorAll('.nav-item')
 
   const noCollectionSelectedMessage = document.getElementById('no-collection-selected')
@@ -1610,6 +1611,7 @@ document.addEventListener('DOMContentLoaded', () => {
       collectionsView.classList.remove('active-view')
       settingsView.classList.remove('active-view')
       boardsView.classList.remove('active-view')
+      formbuilderView.classList.remove('active-view')
       // Show selected content view
       if (menu === 'collections') {
         collectionsView.classList.add('active-view')
@@ -1620,6 +1622,8 @@ document.addEventListener('DOMContentLoaded', () => {
         boardsView.classList.add('active-view')
       } else if (menu === 'pintasan') {
         shortcutView.classList.add('active-view')
+      } else if (menu === 'formbuilder') {
+        formbuilderView.classList.add('active-view')
       }
     })
   })
