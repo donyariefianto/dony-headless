@@ -5,6 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const addCollectionBtn = document.getElementById('add-collection-btn')
   const addDashboardnBtn = document.getElementById('add-dashboard-btn')
   const addFormBuildernBtn = document.getElementById('add-formbuilder-btn')
+  const FlowManagerBtn = document.getElementById('add-bfm-btn')
   const rightFormSidebar = document.getElementById('right-form-sidebar')
   const closeSidebarBtns = document.querySelectorAll('.close-sidebar-btn')
   const overlay = document.getElementById('overlay')

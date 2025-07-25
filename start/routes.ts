@@ -30,7 +30,8 @@ router
     // API CRUD DASHBOARD
     router
       .group(() => {
-        router.get('/list', '#controllers/settings_controller.getCollectionListConfig')
+        router.get('/list', '#controllers/settings_controller.getDashboardListConfig')
+        router.get('/read/:id', '#controllers/settings_controller.getDashboardConfigByID')
       })
       .prefix('/dashboard')
 
@@ -41,6 +42,14 @@ router
         router.get('/read/:id', '#controllers/settings_controller.getFormBuilderConfigByID')
       })
       .prefix('/formbuilder')
+    
+    // API CRUD FLOW MANAGER
+    router
+    .group(() => {
+      router.get('/list', '#controllers/settings_controller.getFlowListConfig')
+      router.get('/read/:id', '#controllers/settings_controller.getFlowConfigByID')
+    })
+    .prefix('/flow-manager')
   })
   .prefix('/configuration')
 
@@ -49,8 +58,10 @@ router
     router.get('/', '#controllers/settings_controller.UI')
     router.get('/dash', '#controllers/settings_controller.UIDash')
     router.get('/dash2', '#controllers/settings_controller.UIDashV2')
+    router.get('/flow-manager', '#controllers/settings_controller.UIFlowManager')
     router.get('/dynamic-form', '#controllers/settings_controller.UIDynamicsForm')
     router.get('/test', '#controllers/settings_controller.Test')
+    router.get('/v2', '#controllers/settings_controller.UIv2')
   })
   .prefix('/manages')
 

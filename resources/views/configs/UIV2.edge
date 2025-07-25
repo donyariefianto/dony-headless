@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>
+      CMS Dashboard
+    </title>
+    <script>
+      const savedTheme = localStorage.getItem("theme");
+      
+      if (savedTheme === "dark-mode") {
+        document.documentElement.classList.add("dark-mode");
+      }
+    </script>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js">
+      
+    </script>
+    <link rel="stylesheet" href="/resources/cms-spa/css/styles.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+      integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+  </head>
+  <body>
+    <div class="app-container">
+      <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+          <h3>
+            NativeCMS
+          </h3>
+          <button class="sidebar-toggle-btn" id="sidebar-toggle-btn" aria-label="Toggle Sidebar">
+            <i class="fa-solid fa-bars"></i>
+          </button>
+        </div>
+        <nav class="sidebar-nav">
+          <ul>
+            <li>
+              <a href="#" data-page="dashboard" class="active">
+                <i class="fa-solid fa-gauge-high"></i>
+                <span>Dashboard</span>
+              </a>
+            </li>
+            <li>
+              <a href="#" data-page="posts">
+                <i class="fa-solid fa-pen-to-square"></i>
+                <span>Posts</span>
+              </a>
+            </li>
+            <li>
+              <a href="#" data-page="pages">
+                <i class="fa-solid fa-file"></i>
+                <span>Pages</span>
+              </a>
+            </li>
+            <li>
+              <a href="#" data-page="media">
+                <i class="fa-solid fa-images"></i>
+                <span>Media</span>
+              </a>
+            </li>
+            <li>
+              <a href="#" data-page="users">
+                <i class="fa-solid fa-users"></i>
+                <span>Users</span>
+              </a>
+            </li>
+            <li>
+              <a href="#" data-page="collections">
+                <i class="fa-solid fa-database"></i>
+                <span>Collections</span>
+              </a>
+            </li>
+            <li>
+              <a href="#" data-page="settings">
+                <i class="fa-solid fa-gear"></i>
+                <span>Settings</span>
+              </a>
+            </li>
+          </ul>
+        </nav>
+        <div class="theme-switcher-container">
+          <label class="theme-toggle-label">
+            <input type="checkbox" id="theme-toggle" />
+            <span class="slider round"></span>
+          </label>
+          <span class="theme-text">Dark Mode</span>
+        </div>
+      </aside>
+
+      <main class="main-content" id="main-content">
+        <header class="header">
+          <h1 id="page-title">
+            Dashboard
+          </h1>
+          <div class="user-info">
+            <span>Hello, Admin!</span>
+            <img src="https://via.placeholder.com/40" alt="User Avatar" class="user-avatar" />
+          </div>
+        </header>
+
+        <div class="loading-overlay" id="loadingOverlay">
+          <div class="loading-spinner">
+            <i class="fa-solid fa-spinner fa-spin fa-3x"></i>
+            <p>
+              Memuat...
+            </p>
+          </div>
+        </div>
+
+        <div class="content-area" id="content-area">
+        </div>
+      </main>
+    </div>
+
+    <div class="side-panel-overlay" id="sidePanelOverlay">
+    </div>
+    <div class="side-panel" id="sidePanel">
+      <div class="side-panel-header">
+        <h3 id="sidePanelTitle">
+          Detail Item
+        </h3>
+        <button class="btn-icon btn-close-panel" id="closeSidePanelBtn" aria-label="Tutup Panel">
+          <i class="fa-solid fa-times"></i>
+        </button>
+      </div>
+      <div class="side-panel-content" id="sidePanelContent">
+      </div>
+    </div>
+
+    <script type="module" src="/resources/cms-spa/js/main.js">
+      
+    </script>
+  </body>
+</html>

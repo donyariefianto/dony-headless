@@ -103,6 +103,7 @@ header {
 
 /* Left Sidebar */
 .left-sidebar {
+  transition: transform 0.3s ease;
   width: 250px;
   background-color: var(--sidebar-bg);
   padding: 20px 0; /* Adjusted padding */
@@ -163,12 +164,12 @@ header {
 
 .content-view {
   display: none;
-  flex-grow: 1;
+  flex-grow: 4;
   flex-direction: column; /* Changed to column to stack header and content */
 }
 
 .content-view.active-view {
-  display: flex;
+  display: block;
 }
 
 .content-header {
@@ -1050,17 +1051,55 @@ body.loading-active {
   }
 }
 
+body.sidebar-open .left-sidebar {
+  transform: translateX(0);
+}
+
+/* Optional overlay saat sidebar terbuka */
+body.sidebar-open::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 999;
+}
+body.sidebar-collapsed .left-sidebar {
+  transform: translateX(-100%);
+}
+
 @media (max-width: 768px) {
+  body.sidebar-open .left-sidebar {
+    transform: translateX(0);
+  }
+
+  /* Optional overlay saat sidebar terbuka */
+  body.sidebar-open::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 999;
+  }
+
   .main-layout {
     flex-direction: column;
   }
 
+  .nav-item .label {
+    display: inline; /* tetap tampil di sidebar mobile */
+  }
+
   .left-sidebar {
-    width: 100%;
-    height: auto;
-    border-right: none;
-    box-shadow: 0 2px 8px var(--shadow-light);
-    border-bottom: 1px solid var(--border-color);
+    position: fixed;
+    top: 60px; /* Sesuaikan dengan tinggi header */
+    left: 0;
+    width: 240px;
+    height: calc(100% - 60px);
+    background-color: var(--sidebar-bg);
+    box-shadow: 2px 0 12px var(--shadow-medium);
+    transform: translateX(-100%);
+    transition: transform 0.3s ease-in-out;
+    z-index: 1000;
   }
 
   .main-nav ul {
@@ -1411,9 +1450,9 @@ body.dark-mode .pagination-controls .btn:disabled {
 .content-view {
   display: none; /* Hidden by default, shown by JS */
 }
-.content-view.active-view {
-  display: block; /* Show when active */
-}
+/* .content-view.active-view {
+  display: block;
+} */
 .view-header {
   display: flex;
   justify-content: space-between;

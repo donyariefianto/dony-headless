@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>
+      Business Flow Manager
+    </title>
+    <link rel="stylesheet" href="/resources/configs/index.css" />
+  </head>
+  <body>
+    <section class="content-area">
+      <div id="business-flow-view" class="content-view active-view">
+        <div class="content-header">
+          <h3>
+            Business Flow Manager
+          </h3>
+          <button class="btn btn-primary" onclick="openFlowEditor()">+ Tambah Flow</button>
+        </div>
+
+        <div class="collections-main-content">
+          <div class="collections-grid" id="flow-list">
+            <!-- Contoh card -->
+            <div class="collection-card">
+              <h4>
+                On Purchase Created
+              </h4>
+              <p class="description">
+                Trigger saat pembelian dibuat
+              </p>
+              <ul class="mt-2">
+                <li>
+                  ➤ Insert ke <strong>stok_masuk</strong>
+                </li>
+                <li>
+                  ➤ Catat log ke <strong>history_log</strong>
+                </li>
+              </ul>
+              <div class="form-actions mt-3">
+                <button class="btn btn-outline-primary" onclick="editFlow()">Edit</button>
+                <button class="btn btn-outline-danger" onclick="deleteFlow()">Hapus</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Form Editor Sidebar -->
+          <aside id="flow-editor" class="right-form-sidebar">
+            <div class="sidebar-header">
+              <h3>
+                Edit Business Flow
+              </h3>
+              <button class="close-sidebar-btn" onclick="closeFlowEditor()">×</button>
+            </div>
+            <div class="sidebar-content">
+              <form id="flow-form">
+                <div class="form-section">
+                  <h4>
+                    Informasi Flow
+                  </h4>
+                  <div class="form-group">
+                    <label>Nama Flow</label>
+                    <input type="text" class="form-control" name="name" />
+                  </div>
+                  <div class="form-group">
+                    <label>Event Trigger</label>
+                    <select class="form-control" name="event">
+                      <option value="purchase_created">
+                        purchase_created
+                      </option>
+                      <option value="stock_updated">
+                        stock_updated
+                      </option>
+                      <option value="user_logged_in">
+                        user_logged_in
+                      </option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="form-section">
+                  <h4>
+                    Daftar Aksi
+                  </h4>
+                  <div id="actions-wrapper">
+                  </div>
+                  <button type="button" class="btn btn-outline-info btn-add-item" onclick="addAction()">+ Tambah Aksi</button>
+                </div>
+
+                <div class="form-actions">
+                  <button type="button" class="btn btn-secondary" onclick="closeFlowEditor()">Batal</button>
+                  <button type="submit" class="btn btn-primary">Simpan</button>
+                </div>
+              </form>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <script>
+      function openFlowEditor() {
+        document.getElementById("flow-editor").classList.add("open");
+      }
+      
+      function closeFlowEditor() {
+        document.getElementById("flow-editor").classList.remove("open");
+      }
+      
+      function addAction() {
+        const wrapper = document.getElementById("actions-wrapper");
+        const index = wrapper.children.length;
+        const actionEl = document.createElement("div");
+        actionEl.classList.add("form-group");
+        actionEl.innerHTML = `
+                                                        <div class="form-group">
+                                                          <label>Jenis Aksi</label>
+                                                          <select class="form-control" name="actions[${index}][type]">
+                                                            <option value="insert">Insert</option>
+                                                            <option value="update">Update</option>
+                                                            <option value="log">Log</option>
+                                                            <option value="notify">Notify</option>
+                                                          </select>
+                                                        </div>
+                                                        <div class="form-group">
+                                                          <label>Target</label>
+                                                          <input type="text" name="actions[${index}][target]" class="form-control" placeholder="Contoh: stok_masuk" />
+                                                        </div>
+                                                      `;
+        wrapper.appendChild(actionEl);
+      }
+      
+      function editFlow() {
+        openFlowEditor();
+        // Implementasi isi form dari data yang dipilih bisa ditambahkan di sini
+      }
+      
+      function deleteFlow() {
+        if (confirm("Yakin ingin menghapus flow ini?")) {
+          alert("Flow berhasil dihapus (simulasi).");
+        }
+      }
+    </script>
+  </body>
+</html>

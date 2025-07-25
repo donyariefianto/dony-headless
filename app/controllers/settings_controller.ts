@@ -224,6 +224,7 @@ export default class SettingsController {
     }
   }
   async getDashboardListConfig({ request, response }: HttpContext) {
+    let collection_dashboard = '_DashboardSystems'
     let { page, limit, sort, search } = request.all()
     try {
       let query = {}
@@ -244,7 +245,7 @@ export default class SettingsController {
         skip,
         limit,
         sort ? sort : { _id: -1 },
-        settings_collections
+        collection_dashboard
       )
       data = data.map((x) => {
         return {
@@ -253,7 +254,7 @@ export default class SettingsController {
           displayName: x.displayName,
         }
       })
-      let totalCount = await MongoDBModels.GetLength(query, settings_collections)
+      let totalCount = await MongoDBModels.GetLength(query, collection_dashboard)
       return response.ok({
         status: true,
         message_id: 'sukses',
@@ -265,6 +266,25 @@ export default class SettingsController {
           currentPage: page,
           limit: limit,
         },
+      })
+    } catch (error) {
+      return response.internalServerError({
+        status: false,
+        status_code: 500,
+        message: error.message,
+      })
+    }
+  }
+  async getDashboardConfigByID({ request, response }: HttpContext) {
+    let collection_dashboard = '_DashboardSystems'
+    const id = request.param('id')
+    try {
+      let data = await MongoDBModels.FindOne({ _id: new ObjectId(id) }, collection_dashboard)
+      return response.ok({
+        status: true,
+        message_id: 'sukses',
+        message_en: 'success',
+        data: data,
       })
     } catch (error) {
       return response.internalServerError({
@@ -332,6 +352,78 @@ export default class SettingsController {
     const id = request.param('id')
     try {
       let data = await MongoDBModels.FindOne({ _id: new ObjectId(id) }, collection_formbuilder)
+      return response.ok({
+        status: true,
+        message_id: 'sukses',
+        message_en: 'success',
+        data: data,
+      })
+    } catch (error) {
+      return response.internalServerError({
+        status: false,
+        status_code: 500,
+        message: error.message,
+      })
+    }
+  }
+  async getFlowListConfig({ request, response }: HttpContext) {
+    let collection_flow = '_FlowSystems'
+    let { page, limit, sort, search } = request.all()
+    try {
+      let query = {}
+      if (search) {
+        query = {
+          $or: [
+            { name: { $regex: search, $options: 'i' } },
+            { displayName: { $regex: search, $options: 'i' } },
+            { description: { $regex: search, $options: 'i' } },
+          ],
+        }
+      }
+      page = Number(page) > 0 ? Number(page) : 1
+      limit = Number(limit) > 0 ? Number(limit) : 5
+      let skip = (page - 1) * limit
+      let data = await MongoDBModels.FindWithPaging(
+        query,
+        skip,
+        limit,
+        sort ? sort : { _id: -1 },
+        collection_flow
+      )
+      data = data.map((x) => {
+        return {
+          _id: x._id,
+          name: x.name,
+          displayName: x.displayName,
+          description: x.description ? x.description : '-',
+        }
+      })
+      let totalCount = await MongoDBModels.GetLength(query, collection_flow)
+      return response.ok({
+        status: true,
+        message_id: 'sukses',
+        message_en: 'success',
+        data: {
+          documents: data,
+          totalCount: totalCount,
+          totalPages: Math.ceil(totalCount / limit),
+          currentPage: page,
+          limit: limit,
+        },
+      })
+    } catch (error) {
+      return response.internalServerError({
+        status: false,
+        status_code: 500,
+        message: error.message,
+      })
+    }
+  }
+  async getFlowConfigByID({ request, response }: HttpContext) {
+    let collection_flow = '_FlowSystems'
+    const id = request.param('id')
+    try {
+      let data = await MongoDBModels.FindOne({ _id: new ObjectId(id) }, collection_flow)
       return response.ok({
         status: true,
         message_id: 'sukses',
@@ -702,5 +794,14 @@ export default class SettingsController {
   }
   async Test({ view }) {
     return view.render('test', { base_url: env.get('APP_URL') })
+  }
+  async UIFlowManager({ view }) {
+    return view.render('configs/flowManager', { base_url: env.get('APP_URL') })
+  }
+  async UIv2({ view }) {
+    return view.render('configs/UIV2', { base_url: env.get('APP_URL') })
+  }
+  async UISinglePageApplication({ view }) {
+    return view.render('spa', { base_url: env.get('APP_URL') })
   }
 }

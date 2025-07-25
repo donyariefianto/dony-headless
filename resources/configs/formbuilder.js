@@ -28,7 +28,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const dom = {
     saveFormBuilderBtn: document.getElementById('data-formbuilder-form'),
     dataDashboardIdInput: document.getElementById('data-dashboard-id'),
-    rightFormSidebar:document.getElementById('right-form-sidebar'),
+    rightFormSidebar: document.getElementById('right-form-sidebar'),
   }
   let choicesInstance = null
   if (collectionSelect) {

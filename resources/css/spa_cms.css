@@ -1,0 +1,105 @@
+/* Sesuai root config kamu */
+:root {
+  --primary-color: #007bff;
+  --secondary-color: #6c757d;
+  --success-color: #28a745;
+  --danger-color: #dc3545;
+  --info-color: #17a2b8;
+  --warning-color: #ffc107;
+  --light-color: #f8f9fa;
+  --dark-color: #343a40;
+
+  --text-color: #333;
+  --bg-color: #f4f7fa;
+  --card-bg: #ffffff;
+  --border-color: #e0e0e0;
+  --sidebar-bg: #ffffff;
+  --header-bg: #ffffff;
+  --shadow-light: rgba(0, 0, 0, 0.08);
+  --shadow-medium: rgba(0, 0, 0, 0.15);
+  --hover-bg: #e9ecef;
+
+  --font-family: 'Inter', sans-serif;
+  --border-radius: 8px;
+  --transition-speed: 0.2s;
+}
+
+body.dark {
+  --bg-color: #1e1e2f;
+  --text-color: #f0f0f0;
+  --card-bg: #2b2b3c;
+  --sidebar-bg: #2b2b3c;
+  --header-bg: #2b2b3c;
+}
+
+body {
+  font-family: var(--font-family);
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  margin: 0;
+}
+
+.app {
+  display: flex;
+}
+
+.sidebar {
+  width: 240px;
+  background: var(--sidebar-bg);
+  transition: width var(--transition-speed);
+  box-shadow: 2px 0 5px var(--shadow-light);
+  height: 100vh;
+  position: fixed;
+}
+
+.sidebar.collapsed {
+  width: 60px;
+}
+
+.sidebar nav ul {
+  list-style: none;
+  padding: 0;
+}
+
+.sidebar nav li {
+  padding: 12px;
+}
+
+.main-content {
+  margin-left: 240px;
+  padding: 20px;
+  transition: margin-left var(--transition-speed);
+}
+
+.sidebar.collapsed ~ .main-content {
+  margin-left: 60px;
+}
+
+.slidein-form {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 400px;
+  height: 100%;
+  background: var(--card-bg);
+  box-shadow: -2px 0 10px var(--shadow-medium);
+  transform: translateX(100%);
+  transition: transform var(--transition-speed);
+  z-index: 999;
+}
+
+.slidein-form.show {
+  transform: translateX(0%);
+}
+
+.slidein-form .close-btn {
+  float: right;
+  font-size: 24px;
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+
+.hidden {
+  display: none;
+}
