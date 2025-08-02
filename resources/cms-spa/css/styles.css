@@ -1685,3 +1685,50 @@ body.sidebar-collapsed .main-content {
     margin-left: 0;
   }
 }
+
+/* --- Responsive Adjustments --- */
+@media (max-width: 992px) {
+  .sidebar {
+    width: 200px;
+    background-color: var(--sidebar-bg);
+    color: var(--sidebar-link-color);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    box-shadow: var(--shadow-medium);
+    transition:
+      width var(--transition-speed),
+      background-color var(--transition-speed);
+    position: sticky;
+    top: 0;
+    height: 100vh;
+  }
+
+  .sidebar.collapsed {
+    width: 80px;
+  }
+
+  .sidebar-header h3 {
+    opacity: 1; /* Pastikan judul tetap terlihat saat sidebar terbuka di mobile */
+    width: auto;
+  }
+
+  .sidebar-nav a i {
+    margin-right: 15px; /* Icon kembali dengan margin */
+  }
+
+  .sidebar-nav a span,
+  .theme-text {
+    opacity: 1; /* Teks kembali terlihat */
+    transform: translateX(0);
+  }
+
+  .main-content {
+    margin-left: 0; /* Tidak ada margin di mobile */
+  }
+
+  /* Ini penting: Tombol toggle hanya muncul di mobile */
+  .sidebar-toggle-btn {
+    display: block !important;
+  }
+}
