@@ -4,7 +4,136 @@ import {
     hideLoadingOverlay,
     openSidePanel,
     closeSidePanel,
+    showNotification
 } from '../main.js';
+
+// --- Helper Functions (Moved to a higher scope to avoid `is not defined` errors) ---
+
+/**
+ * Toggles the collapse state of a card body.
+ * @param {HTMLElement} btn
+ */
+function toggleCollapse(btn) {
+    const content = btn.closest(".field-item").querySelector(".collapsible-content");
+    content.classList.toggle("collapsed");
+    const icon = btn.querySelector("i");
+    icon.classList.toggle("fa-chevron-up");
+    icon.classList.toggle("fa-chevron-down");
+}
+
+/**
+ * Handles toggling between static and relation options for a 'select' field.
+ * @param {HTMLElement} selectEl
+ */
+function toggleSelectModeOptions(selectEl) {
+    const container = selectEl.closest(".extra-options");
+    const staticHTML = `
+        <label class="form-label">Opsi Static (pisahkan dengan koma)</label>
+        <input type="text" class="form-control select-static-values" placeholder="cth: Aktif, Tidak Aktif" />
+    `;
+    const relationHTML = `
+        <label class="form-label">Nama Tabel Relasi</label>
+        <input type="text" class="form-control relation-table" placeholder="users" />
+        <label class="form-label">Kolom Value</label>
+        <input type="text" class="form-control relation-value" placeholder="id" />
+        <label class="form-label">Kolom Label</label>
+        <input type="text" class="form-control relation-label" placeholder="name" />
+    `;
+    const optionsContainer = container.querySelector(".select-mode-options");
+    if (optionsContainer) {
+        optionsContainer.innerHTML = selectEl.value === "static" ? staticHTML : relationHTML;
+    }
+}
+
+/**
+ * Adds a new subfield widget to a subform.
+ * @param {HTMLElement} btn
+ */
+function addSubField(btn) {
+    const container = btn.closest(".field-item").querySelector(".form-subfields");
+    container.appendChild(buildFieldWidget());
+}
+
+/**
+ * Displays extra options (e.g., for 'select' or 'calculated' fields) based on the selected type.
+ * @param {HTMLElement} typeContainer
+ * @param {Object} [optionsData=null] Pre-existing options data.
+ * @param {string} [fieldType=null] Pre-existing field type.
+ */
+function handleExtraOptions(typeContainer, optionsData = null, fieldType = null) {
+    const selectedType = fieldType || typeContainer.querySelector("input[type=radio]:checked")?.value;
+    const extraOptionsContainer = typeContainer.closest(".collapsible-content")?.querySelector(".extra-options");
+
+    if (!extraOptionsContainer) return;
+
+    extraOptionsContainer.innerHTML = "";
+
+    if (selectedType === "select") {
+        const mode = optionsData?.mode || 'static';
+        const staticValues = optionsData?.values?.join(', ') || '';
+        const relation = optionsData?.relation || {};
+
+        extraOptionsContainer.innerHTML = `
+            <div class="form-group">
+                <label class="form-label">Mode Select</label>
+                <select class="select-mode form-control">
+                    <option value="static" ${mode === 'static' ? 'selected' : ''}>Static</option>
+                    <option value="relation" ${mode === 'relation' ? 'selected' : ''}>Relasi</option>
+                </select>
+            </div>
+            <div class="select-mode-options">
+                ${mode === 'static' ? `
+                    <label class="form-label">Opsi Static (pisahkan dengan koma)</label>
+                    <input type="text" class="form-control select-static-values" value="${staticValues}" placeholder="cth: Aktif, Tidak Aktif" />
+                ` : `
+                    <label class="form-label">Nama Tabel Relasi</label>
+                    <input type="text" class="form-control relation-table" value="${relation.table || ''}" placeholder="users" />
+                    <label class="form-label">Kolom Value</label>
+                    <input type="text" class="form-control relation-value" value="${relation.value_column || ''}" placeholder="id" />
+                    <label class="form-label">Kolom Label</label>
+                    <input type="text" class="form-control relation-label" value="${relation.label_column || ''}" placeholder="name" />
+                `}
+            </div>
+        `;
+        extraOptionsContainer.querySelector('.select-mode')?.addEventListener('change', (e) => toggleSelectModeOptions(e.currentTarget));
+    } else if (selectedType === "calculated") {
+        const formula = optionsData?.formula || '';
+        extraOptionsContainer.innerHTML = `
+            <div class="form-group">
+                <label class="form-label">Formula Perhitungan</label>
+                <input type="text" class="form-control field-formula" value="${formula}" placeholder="Contoh: (harga * jumlah) - diskon" />
+                <small class="form-text text-muted">
+                    <ul>
+                        <li>Gunakan nama field dari form utama sebagai variabel.</li>
+                        <li>Untuk menghitung nilai dari **subform**, gunakan format: <code>FUNGSI(nama_tabel_detail.nama_field)</code></li>
+                        <li>Fungsi yang tersedia:
+                            <ul>
+                                <li><code>SUM()</code>: Menjumlahkan seluruh nilai.</li>
+                                <li><code>AVG()</code>: Menghitung rata-rata nilai.</li>
+                                <li><code>COUNT()</code>: Menghitung jumlah item.</li>
+                                <li><code>MIN()</code>: Mencari nilai terkecil.</li>
+                                <li><code>MAX()</code>: Mencari nilai terbesar.</li>
+                            </ul>
+                        </li>
+                        <li>**Contoh kombinasi**: <code>(harga_satuan * qty) + SUM(items.ppn)</code></li>
+                    </ul>
+                </small>
+            </div>
+        `;
+    }
+}
+
+/**
+ * Handles the selection of a field type.
+ * @param {HTMLElement} el The clicked type option element.
+ */
+function selectType(el) {
+    const group = el.closest(".type-options");
+    group.querySelectorAll(".type-option").forEach(opt => opt.classList.remove("selected"));
+    el.classList.add("selected");
+    el.querySelector("input[type=radio]").checked = true;
+    handleExtraOptions(group);
+}
 
 /**
  * Helper function to create a new field widget with pre-filled data.
@@ -55,154 +184,22 @@ function buildFieldWidget(fieldData = null) {
             <div class="extra-options p-3 border rounded-2 bg-light"></div>
         </div>`;
     
-    wrapper.querySelector('.field-name').addEventListener('input', (e) => {
+    wrapper.querySelector('.field-name')?.addEventListener('input', (e) => {
         wrapper.querySelector('.field-name-display').textContent = e.target.value || 'Field Baru';
     });
 
-    wrapper.querySelector('.remove-item-btn').addEventListener('click', () => wrapper.remove());
-    wrapper.querySelector('.toggle-collapse-btn').addEventListener('click', (e) => toggleCollapse(e.currentTarget));
+    wrapper.querySelector('.remove-item-btn')?.addEventListener('click', () => wrapper.remove());
+    wrapper.querySelector('.toggle-collapse-btn')?.addEventListener('click', (e) => toggleCollapse(e.currentTarget));
     wrapper.querySelectorAll('.type-option').forEach(option => {
         option.addEventListener('click', () => selectType(option));
     });
 
-    if (fieldData?.type === 'select') {
-        const extraOptionsContainer = wrapper.querySelector(".extra-options");
-        const mode = fieldData.options?.mode || 'static';
-        extraOptionsContainer.innerHTML = `
-            <div class="form-group">
-                <label class="form-label">Mode Select</label>
-                <select class="select-mode form-control">
-                    <option value="static" ${mode === 'static' ? 'selected' : ''}>Static</option>
-                    <option value="relation" ${mode === 'relation' ? 'selected' : ''}>Relasi</option>
-                </select>
-            </div>
-            <div class="select-mode-options">
-                ${mode === 'static' ? `<label class="form-label">Opsi Static (pisahkan dengan koma)</label>
-                    <input type="text" class="form-control select-static-values" value="${fieldData.options.values?.join(', ') || ''}" />` :
-                    `<label class="form-label">Nama Tabel Relasi</label>
-                    <input type="text" class="form-control relation-table" value="${fieldData.options.relation?.table || ''}" />
-                    <label class="form-label">Kolom Value</label>
-                    <input type="text" class="form-control relation-value" value="${fieldData.options.relation?.value_column || ''}" />
-                    <label class="form-label">Kolom Label</label>
-                    <input type="text" class="form-control relation-label" value="${fieldData.options.relation?.label_column || ''}" />`}
-            </div>
-        `;
-        extraOptionsContainer.querySelector('.select-mode').addEventListener('change', (e) => toggleSelectModeOptions(e.currentTarget));
-    }
+    const typeOptionsEl = wrapper.querySelector(".type-options");
+    handleExtraOptions(typeOptionsEl, fieldData?.options, fieldData?.type);
 
     return wrapper;
 }
 
-// --- Helper Functions ---
-function handleSelectFieldMode(typeContainer) {
-    const selectedType = typeContainer.querySelector("input[type=radio]:checked").value;
-    const extraOptionsContainer = typeContainer.closest(".collapsible-content").querySelector(".extra-options");
-    if (!extraOptionsContainer) return;
-    if (selectedType === "select") {
-        extraOptionsContainer.innerHTML = `
-            <div class="form-group">
-                <label class="form-label">Mode Select</label>
-                <select class="select-mode form-control">
-                    <option value="static">Static</option>
-                    <option value="relation">Relasi</option>
-                </select>
-            </div>
-            <div class="select-mode-options static-options">
-                <label class="form-label">Opsi Static (pisahkan dengan koma)</label>
-                <input type="text" class="form-control select-static-values" placeholder="cth: Aktif, Tidak Aktif" />
-            </div>
-        `;
-        extraOptionsContainer.querySelector('.select-mode').addEventListener('change', (e) => toggleSelectModeOptions(e.currentTarget));
-    } else {
-        extraOptionsContainer.innerHTML = "";
-    }
-}
-
-function toggleSelectModeOptions(selectEl) {
-    const container = selectEl.closest(".extra-options");
-    const staticHTML = `
-        <label class="form-label">Opsi Static (pisahkan dengan koma)</label>
-        <input type="text" class="form-control select-static-values" placeholder="cth: Aktif, Tidak Aktif" />
-    `;
-    const relationHTML = `
-        <label class="form-label">Nama Tabel Relasi</label>
-        <input type="text" class="form-control relation-table" placeholder="users" />
-        <label class="form-label">Kolom Value</label>
-        <input type="text" class="form-control relation-value" placeholder="id" />
-        <label class="form-label">Kolom Label</label>
-        <input type="text" class="form-control relation-label" placeholder="name" />
-    `;
-    const optionsContainer = container.querySelector(".select-mode-options");
-    if (optionsContainer) {
-        optionsContainer.innerHTML = selectEl.value === "static" ? staticHTML : relationHTML;
-    }
-}
-
-function selectType(el) {
-    const group = el.closest(".type-options");
-    group.querySelectorAll(".type-option").forEach(opt => opt.classList.remove("selected"));
-    el.classList.add("selected");
-    el.querySelector("input[type=radio]").checked = true;
-    handleSelectFieldMode(group);
-}
-
-function toggleCollapse(btn) {
-    const content = btn.closest(".field-item").querySelector(".collapsible-content");
-    content.classList.toggle("collapsed");
-    const icon = btn.querySelector("i");
-    icon.classList.toggle("fa-chevron-up");
-    icon.classList.toggle("fa-chevron-down");
-}
-
-function generateSchema(formPanel) {
-    const schema = {
-        id: formPanel.querySelector("#form-id")?.value || null,
-        slug: formPanel.querySelector("#form-slug")?.value || '',
-        name: formPanel.querySelector("#form-name")?.value || '',
-        table_name: formPanel.querySelector("#form-table")?.value || '',
-        submit_label: formPanel.querySelector("#form-submit-label")?.value || '',
-        fields: Array.from(formPanel.querySelectorAll("#main-fields .field-item")).map(div => {
-            const type = div.querySelector(".type-option.selected input")?.value || '';
-            const options = {};
-            if (type === "select") {
-                const extra = div.querySelector(".extra-options");
-                if (extra) {
-                    const mode = extra.querySelector(".select-mode")?.value || 'static';
-                    options.mode = mode;
-                    if (mode === "static") {
-                        options.values = (extra.querySelector(".select-static-values")?.value || '').split(",").map(v => v.trim());
-                    } else {
-                        options.relation = {
-                            table: extra.querySelector(".relation-table")?.value || '',
-                            value_column: extra.querySelector(".relation-value")?.value || '',
-                            label_column: extra.querySelector(".relation-label")?.value || ''
-                        };
-                    }
-                }
-            }
-            return {
-                name: div.querySelector(".field-name")?.value || '',
-                label: div.querySelector(".field-label")?.value || '',
-                type: type,
-                required: div.querySelector(".field-required")?.checked || false,
-                options: options
-            };
-        }),
-        subforms: Array.from(formPanel.querySelectorAll("#subform-panels .field-item")).map(sf => ({
-            table_name: sf.querySelector(".subform-table")?.value || '',
-            foreign_key: sf.querySelector(".subform-fk")?.value || '',
-            label: sf.querySelector(".subform-label")?.value || '',
-            fields: Array.from(sf.querySelectorAll(".form-subfields .field-item")).map(f => ({
-                name: f.querySelector(".field-name")?.value || '',
-                label: f.querySelector(".field-label")?.value || '',
-                type: f.querySelector(".type-option.selected input")?.value || ''
-            }))
-        })),
-        calculations: [] // calculations sekarang dikosongkan karena sudah tidak digunakan
-    };
-    formPanel.querySelector("#schema-output").textContent = JSON.stringify(schema, null, 2);
-    return schema;
-}
 
 /**
  * Builds a subform widget with optional pre-filled data.
@@ -238,12 +235,12 @@ function buildSubformWidget(subformData = null) {
             <button type="button" class="btn btn-outline-primary btn-sm mt-3 add-subfield-btn">+ Tambah Field Subform</button>
         </div>`;
 
-    wrapper.querySelector('.subform-label').addEventListener('input', (e) => {
+    wrapper.querySelector('.subform-label')?.addEventListener('input', (e) => {
         wrapper.querySelector('.subform-name-display').textContent = e.target.value || 'Subform Baru';
     });
-    wrapper.querySelector('.remove-item-btn').addEventListener('click', () => wrapper.remove());
-    wrapper.querySelector('.toggle-collapse-btn').addEventListener('click', (e) => toggleCollapse(e.currentTarget));
-    wrapper.querySelector('.add-subfield-btn').addEventListener('click', (e) => addSubField(e.currentTarget));
+    wrapper.querySelector('.remove-item-btn')?.addEventListener('click', () => wrapper.remove());
+    wrapper.querySelector('.toggle-collapse-btn')?.addEventListener('click', (e) => toggleCollapse(e.currentTarget));
+    wrapper.querySelector('.add-subfield-btn')?.addEventListener('click', (e) => addSubField(e.currentTarget));
 
     if (subformData?.fields) {
         const subfieldsContainer = wrapper.querySelector(".form-subfields");
@@ -255,6 +252,62 @@ function buildSubformWidget(subformData = null) {
     return wrapper;
 }
 
+
+function generateSchema(formPanel) {
+    const schema = {
+        id: formPanel.querySelector("#form-id")?.value || null,
+        slug: formPanel.querySelector("#form-slug")?.value || '',
+        name: formPanel.querySelector("#form-name")?.value || '',
+        table_name: formPanel.querySelector("#form-table")?.value || '',
+        submit_label: formPanel.querySelector("#form-submit-label")?.value || '',
+        fields: Array.from(formPanel.querySelectorAll("#main-fields .field-item")).map(div => {
+            const type = div.querySelector(".type-option.selected input")?.value || '';
+            const options = {};
+            
+            if (type === "select") {
+                const extra = div.querySelector(".extra-options");
+                if (extra) {
+                    const mode = extra.querySelector(".select-mode")?.value || 'static';
+                    options.mode = mode;
+                    if (mode === "static") {
+                        options.values = (extra.querySelector(".select-static-values")?.value || '').split(",").map(v => v.trim());
+                    } else {
+                        options.relation = {
+                            table: extra.querySelector(".relation-table")?.value || '',
+                            value_column: extra.querySelector(".relation-value")?.value || '',
+                            label_column: extra.querySelector(".relation-label")?.value || ''
+                        };
+                    }
+                }
+            } else if (type === "calculated") {
+                const extra = div.querySelector(".extra-options");
+                if (extra) {
+                    options.formula = extra.querySelector(".field-formula")?.value || '';
+                }
+            }
+            
+            return {
+                name: div.querySelector(".field-name")?.value || '',
+                label: div.querySelector(".field-label")?.value || '',
+                type: type,
+                required: div.querySelector(".field-required")?.checked || false,
+                options: options
+            };
+        }),
+        subforms: Array.from(formPanel.querySelectorAll("#subform-panels .field-item")).map(sf => ({
+            table_name: sf.querySelector(".subform-table")?.value || '',
+            foreign_key: sf.querySelector(".subform-fk")?.value || '',
+            label: sf.querySelector(".subform-label")?.value || '',
+            fields: Array.from(sf.querySelectorAll(".form-subfields .field-item")).map(f => ({
+                name: f.querySelector(".field-name")?.value || '',
+                label: f.querySelector(".field-label")?.value || '',
+                type: f.querySelector(".type-option.selected input")?.value || ''
+            }))
+        })),
+    };
+    formPanel.querySelector("#schema-output").textContent = JSON.stringify(schema, null, 2);
+    return schema;
+}
 
 /**
  * Melampirkan semua event listener untuk form generator di side panel
@@ -272,14 +325,9 @@ function attachFormGeneratorEventListeners() {
         formPanel.querySelector("#subform-panels").appendChild(buildSubformWidget());
     }
 
-    function addSubField(btn) {
-        const container = btn.closest(".field-item").querySelector(".form-subfields");
-        container.appendChild(buildFieldWidget());
-    }
-
-    formPanel.querySelector("#addMainFieldBtn").addEventListener('click', addMainField);
-    formPanel.querySelector("#addSubformBtn").addEventListener('click', addSubform);
-    formPanel.querySelector("#generateSchemaBtn").addEventListener('click', () => generateSchema(formPanel));
+    formPanel.querySelector("#addMainFieldBtn")?.addEventListener('click', addMainField);
+    formPanel.querySelector("#addSubformBtn")?.addEventListener('click', addSubform);
+    formPanel.querySelector("#generateSchemaBtn")?.addEventListener('click', () => generateSchema(formPanel));
 
     formPanel.addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -302,7 +350,7 @@ function attachFormGeneratorEventListeners() {
             const result = await response.json();
 
             if (result.status) {
-                alert(`Formulir '${schema.name}' berhasil disimpan.`);
+                showNotification(`Formulir '${schema.name}' berhasil disimpan.`);
                 closeSidePanel();
                 fetchForms();
             } else {
@@ -332,11 +380,6 @@ function attachFormGeneratorEventListeners() {
             subformsContainer.appendChild(buildSubformWidget(subform));
         });
         
-        // Menghapus bagian untuk calculations
-        // (window.currentFormData.calculations || []).forEach(calc => {
-        //     calculationsContainer.appendChild(buildCalculationWidget(calc));
-        // });
-
         window.currentFormData = null;
     }
 }
@@ -401,7 +444,7 @@ const renderFormGenerator = (formData = null) => {
 const fetchFormById = async (formId) => {
     showLoadingOverlay();
     try {
-        const url = `${BASE_API_URL}/configuration/formbuilder/read/${formId}`;
+        const url = `${BASE_API_URL}/configuration/formbuilder/get?id=${formId}`;
         const response = await fetch(url);
         const data = await response.json();
         
@@ -486,38 +529,38 @@ export function renderFormBuilderSettingsPage(container) {
             nextPageBtn.disabled = currentPage >= totalPages;
         }
         
-        addFormBtn.addEventListener('click', () => renderFormGenerator());
-        searchButton.addEventListener('click', () => {
+        addFormBtn?.addEventListener('click', () => renderFormGenerator());
+        searchButton?.addEventListener('click', () => {
             currentSearch = formSearchInput.value;
             currentPage = 1;
             fetchForms();
         });
-        clearSearchButton.addEventListener('click', () => {
+        clearSearchButton?.addEventListener('click', () => {
             formSearchInput.value = '';
             currentSearch = '';
             currentPage = 1;
             fetchForms();
         });
-        prevPageBtn.addEventListener('click', () => {
+        prevPageBtn?.addEventListener('click', () => {
             if (currentPage > 1) {
                 currentPage--;
                 fetchForms();
             }
         });
-        nextPageBtn.addEventListener('click', () => {
+        nextPageBtn?.addEventListener('click', () => {
             currentPage++;
             fetchForms();
         });
 
         container.querySelectorAll('.btn-edit-form').forEach(button => {
-            button.addEventListener('click', (e) => {
+            button?.addEventListener('click', (e) => {
                 const formId = e.currentTarget.dataset.formId;
                 fetchFormById(formId);
             });
         });
 
         container.querySelectorAll('.btn-delete-form').forEach(button => {
-            button.addEventListener('click', async (e) => {
+            button?.addEventListener('click', async (e) => {
                 const formId = e.currentTarget.dataset.formId;
                 const formName = e.currentTarget.dataset.displayName;
                 if (confirm(`Apakah Anda yakin ingin menghapus formulir '${formName}' ini?`)) {
@@ -528,7 +571,7 @@ export function renderFormBuilderSettingsPage(container) {
                         });
                         const result = await response.json();
                         if (result.status) {
-                            alert(`Formulir '${formName}' berhasil dihapus.`);
+                            showNotification(`Formulir '${formName}' berhasil dihapus.`);
                             fetchForms();
                         } else {
                             alert(`Gagal menghapus formulir: ${result.message}`);

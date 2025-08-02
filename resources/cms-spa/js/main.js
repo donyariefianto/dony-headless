@@ -84,6 +84,42 @@ export function removeClass(element, className) {
   }
 }
 
+export function showNotification(message, type) {
+    const notificationElement = type === 'success' ? successMessage : errorMessage
+    notificationElement.textContent = message
+    notificationElement.style.display = 'block'
+    setTimeout(() => {
+      notificationElement.style.display = 'none'
+      notificationElement.textContent = '' // Clear message
+    }, 5000) // Hide after 5 seconds
+  }
+export function slugify(text) {
+  return text
+    .toString()
+    .toLowerCase()
+    .replace(/\s+/g, '-') // Replace spaces with -
+    .replace(/[^\w-]+/g, '') // Remove all non-word chars
+    .replace(/--+/g, '-') // Replace multiple - with single -
+    .replace(/^-+/, '') // Trim - from start of text
+    .replace(/-+$/, '') // Trim - from end of text
+}
+export function formatDateTime(isoString) {
+  if (!isoString) return 'N/A'
+  const options = {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+  }
+  try {
+    return new Date(isoString).toLocaleString('id-ID', options)
+  } catch (e) {
+    console.error('Invalid date string:', isoString, e)
+    return isoString // Return original if invalid
+  }
+}
 
 closeSidePanelBtn.onclick = closeSidePanel
 sidePanelOverlay.onclick = closeSidePanel
