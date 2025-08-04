@@ -37,9 +37,12 @@ router
 
     // API CRUD FORMBUILDER
     router
-      .group(() => {
+      .group(() => {        
+        router.post('/create', '#controllers/settings_controller.createFormBuilderConfig')
         router.get('/list', '#controllers/settings_controller.getFormBuilderListConfig')
         router.get('/read/:id', '#controllers/settings_controller.getFormBuilderConfigByID')
+        router.put('/update', '#controllers/settings_controller.updateFormBuilderConfig')
+        router.delete('/delete', '#controllers/settings_controller.deleteFormBuilderConfig')
       })
       .prefix('/formbuilder')
     

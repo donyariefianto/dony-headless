@@ -27,21 +27,36 @@ function toggleCollapse(btn) {
  */
 function toggleSelectModeOptions(selectEl) {
     const container = selectEl.closest(".extra-options");
-    const staticHTML = `
-        <label class="form-label">Opsi Static (pisahkan dengan koma)</label>
-        <input type="text" class="form-control select-static-values" placeholder="cth: Aktif, Tidak Aktif" />
-    `;
-    const relationHTML = `
-        <label class="form-label">Nama Tabel Relasi</label>
-        <input type="text" class="form-control relation-table" placeholder="users" />
-        <label class="form-label">Kolom Value</label>
-        <input type="text" class="form-control relation-value" placeholder="id" />
-        <label class="form-label">Kolom Label</label>
-        <input type="text" class="form-control relation-label" placeholder="name" />
-    `;
+    const mode = selectEl.value;
+    
+    // Clear previous options
     const optionsContainer = container.querySelector(".select-mode-options");
     if (optionsContainer) {
-        optionsContainer.innerHTML = selectEl.value === "static" ? staticHTML : relationHTML;
+        optionsContainer.innerHTML = '';
+    }
+
+    if (mode === "static") {
+        optionsContainer.innerHTML = `
+            <label class="form-label">Opsi Static (pisahkan dengan koma)</label>
+            <input type="text" class="form-control select-static-values" placeholder="cth: Aktif, Tidak Aktif" />
+        `;
+    } else if (mode === "relation") {
+        optionsContainer.innerHTML = `
+            <label class="form-label">Nama Tabel Relasi</label>
+            <input type="text" class="form-control relation-table" placeholder="users" />
+            <label class="form-label">Kolom Value</label>
+            <input type="text" class="form-control relation-value" placeholder="id" />
+            <label class="form-label">Kolom Label</label>
+            <input type="text" class="form-control relation-label" placeholder="name" />
+            <hr>
+            <div class="form-group mt-3">
+                <label class="form-label">Auto-fill Fields</label>
+                <input type="text" class="form-control autofill-fields" placeholder="cth: harga:price,deskripsi:description" />
+                <small class="form-text text-muted">
+                    Isi dengan format <code>nama_field_form:nama_kolom_tabel</code>. Pisahkan dengan koma jika lebih dari satu.
+                </small>
+            </div>
+        `;
     }
 }
 
@@ -92,6 +107,14 @@ function handleExtraOptions(typeContainer, optionsData = null, fieldType = null)
                     <input type="text" class="form-control relation-value" value="${relation.value_column || ''}" placeholder="id" />
                     <label class="form-label">Kolom Label</label>
                     <input type="text" class="form-control relation-label" value="${relation.label_column || ''}" placeholder="name" />
+                    <hr>
+                    <div class="form-group mt-3">
+                        <label class="form-label">Auto-fill Fields</label>
+                        <input type="text" class="form-control autofill-fields" value="${relation.autofill_fields || ''}" placeholder="cth: harga:price,deskripsi:description" />
+                        <small class="form-text text-muted">
+                            Isi dengan format <code>nama_field_form:nama_kolom_tabel</code>. Pisahkan dengan koma jika lebih dari satu.
+                        </small>
+                    </div>
                 `}
             </div>
         `;
@@ -275,7 +298,8 @@ function generateSchema(formPanel) {
                         options.relation = {
                             table: extra.querySelector(".relation-table")?.value || '',
                             value_column: extra.querySelector(".relation-value")?.value || '',
-                            label_column: extra.querySelector(".relation-label")?.value || ''
+                            label_column: extra.querySelector(".relation-label")?.value || '',
+                            autofill_fields: extra.querySelector(".autofill-fields")?.value || ''
                         };
                     }
                 }
@@ -298,11 +322,41 @@ function generateSchema(formPanel) {
             table_name: sf.querySelector(".subform-table")?.value || '',
             foreign_key: sf.querySelector(".subform-fk")?.value || '',
             label: sf.querySelector(".subform-label")?.value || '',
-            fields: Array.from(sf.querySelectorAll(".form-subfields .field-item")).map(f => ({
-                name: f.querySelector(".field-name")?.value || '',
-                label: f.querySelector(".field-label")?.value || '',
-                type: f.querySelector(".type-option.selected input")?.value || ''
-            }))
+            fields: Array.from(sf.querySelectorAll(".form-subfields .field-item")).map(f => {
+                const type = f.querySelector(".type-option.selected input")?.value || '';
+                const options = {};
+                
+                if (type === "select") {
+                    const extra = f.querySelector(".extra-options");
+                    if (extra) {
+                        const mode = extra.querySelector(".select-mode")?.value || 'static';
+                        options.mode = mode;
+                        if (mode === "static") {
+                            options.values = (extra.querySelector(".select-static-values")?.value || '').split(",").map(v => v.trim());
+                        } else {
+                            options.relation = {
+                                table: extra.querySelector(".relation-table")?.value || '',
+                                value_column: extra.querySelector(".relation-value")?.value || '',
+                                label_column: extra.querySelector(".relation-label")?.value || '',
+                                autofill_fields: extra.querySelector(".autofill-fields")?.value || ''
+                            };
+                        }
+                    }
+                } else if (type === "calculated") {
+                    const extra = f.querySelector(".extra-options");
+                    if (extra) {
+                        options.formula = extra.querySelector(".field-formula")?.value || '';
+                    }
+                }
+                
+                return {
+                    name: f.querySelector(".field-name")?.value || '',
+                    label: f.querySelector(".field-label")?.value || '',
+                    type: type,
+                    required: f.querySelector(".field-required")?.checked || false,
+                    options: options
+                };
+            })
         })),
     };
     formPanel.querySelector("#schema-output").textContent = JSON.stringify(schema, null, 2);
@@ -345,7 +399,7 @@ function attachFormGeneratorEventListeners() {
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify(schema)
+                body: JSON.stringify({data:schema})
             });
             const result = await response.json();
 

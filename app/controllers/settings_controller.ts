@@ -294,6 +294,36 @@ export default class SettingsController {
       })
     }
   }
+  async createFormBuilderConfig({ request, response }: HttpContext) {
+    let { data } = request.all()
+    let collection_formbuilder = '_FormBuilder'
+    try {
+      const dataToSave = {
+        ...data,
+        created_at: moment().format(),
+        updated_at: moment().format(),
+      }
+
+      await MongoDBModels.InsertOne(dataToSave, collection_formbuilder)
+      return response.created({
+        status: true,
+        status_code: 201,
+        message_id: 'Konfigurasi koleksi berhasil disimpan.',
+        message_en: 'Collection configuration saved successfully.',
+      })
+    } catch (error) {
+      return response.internalServerError({
+        status: false,
+        status_code: 500,
+        message_id:
+          `Gagal menyimpan atau memperbarui konfigurasi untuk koleksi '${collectionConfigData.name}':` +
+          error.message,
+        message_en:
+          `Failed to save or Updating configuration for collections '${collectionConfigData.name}':` +
+          error.message,
+      })
+    }
+  }
   async getFormBuilderListConfig({ request, response }: HttpContext) {
     let collection_formbuilder = '_FormBuilder'
     let { page, limit, sort, search } = request.all()
@@ -363,6 +393,46 @@ export default class SettingsController {
         status: false,
         status_code: 500,
         message: error.message,
+      })
+    }
+  }
+  async deleteFormBuilderConfig({ request, response }: HttpContext) {
+    let { collectionName } = request.all()
+    if (!collectionName) {
+      return response.badRequest({
+        status: false,
+        status_code: 400,
+        message_id: 'koleksi tidak boleh kosong.',
+        message_en: 'Collection name cannot be empty.',
+      })
+    }
+    const configDocId = collectionName + '_config'
+    try {
+      await MongoDBModels.DeleteCollection(collectionName)
+      const result = await MongoDBModels.DeletetOne(configDocId, {}, settings_collections)
+      if (result.deletedCount > 0) {
+        return response.accepted({
+          status: true,
+          status_code: 200,
+          message_id: 'Konfigurasi koleksi ' + collectionName + ' berhasil dihapus.',
+          message_en: 'Collection ' + collectionName + ' configuration deleted successfully.',
+        })
+      } else {
+        return response.notFound({
+          status: false,
+          status_code: 404,
+          message_id: 'Konfigurasi koleksi ' + collectionName + ' tidak ditemukan.',
+          message_en: 'Collection ' + collectionName + ' configuration not found.',
+        })
+      }
+    } catch (error) {
+      console.log(error)
+
+      return response.internalServerError({
+        status: false,
+        status_code: 500,
+        message_id: 'Validasi konfigurasi koleksi gagal. Tidak dapat menyimpan.',
+        message_en: 'Collection configuration validation failed. Cannot save.',
       })
     }
   }

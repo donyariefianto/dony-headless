@@ -689,9 +689,9 @@ export function loadCollectionsPage(container) {
             .value.trim()
 
           if (field && type && target_collection) {
-            if (fieldNames.has(field)) {
-              hasDuplicateRelations = true
-            }
+            // if (fieldNames.has(field)) {
+            //   hasDuplicateRelations = true
+            // }
             fieldNames.add(field)
 
             relations.push({
@@ -758,7 +758,7 @@ export function loadCollectionsPage(container) {
             headers: {
               'Content-Type': 'application/json',
             },
-            body: JSON.stringify(payload),
+            body: JSON.stringify({collectionConfigData:payload}),
           })
 
           if (!response.ok) {
@@ -963,7 +963,7 @@ export function loadCollectionsPage(container) {
             value = parseFloat(formData.get(fieldName))
             if (isNaN(value)) value = null
           } else if (fieldType === 'date') {
-            value = formData.get(fieldName) || null
+            value = formData.get(fieldName) || new Date().toISOString().split('T')[0]
           } else {
             value = formData.get(fieldName)
           }
@@ -987,7 +987,7 @@ export function loadCollectionsPage(container) {
             headers: {
               'Content-Type': 'application/json',
             },
-            body: JSON.stringify(dataToSave),
+            body: JSON.stringify({data:dataToSave}),
           })
 
           if (!response.ok) {
