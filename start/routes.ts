@@ -37,7 +37,7 @@ router
 
     // API CRUD FORMBUILDER
     router
-      .group(() => {        
+      .group(() => {
         router.post('/create', '#controllers/settings_controller.createFormBuilderConfig')
         router.get('/list', '#controllers/settings_controller.getFormBuilderListConfig')
         router.get('/read/:id', '#controllers/settings_controller.getFormBuilderConfigByID')
@@ -45,14 +45,14 @@ router
         router.delete('/delete', '#controllers/settings_controller.deleteFormBuilderConfig')
       })
       .prefix('/formbuilder')
-    
+
     // API CRUD FLOW MANAGER
     router
-    .group(() => {
-      router.get('/list', '#controllers/settings_controller.getFlowListConfig')
-      router.get('/read/:id', '#controllers/settings_controller.getFlowConfigByID')
-    })
-    .prefix('/flow-manager')
+      .group(() => {
+        router.get('/list', '#controllers/settings_controller.getFlowListConfig')
+        router.get('/read/:id', '#controllers/settings_controller.getFlowConfigByID')
+      })
+      .prefix('/flow-manager')
   })
   .prefix('/configuration')
 
@@ -86,4 +86,4 @@ router
   })
   .prefix('/api')
 
-router.post('/beacon', '#controllers/settings_controller.Beacon')
+router.get('/management', '#controllers/settings_controller.Management')

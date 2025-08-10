@@ -73,26 +73,26 @@ export function closeSidePanel() {
 
 export function addClass(element, className) {
   if (element && !element.classList.contains(className)) {
-      element.classList.add(className);
+    element.classList.add(className)
   }
 }
 
 // Fungsi utilitas untuk menghapus kelas CSS
 export function removeClass(element, className) {
   if (element && element.classList.contains(className)) {
-      element.classList.remove(className);
+    element.classList.remove(className)
   }
 }
 
 export function showNotification(message, type) {
-    const notificationElement = type === 'success' ? successMessage : errorMessage
-    notificationElement.textContent = message
-    notificationElement.style.display = 'block'
-    setTimeout(() => {
-      notificationElement.style.display = 'none'
-      notificationElement.textContent = '' // Clear message
-    }, 5000) // Hide after 5 seconds
-  }
+  const notificationElement = type === 'success' ? successMessage : errorMessage
+  notificationElement.textContent = message
+  notificationElement.style.display = 'block'
+  setTimeout(() => {
+    notificationElement.style.display = 'none'
+    notificationElement.textContent = '' // Clear message
+  }, 5000) // Hide after 5 seconds
+}
 export function slugify(text) {
   return text
     .toString()
@@ -204,10 +204,10 @@ sidebarNavLinks.forEach((link) => {
 document.addEventListener('DOMContentLoaded', () => {
   loadContent('dashboard')
   // --- Sidebar Toggle Logic ---
-sidebarToggleBtn.addEventListener('click', () => {
-  console.log('sini');
-  
-  sidebar.classList.toggle('collapsed')
-  document.body.classList.toggle('sidebar-collapsed-body')
-})
+  sidebarToggleBtn.addEventListener('click', () => {
+    console.log('sini')
+
+    sidebar.classList.toggle('collapsed')
+    document.body.classList.toggle('sidebar-collapsed-body')
+  })
 })

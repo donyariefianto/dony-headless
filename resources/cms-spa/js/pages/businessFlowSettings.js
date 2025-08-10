@@ -25,9 +25,9 @@ function attachBusinessFlowGeneratorEventListeners() {
  * Merender form generator di side panel.
  */
 export function renderBusinessFlowGenerator(flowData = null) {
-    const flowTitle = flowData ? 'Edit Alur Kerja' : 'Buat Business Flow Baru';
+  const flowTitle = flowData ? 'Edit Alur Kerja' : 'Buat Business Flow Baru'
 
-    const formHtml = `
+  const formHtml = `
         <form id="newBusinessFlowGenerator" class="p-4 active-form">
             ${flowData ? `<input type="hidden" id="flowId" value="${flowData._id || ''}">` : ''}
             <div class="form-section">
@@ -59,13 +59,12 @@ export function renderBusinessFlowGenerator(flowData = null) {
                 <button type="submit" class="btn btn-primary">Simpan Konfigurasi Alur Kerja</button>
             </div>
         </form>
-    `;
+    `
 
-    openSidePanel(flowTitle, formHtml);
-    window.currentFlowData = flowData;
-    attachBusinessFlowGeneratorEventListeners();
+  openSidePanel(flowTitle, formHtml)
+  window.currentFlowData = flowData
+  attachBusinessFlowGeneratorEventListeners()
 }
-
 
 export function renderBusinessFlowSettingsPage(container) {
   let currentPage = 1

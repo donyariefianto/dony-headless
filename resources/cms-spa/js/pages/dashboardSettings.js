@@ -1,20 +1,15 @@
-import { BASE_API_URL } from '../config/constants.js';
-import {
-    showLoadingOverlay,
-    hideLoadingOverlay,
-    openSidePanel,
-    closeSidePanel,
-} from '../main.js';
+import { BASE_API_URL } from '../config/constants.js'
+import { showLoadingOverlay, hideLoadingOverlay, openSidePanel, closeSidePanel } from '../main.js'
 
 /**
  * Helper function to build a single chart widget
  */
 function buildChartWidget(chartData = null) {
-    const widgetId = `chart-${Date.now()}-${Math.floor(Math.random() * 1e3)}`;
-    const wrapper = document.createElement("div");
-    wrapper.className = "card mb-3 chart-widget-item";
-    wrapper.dataset.id = widgetId;
-    wrapper.innerHTML = `
+  const widgetId = `chart-${Date.now()}-${Math.floor(Math.random() * 1e3)}`
+  const wrapper = document.createElement('div')
+  wrapper.className = 'card mb-3 chart-widget-item'
+  wrapper.dataset.id = widgetId
+  wrapper.innerHTML = `
         <div class="card-header d-flex justify-content-between align-items-center">
             <span class="fw-bold"><span class="chart-title-display">${chartData?.title || 'Chart Baru'}</span></span>
             <div class="item-actions">
@@ -46,122 +41,130 @@ function buildChartWidget(chartData = null) {
                 <textarea class="chart-options-json form-control" rows="5">${chartData?.options ? JSON.stringify(chartData.options, null, 2) : ''}</textarea>
             </div>
         </div>
-    `;
+    `
 
-    // Event Listeners for the chart widget
-    wrapper.querySelector('.chart-title').addEventListener('input', (e) => {
-        wrapper.querySelector('.chart-title-display').textContent = e.target.value || 'Chart Baru';
-    });
-    wrapper.querySelector('.remove-item-btn').addEventListener('click', () => wrapper.remove());
-    wrapper.querySelector('.toggle-collapse-btn').addEventListener('click', (e) => {
-        const content = e.currentTarget.closest(".chart-widget-item").querySelector(".collapsible-content");
-        content.classList.toggle("collapsed");
-        const icon = e.currentTarget.querySelector("i");
-        icon.classList.toggle("fa-chevron-up");
-        icon.classList.toggle("fa-chevron-down");
-    });
-    return wrapper;
+  // Event Listeners for the chart widget
+  wrapper.querySelector('.chart-title').addEventListener('input', (e) => {
+    wrapper.querySelector('.chart-title-display').textContent = e.target.value || 'Chart Baru'
+  })
+  wrapper.querySelector('.remove-item-btn').addEventListener('click', () => wrapper.remove())
+  wrapper.querySelector('.toggle-collapse-btn').addEventListener('click', (e) => {
+    const content = e.currentTarget
+      .closest('.chart-widget-item')
+      .querySelector('.collapsible-content')
+    content.classList.toggle('collapsed')
+    const icon = e.currentTarget.querySelector('i')
+    icon.classList.toggle('fa-chevron-up')
+    icon.classList.toggle('fa-chevron-down')
+  })
+  return wrapper
 }
 
 /**
  * Generates the JSON schema from the form inputs
  */
 function generateDashboardSchema(dashboardPanel) {
-    const schema = {
-        id: dashboardPanel.querySelector("#dashboardId")?.value || null,
-        name: dashboardPanel.querySelector("#dashboardName")?.value || '',
-        slug: dashboardPanel.querySelector("#dashboardSlug")?.value || '',
-        widgets: Array.from(dashboardPanel.querySelectorAll("#dashboard-widgets .chart-widget-item")).map(widgetDiv => {
-            let chartOptions = {};
-            try {
-                chartOptions = JSON.parse(widgetDiv.querySelector(".chart-options-json").value);
-            } catch (e) {
-                console.error("Invalid JSON in chart options:", e);
-                alert("Konfigurasi ECharts tidak valid, silakan periksa kembali JSON Anda.");
-            }
-            return {
-                title: widgetDiv.querySelector(".chart-title").value,
-                type: widgetDiv.querySelector(".chart-type").value,
-                data: {
-                    collection: widgetDiv.querySelector(".chart-data-collection").value,
-                },
-                options: chartOptions
-            };
-        })
-    };
-    dashboardPanel.querySelector("#schema-output").textContent = JSON.stringify(schema, null, 2);
-    return schema;
+  const schema = {
+    id: dashboardPanel.querySelector('#dashboardId')?.value || null,
+    name: dashboardPanel.querySelector('#dashboardName')?.value || '',
+    slug: dashboardPanel.querySelector('#dashboardSlug')?.value || '',
+    widgets: Array.from(
+      dashboardPanel.querySelectorAll('#dashboard-widgets .chart-widget-item')
+    ).map((widgetDiv) => {
+      let chartOptions = {}
+      try {
+        chartOptions = JSON.parse(widgetDiv.querySelector('.chart-options-json').value)
+      } catch (e) {
+        console.error('Invalid JSON in chart options:', e)
+        alert('Konfigurasi ECharts tidak valid, silakan periksa kembali JSON Anda.')
+      }
+      return {
+        title: widgetDiv.querySelector('.chart-title').value,
+        type: widgetDiv.querySelector('.chart-type').value,
+        data: {
+          collection: widgetDiv.querySelector('.chart-data-collection').value,
+        },
+        options: chartOptions,
+      }
+    }),
+  }
+  dashboardPanel.querySelector('#schema-output').textContent = JSON.stringify(schema, null, 2)
+  return schema
 }
 
 /**
  * Attaches all event listeners for the dashboard generator form
  */
 function attachDashboardGeneratorEventListeners() {
-    const form = document.getElementById('newDashboardGenerator');
-    if (!form) return;
+  const form = document.getElementById('newDashboardGenerator')
+  if (!form) return
 
-    function addChartWidget() {
-        form.querySelector("#dashboard-widgets").appendChild(buildChartWidget());
+  function addChartWidget() {
+    form.querySelector('#dashboard-widgets').appendChild(buildChartWidget())
+  }
+
+  form.querySelector('#addChartBtn').addEventListener('click', addChartWidget)
+  form
+    .querySelector('#generateSchemaBtn')
+    .addEventListener('click', () => generateDashboardSchema(form))
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault()
+
+    const schema = generateDashboardSchema(form)
+    const dashboardId = schema.id
+
+    showLoadingOverlay()
+    try {
+      const method = dashboardId ? 'PUT' : 'POST'
+      const url = dashboardId
+        ? `${BASE_API_URL}/configuration/dashboard/update/${dashboardId}`
+        : `${BASE_API_URL}/configuration/dashboard/create`
+
+      const response = await fetch(url, {
+        method: method,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(schema),
+      })
+      const result = await response.json()
+
+      if (result.status) {
+        alert(`Dashboard '${schema.name}' berhasil disimpan.`)
+        closeSidePanel()
+      } else {
+        alert(`Gagal menyimpan dashboard: ${result.message}`)
+      }
+    } catch (error) {
+      console.error('Error saving dashboard:', error)
+      alert('Terjadi kesalahan saat menyimpan dashboard.')
+    } finally {
+      hideLoadingOverlay()
     }
+  })
 
-    form.querySelector("#addChartBtn").addEventListener('click', addChartWidget);
-    form.querySelector("#generateSchemaBtn").addEventListener('click', () => generateDashboardSchema(form));
-    
-    form.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        
-        const schema = generateDashboardSchema(form);
-        const dashboardId = schema.id;
+  if (window.currentDashboardData) {
+    form.querySelector('#dashboardId').value = window.currentDashboardData._id || ''
+    form.querySelector('#dashboardName').value = window.currentDashboardData.name || ''
+    form.querySelector('#dashboardSlug').value = window.currentDashboardData.slug || ''
 
-        showLoadingOverlay();
-        try {
-            const method = dashboardId ? 'PUT' : 'POST';
-            const url = dashboardId ? `${BASE_API_URL}/configuration/dashboard/update/${dashboardId}` : `${BASE_API_URL}/configuration/dashboard/create`;
-            
-            const response = await fetch(url, {
-                method: method,
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(schema)
-            });
-            const result = await response.json();
+    const widgetsContainer = form.querySelector('#dashboard-widgets')
+    ;(window.currentDashboardData.widgets || []).forEach((widget) => {
+      widgetsContainer.appendChild(buildChartWidget(widget))
+    })
 
-            if (result.status) {
-                alert(`Dashboard '${schema.name}' berhasil disimpan.`);
-                closeSidePanel();
-            } else {
-                alert(`Gagal menyimpan dashboard: ${result.message}`);
-            }
-        } catch (error) {
-            console.error('Error saving dashboard:', error);
-            alert('Terjadi kesalahan saat menyimpan dashboard.');
-        } finally {
-            hideLoadingOverlay();
-        }
-    });
-
-    if (window.currentDashboardData) {
-        form.querySelector("#dashboardId").value = window.currentDashboardData._id || '';
-        form.querySelector("#dashboardName").value = window.currentDashboardData.name || '';
-        form.querySelector("#dashboardSlug").value = window.currentDashboardData.slug || '';
-        
-        const widgetsContainer = form.querySelector("#dashboard-widgets");
-        (window.currentDashboardData.widgets || []).forEach(widget => {
-            widgetsContainer.appendChild(buildChartWidget(widget));
-        });
-
-        window.currentDashboardData = null;
-    }
+    window.currentDashboardData = null
+  }
 }
 
 /**
  * Renders the dashboard generator form in a side panel
  */
 export function renderDashboardGenerator(dashboardData = null) {
-    const dashboardTitle = dashboardData ? 'Edit Dashboard' : 'Buat Dashboard Baru';
+  const dashboardTitle = dashboardData ? 'Edit Dashboard' : 'Buat Dashboard Baru'
 
-    const formHtml = `
+  const formHtml = `
         <form id="newDashboardGenerator" class="p-4 active-form">
             ${dashboardData ? `<input type="hidden" id="dashboardId" value="${dashboardData._id || ''}">` : ''}
             <div class="form-section">
@@ -189,20 +192,20 @@ export function renderDashboardGenerator(dashboardData = null) {
                 <button type="submit" class="btn btn-primary">Simpan Konfigurasi Dashboard</button>
             </div>
         </form>
-    `;
+    `
 
-    openSidePanel(dashboardTitle, formHtml);
-    window.currentDashboardData = dashboardData;
-    attachDashboardGeneratorEventListeners();
+  openSidePanel(dashboardTitle, formHtml)
+  window.currentDashboardData = dashboardData
+  attachDashboardGeneratorEventListeners()
 }
 
 /**
  * Renders the list of dashboards on the main page
  */
 export function renderDashboardSettingsPage(container) {
-  let currentPage = 1;
-  let currentLimit = 10;
-  let currentSearch = '';
+  let currentPage = 1
+  let currentLimit = 10
+  let currentSearch = ''
 
   const renderDashboardList = (dashboards, totalCount, totalPages) => {
     container.innerHTML = `
@@ -233,24 +236,26 @@ export function renderDashboardSettingsPage(container) {
                 </div>
             </div>
         </div>
-    `;
+    `
 
-    const dashboardListItems = container.querySelector('#dashboardListItems');
-    const dashboardPagination = container.querySelector('#dashboardPagination');
-    const paginationTotal = container.querySelector('#paginationTotal');
-    const pageInfo = container.querySelector('#pageInfo');
-    const prevPageBtn = container.querySelector('#prevPageBtn');
-    const nextPageBtn = container.querySelector('#nextPageBtn');
-    const addDashboardBtn = container.querySelector('#addDashboardBtn');
-    const dashboardSearchInput = container.querySelector('#dashboardSearchInput');
-    const searchButton = container.querySelector('#searchButton');
-    const clearSearchButton = container.querySelector('#clearSearchButton');
+    const dashboardListItems = container.querySelector('#dashboardListItems')
+    const dashboardPagination = container.querySelector('#dashboardPagination')
+    const paginationTotal = container.querySelector('#paginationTotal')
+    const pageInfo = container.querySelector('#pageInfo')
+    const prevPageBtn = container.querySelector('#prevPageBtn')
+    const nextPageBtn = container.querySelector('#nextPageBtn')
+    const addDashboardBtn = container.querySelector('#addDashboardBtn')
+    const dashboardSearchInput = container.querySelector('#dashboardSearchInput')
+    const searchButton = container.querySelector('#searchButton')
+    const clearSearchButton = container.querySelector('#clearSearchButton')
 
     if (dashboards.length === 0) {
-        dashboardListItems.innerHTML = `<p class="text-center-subtle">Belum ada dashboard yang dibuat.</p>`;
-        dashboardPagination.style.display = 'none';
+      dashboardListItems.innerHTML = `<p class="text-center-subtle">Belum ada dashboard yang dibuat.</p>`
+      dashboardPagination.style.display = 'none'
     } else {
-        dashboardListItems.innerHTML = dashboards.map(dashboard => `
+      dashboardListItems.innerHTML = dashboards
+        .map(
+          (dashboard) => `
             <li data-name="${dashboard.slug}" data-display-name="${dashboard.name}">
                 <span><strong>${dashboard.name}</strong> <br> <small><em>Nama Internal: ${dashboard.slug || dashboard._id}</em></small></span>
                 <div class="item-actions">
@@ -258,122 +263,127 @@ export function renderDashboardSettingsPage(container) {
                     <button class="btn btn-icon btn-delete-dashboard" data-dashboard-id="${dashboard._id}" data-display-name="${dashboard.name}" aria-label="Hapus Dashboard"><i class="fa-solid fa-trash"></i></button>
                 </div>
             </li>
-        `).join('');
+        `
+        )
+        .join('')
 
-        dashboardPagination.style.display = 'flex';
-        paginationTotal.textContent = `Total: ${totalCount} dashboard`;
-        pageInfo.textContent = `Halaman ${currentPage} dari ${totalPages}`;
-        prevPageBtn.disabled = currentPage <= 1;
-        nextPageBtn.disabled = currentPage >= totalPages;
+      dashboardPagination.style.display = 'flex'
+      paginationTotal.textContent = `Total: ${totalCount} dashboard`
+      pageInfo.textContent = `Halaman ${currentPage} dari ${totalPages}`
+      prevPageBtn.disabled = currentPage <= 1
+      nextPageBtn.disabled = currentPage >= totalPages
     }
-    
+
     if (addDashboardBtn) {
-        addDashboardBtn.addEventListener('click', () => renderDashboardGenerator());
+      addDashboardBtn.addEventListener('click', () => renderDashboardGenerator())
     }
     if (searchButton) {
-        searchButton.addEventListener('click', () => {
-            currentSearch = dashboardSearchInput.value;
-            currentPage = 1;
-            fetchDashboards();
-        });
+      searchButton.addEventListener('click', () => {
+        currentSearch = dashboardSearchInput.value
+        currentPage = 1
+        fetchDashboards()
+      })
     }
     if (clearSearchButton) {
-        clearSearchButton.addEventListener('click', () => {
-            dashboardSearchInput.value = '';
-            currentSearch = '';
-            currentPage = 1;
-            fetchDashboards();
-        });
+      clearSearchButton.addEventListener('click', () => {
+        dashboardSearchInput.value = ''
+        currentSearch = ''
+        currentPage = 1
+        fetchDashboards()
+      })
     }
     if (prevPageBtn) {
-        prevPageBtn.addEventListener('click', () => {
-            if (currentPage > 1) {
-                currentPage--;
-                fetchDashboards();
-            }
-        });
+      prevPageBtn.addEventListener('click', () => {
+        if (currentPage > 1) {
+          currentPage--
+          fetchDashboards()
+        }
+      })
     }
     if (nextPageBtn) {
-        nextPageBtn.addEventListener('click', () => {
-            currentPage++;
-            fetchDashboards();
-        });
+      nextPageBtn.addEventListener('click', () => {
+        currentPage++
+        fetchDashboards()
+      })
     }
 
     container.querySelectorAll('.btn-edit-dashboard').forEach((button) => {
       button.addEventListener('click', (e) => {
-        const dashboardId = e.currentTarget.dataset.dashboardId;
-        fetchDashboardById(dashboardId);
-      });
-    });
+        const dashboardId = e.currentTarget.dataset.dashboardId
+        fetchDashboardById(dashboardId)
+      })
+    })
 
     container.querySelectorAll('.btn-delete-dashboard').forEach((button) => {
       button.addEventListener('click', async (e) => {
-        const dashboardId = e.currentTarget.dataset.dashboardId;
-        const dashboardName = e.currentTarget.dataset.displayName;
+        const dashboardId = e.currentTarget.dataset.dashboardId
+        const dashboardName = e.currentTarget.dataset.displayName
         if (confirm(`Apakah Anda yakin ingin menghapus dashboard '${dashboardName}' ini?`)) {
-          showLoadingOverlay();
+          showLoadingOverlay()
           try {
-              const response = await fetch(`${BASE_API_URL}/configuration/dashboard/delete/${dashboardId}`, {
-                  method: 'DELETE'
-              });
-              const result = await response.json();
-              if (result.status) {
-                  alert(`Dashboard '${dashboardName}' berhasil dihapus.`);
-                  fetchDashboards();
-              } else {
-                  alert(`Gagal menghapus dashboard: ${result.message}`);
+            const response = await fetch(
+              `${BASE_API_URL}/configuration/dashboard/delete/${dashboardId}`,
+              {
+                method: 'DELETE',
               }
+            )
+            const result = await response.json()
+            if (result.status) {
+              alert(`Dashboard '${dashboardName}' berhasil dihapus.`)
+              fetchDashboards()
+            } else {
+              alert(`Gagal menghapus dashboard: ${result.message}`)
+            }
           } catch (error) {
-              console.error('Error deleting dashboard:', error);
-              alert('Terjadi kesalahan saat menghapus dashboard.');
+            console.error('Error deleting dashboard:', error)
+            alert('Terjadi kesalahan saat menghapus dashboard.')
           } finally {
-              hideLoadingOverlay();
+            hideLoadingOverlay()
           }
         }
-      });
-    });
-  };
+      })
+    })
+  }
 
   const fetchDashboards = async () => {
-    showLoadingOverlay();
+    showLoadingOverlay()
     try {
-      const url = `${BASE_API_URL}/configuration/dashboard/list?page=${currentPage}&limit=${currentLimit}&search=${currentSearch}`;
-      const response = await fetch(url);
-      const data = await response.json();
+      const url = `${BASE_API_URL}/configuration/dashboard/list?page=${currentPage}&limit=${currentLimit}&search=${currentSearch}`
+      const response = await fetch(url)
+      const data = await response.json()
 
       if (data.status) {
-        renderDashboardList(data.data.documents, data.data.totalCount, data.data.totalPages);
+        renderDashboardList(data.data.documents, data.data.totalCount, data.data.totalPages)
       } else {
-        renderDashboardList([], 0, 0);
+        renderDashboardList([], 0, 0)
       }
     } catch (error) {
-      console.error('Error fetching dashboards:', error);
-      renderDashboardList([], 0, 0);
+      console.error('Error fetching dashboards:', error)
+      renderDashboardList([], 0, 0)
     } finally {
-      hideLoadingOverlay();
+      hideLoadingOverlay()
     }
-  };
+  }
 
   const fetchDashboardById = async (dashboardId) => {
-    showLoadingOverlay();
+    showLoadingOverlay()
     try {
-        const url = `${BASE_API_URL}/configuration/dashboard/read/${dashboardId}`;
-        const response = await fetch(url);
-        const data = await response.json();
-        
-        if (data.status && data.data) {
-            renderDashboardGenerator(data.data);
-        } else {
-            alert('Gagal mengambil data dashboard. Silakan coba lagi.');
-        }
-    } catch (error) {
-        console.error('Error fetching dashboard data:', error);
-        alert('Terjadi kesalahan saat mengambil data dashboard.');
-    } finally {
-        hideLoadingOverlay();
-    }
-  };
+      const url = `${BASE_API_URL}/configuration/dashboard/read/${dashboardId}`
+      const response = await fetch(url)
+      const data = await response.json()
 
-  fetchDashboards();
+      if (data.status && data.data) {
+        renderDashboardGenerator(data.data)
+      } else {
+        alert('Gagal mengambil data dashboard. Silakan coba lagi.')
+      }
+    } catch (error) {
+      console.error('Error fetching dashboard data:', error)
+      alert('Terjadi kesalahan saat mengambil data dashboard.')
+    } finally {
+      hideLoadingOverlay()
+    }
+  }
+
+  fetchDashboards()
 }

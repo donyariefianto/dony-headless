@@ -758,7 +758,7 @@ export function loadCollectionsPage(container) {
             headers: {
               'Content-Type': 'application/json',
             },
-            body: JSON.stringify({collectionConfigData:payload}),
+            body: JSON.stringify({ collectionConfigData: payload }),
           })
 
           if (!response.ok) {
@@ -987,7 +987,7 @@ export function loadCollectionsPage(container) {
             headers: {
               'Content-Type': 'application/json',
             },
-            body: JSON.stringify({data:dataToSave}),
+            body: JSON.stringify({ data: dataToSave }),
           })
 
           if (!response.ok) {
