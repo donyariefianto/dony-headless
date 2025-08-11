@@ -1,401 +1,538 @@
 /* Global Styles & Variables */
 :root {
-    --primary-color: #5a7dff;
-    --primary-color-dark: #4a6ddb;
-    --text-color: #333;
-    --background-light: #f0f4f8;
-    --surface-light: #ffffff;
-    --shadow-color: rgba(0, 0, 0, 0.08);
+  --primary-color: #5a7dff;
+  --primary-color-dark: #4a6ddb;
+  --text-color: #333;
+  --background-light: #f0f4f8;
+  --surface-light: #ffffff;
+  --shadow-color: rgba(0, 0, 0, 0.08);
 
-    /* Dark Mode Variables */
-    --text-color-dark: #e0e6f0;
-    --background-dark: #1f2a40;
-    --surface-dark: #293448;
-    --shadow-color-dark: rgba(0, 0, 0, 0.2);
+  /* Dark Mode Variables */
+  --text-color-dark: #e0e6f0;
+  --background-dark: #1f2a40;
+  --surface-dark: #293448;
+  --shadow-color-dark: rgba(0, 0, 0, 0.2);
 }
 
 body {
-    font-family: 'Poppins', sans-serif;
-    margin: 0;
-    background-color: var(--background-light);
-    color: var(--text-color);
-    transition: background-color 0.3s ease, color 0.3s ease;
+  font-family: 'Poppins', sans-serif;
+  margin: 0;
+  background-color: var(--background-light);
+  color: var(--text-color);
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
 }
 
 /* Dark Mode */
 body.dark-mode {
-    --text-color: var(--text-color-dark);
-    --background-light: var(--background-dark);
-    --surface-light: var(--surface-dark);
-    --shadow-color: var(--shadow-color-dark);
+  --text-color: var(--text-color-dark);
+  --background-light: var(--background-dark);
+  --surface-light: var(--surface-dark);
+  --shadow-color: var(--shadow-color-dark);
 }
 
 /* Layout */
 #app {
-    display: flex;
-    min-height: 100vh;
+  display: flex;
+  min-height: 100vh;
 }
 
 /* Sidebar */
 .sidebar {
-    width: 250px;
-    background-color: var(--surface-light);
-    box-shadow: 2px 0 10px var(--shadow-color);
-    padding: 24px 16px;
-    display: flex;
-    flex-direction: column;
-    transition: width 0.3s ease, transform 0.3s ease;
-    z-index: 1000;
+  width: 250px;
+  background-color: var(--surface-light);
+  box-shadow: 2px 0 10px var(--shadow-color);
+  padding: 24px 16px;
+  display: flex;
+  flex-direction: column;
+  transition:
+    width 0.3s ease,
+    transform 0.3s ease;
+  z-index: 1000;
 }
 
 /* Collapsed Sidebar */
 .sidebar.collapsed {
-    width: 80px;
+  width: 80px;
 }
 
 .sidebar.collapsed .sidebar-header,
 .sidebar.collapsed .nav-links li a span {
-    display: none;
+  display: none;
 }
 
 .sidebar.collapsed .nav-links li a {
-    justify-content: center;
+  justify-content: center;
 }
 
 .sidebar.collapsed .toggle-btn {
-    align-self: center;
+  align-self: center;
 }
 
 .sidebar-header {
-    font-size: 1.5rem;
-    font-weight: 600;
-    color: var(--primary-color);
-    margin-bottom: 30px;
-    padding-left: 10px;
-    transition: opacity 0.3s ease;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--primary-color);
+  margin-bottom: 30px;
+  padding-left: 10px;
+  transition: opacity 0.3s ease;
 }
 
 .nav-links {
-    list-style: none;
-    padding: 0;
-    margin: 0;
+  list-style: none;
+  padding: 0;
+  margin: 0;
 }
 
 .nav-links li a {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    padding: 12px 16px;
-    color: var(--text-color);
-    text-decoration: none;
-    border-radius: 8px;
-    transition: background-color 0.2s ease, color 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 12px 16px;
+  color: var(--text-color);
+  text-decoration: none;
+  border-radius: 8px;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
 }
 
 .nav-links li a:hover,
 .nav-links li a.active {
-    background-color: var(--primary-color);
-    color: white;
+  background-color: var(--primary-color);
+  color: white;
 }
 
 .nav-links li a .icon {
-    width: 20px;
-    text-align: center;
+  width: 20px;
+  text-align: center;
 }
 
 .sidebar-footer {
-    margin-top: auto;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 10px;
-    flex-wrap: wrap;
+  margin-top: auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
 }
 
-.toggle-btn, .theme-toggle, .logout-btn {
-    background-color: transparent;
-    border: none;
-    cursor: pointer;
-    padding: 8px;
-    border-radius: 8px;
-    color: var(--text-color);
-    transition: background-color 0.2s ease, color 0.2s ease;
+.toggle-btn,
+.theme-toggle,
+.logout-btn {
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 8px;
+  color: var(--text-color);
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
 }
 
-.toggle-btn:hover, .theme-toggle:hover, .logout-btn:hover {
-    background-color: var(--primary-color);
-    color: white;
+.toggle-btn:hover,
+.theme-toggle:hover,
+.logout-btn:hover {
+  background-color: var(--primary-color);
+  color: white;
 }
 
 /* Main Content Area */
 .main-content {
-    flex-grow: 1;
-    padding: 30px;
-    overflow-y: auto;
-    transition: margin-left 0.3s ease;
+  flex-grow: 1;
+  padding: 30px;
+  overflow-y: auto;
+  transition: margin-left 0.3s ease;
 }
 
 body.sidebar-collapsed .main-content {
-    margin-left: 80px;
+  margin-left: 80px;
 }
 
 /* Login Page */
 .login-container {
-    display: flex;
-    /* Perbaikan utama: Menggunakan margin-left: auto untuk mendorong kartu ke kanan */
-    justify-content: flex-end;
-    align-items: center;
-    height: 100vh;
-    background: linear-gradient(135deg, #6a82fb 0%, #fc5c7d 100%);
-    padding-right: 5vw; /* Tambahkan sedikit padding di sisi kanan */
+  display: flex;
+  /* Perbaikan utama: Menggunakan margin-left: auto untuk mendorong kartu ke kanan */
+  justify-content: flex-end;
+  align-items: center;
+  height: 100vh;
+  background: linear-gradient(135deg, #6a82fb 0%, #fc5c7d 100%);
+  padding-right: 5vw; /* Tambahkan sedikit padding di sisi kanan */
 }
 
 .login-form-card {
-    background-color: var(--surface-light);
-    padding: 40px;
-    border-radius: 12px;
-    box-shadow: 0 10px 30px var(--shadow-color);
-    text-align: center;
-    width: 100%;
-    max-width: 400px;
-    transition: transform 0.3s ease-in-out;
-    /* Perbaikan: Tambahkan margin-left: auto untuk memastikan posisi kanan */
-    margin-left: auto;
+  background-color: var(--surface-light);
+  padding: 40px;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px var(--shadow-color);
+  text-align: center;
+  width: 100%;
+  max-width: 400px;
+  transition: transform 0.3s ease-in-out;
+  /* Perbaikan: Tambahkan margin-left: auto untuk memastikan posisi kanan */
+  margin-left: auto;
 }
 
 .login-form-card:hover {
-    transform: translateY(-5px);
+  transform: translateY(-5px);
 }
 
 .login-form-card h2 {
-    color: var(--primary-color);
-    margin-bottom: 25px;
-    font-weight: 600;
+  color: var(--primary-color);
+  margin-bottom: 25px;
+  font-weight: 600;
 }
 
 .login-form-card input {
-    width: 100%;
-    padding: 14px;
-    margin-bottom: 18px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    background-color: #f9f9f9;
-    box-sizing: border-box;
-    font-size: 1rem;
-    transition: all 0.3s ease;
+  width: 100%;
+  padding: 14px;
+  margin-bottom: 18px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+  box-sizing: border-box;
+  font-size: 1rem;
+  transition: all 0.3s ease;
 }
 
 .login-form-card input:focus {
-    outline: none;
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px rgba(90, 125, 255, 0.2);
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(90, 125, 255, 0.2);
 }
 
 .login-form-card button {
-    width: 100%;
-    padding: 14px;
-    border: none;
-    background-color: var(--primary-color);
-    color: white;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: 600;
-    font-size: 1rem;
-    transition: background-color 0.2s ease, transform 0.2s ease;
+  width: 100%;
+  padding: 14px;
+  border: none;
+  background-color: var(--primary-color);
+  color: white;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 1rem;
+  transition:
+    background-color 0.2s ease,
+    transform 0.2s ease;
 }
 
 .login-form-card button:hover {
-    background-color: var(--primary-color-dark);
-    transform: translateY(-2px);
+  background-color: var(--primary-color-dark);
+  transform: translateY(-2px);
 }
 
 .login-form-card button:disabled {
-    background-color: #cccccc;
-    cursor: not-allowed;
-    transform: none;
+  background-color: #cccccc;
+  cursor: not-allowed;
+  transform: none;
 }
 
 /* Page Content */
 .page-container {
-    background-color: var(--surface-light);
-    border-radius: 12px;
-    padding: 30px;
-    box-shadow: 0 4px 20px var(--shadow-color);
+  background-color: var(--surface-light);
+  border-radius: 12px;
+  padding: 30px;
+  box-shadow: 0 4px 20px var(--shadow-color);
 }
 
 /* Data Entries Page Styles */
 .page-container h1 {
-    font-size: 2rem;
-    font-weight: 600;
-    margin-bottom: 5px;
+  font-size: 2rem;
+  font-weight: 600;
+  margin-bottom: 5px;
 }
 
 .page-container p {
-    color: #666;
-    margin-bottom: 20px;
+  color: #666;
+  margin-bottom: 20px;
 }
 
 .data-controls {
-    margin-bottom: 20px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 #search-input {
-    width: 100%;
-    max-width: 300px;
-    padding: 10px 15px;
-    border-radius: 8px;
-    border: 1px solid #ddd;
-    font-size: 1rem;
-    transition: all 0.2s ease;
+  width: 100%;
+  max-width: 300px;
+  padding: 10px 15px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  font-size: 1rem;
+  transition: all 0.2s ease;
 }
 
 #search-input:focus {
-    outline: none;
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px rgba(90, 125, 255, 0.2);
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(90, 125, 255, 0.2);
 }
 
 .grid-view {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    gap: 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 20px;
 }
 
 .grid-item {
-    background-color: var(--surface-light);
-    border-radius: 12px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  background-color: var(--surface-light);
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .grid-item:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+  transform: translateY(-5px);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
 }
 
 .grid-item h3 {
-    margin: 0 0 10px 0;
-    font-size: 1.2rem;
-    font-weight: 600;
+  margin: 0 0 10px 0;
+  font-size: 1.2rem;
+  font-weight: 600;
 }
 
 .grid-item p {
-    margin: 0;
-    flex-grow: 1;
-    color: #888;
+  margin: 0;
+  flex-grow: 1;
+  color: #888;
 }
 
 .grid-actions {
-    margin-top: 15px;
-    display: flex;
-    justify-content: flex-end;
-    gap: 10px;
+  margin-top: 15px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
 }
 
 .icon-only-btn {
-    background-color: transparent;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    padding: 8px;
-    cursor: pointer;
-    color: var(--text-color);
-    transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+  background-color: transparent;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 8px;
+  cursor: pointer;
+  color: var(--text-color);
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease;
 }
 
 .icon-only-btn:hover {
-    background-color: var(--primary-color);
-    color: white;
-    border-color: var(--primary-color);
+  background-color: var(--primary-color);
+  color: white;
+  border-color: var(--primary-color);
 }
 
 .pagination {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-top: 20px;
-    gap: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+  gap: 10px;
 }
 
 .pagination button {
-    padding: 8px 16px;
-    border: 1px solid var(--primary-color);
-    border-radius: 8px;
-    background-color: transparent;
-    color: var(--primary-color);
-    cursor: pointer;
-    transition: all 0.2s ease;
+  padding: 8px 16px;
+  border: 1px solid var(--primary-color);
+  border-radius: 8px;
+  background-color: transparent;
+  color: var(--primary-color);
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
 .pagination button:hover:not(:disabled) {
-    background-color: var(--primary-color);
-    color: white;
+  background-color: var(--primary-color);
+  color: white;
 }
 
 .pagination button:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 /* Side Panel Styles */
 .form-panel {
-    position: fixed;
-    top: 0;
-    right: 0;
-    width: 100%;
-    max-width: 650px;
-    height: 100%;
-    background-color: var(--surface-light);
-    box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
-    transform: translateX(100%);
-    transition: transform 0.4s ease-in-out;
-    z-index: 2000;
-    display: flex;
-    flex-direction: column;
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 100%;
+  max-width: 650px;
+  height: 100%;
+  background-color: var(--surface-light);
+  box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
+  transform: translateX(100%);
+  transition: transform 0.4s ease-in-out;
+  z-index: 2000;
+  display: flex;
+  flex-direction: column;
 }
 
 .form-panel.open {
-    transform: translateX(0);
+  transform: translateX(0);
 }
 
 .panel-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 20px;
-    border-bottom: 1px solid #eee;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  border-bottom: 1px solid #eee;
 }
 
 .panel-header h3 {
-    margin: 0;
-    font-size: 1.5rem;
-    color: var(--primary-color);
+  margin: 0;
+  font-size: 1.5rem;
+  color: var(--primary-color);
 }
 
 #close-panel-btn {
-    background-color: transparent;
-    border: none;
-    font-size: 1.5rem;
-    cursor: pointer;
-    color: #999;
-    transition: color 0.2s ease;
+  background-color: transparent;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #999;
+  transition: color 0.2s ease;
 }
 
 #close-panel-btn:hover {
-    color: var(--text-color);
+  color: var(--text-color);
 }
 
 .panel-body {
-    padding: 20px;
-    overflow-y: auto;
+  padding: 20px;
+  overflow-y: auto;
 }
 
 .panel-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: none;
+  z-index: 1500;
+}
+
+.panel-overlay.open {
+  display: block;
+}
+
+/* Dynamic Form Styles */
+.dynamic-form-container .form-group {
+  margin-bottom: 20px;
+}
+
+.dynamic-form-container label {
+  display: block;
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+
+.dynamic-form-container input,
+.dynamic-form-container select {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-sizing: border-box;
+  font-size: 1rem;
+}
+
+.dynamic-form-container h4 {
+  margin-top: 25px;
+  margin-bottom: 15px;
+  font-weight: 600;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 5px;
+  color: var(--primary-color);
+}
+
+.dynamic-form-container .submit-btn {
+  width: 100%;
+  padding: 14px;
+  border: none;
+  background-color: var(--primary-color);
+  color: white;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background-color 0.2s ease;
+}
+
+.dynamic-form-container .submit-btn:hover {
+  background-color: var(--primary-color-dark);
+}
+
+/* Responsive Design for Mobile */
+@media (max-width: 768px) {
+  #app {
+    flex-direction: column;
+  }
+
+  /* Sembunyikan sidebar di tampilan default mobile */
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 280px;
+    max-width: 90vw;
+    height: 100%;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease-in-out;
+    z-index: 2000;
+  }
+
+  /* Sidebar saat dibuka */
+  .sidebar.open {
+    transform: translateX(0);
+  }
+
+  .sidebar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 16px;
+    margin-bottom: 20px;
+  }
+
+  .sidebar-header h2 {
+    display: block;
+  }
+
+  .sidebar-footer {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 30px;
+  }
+
+  .sidebar-footer .theme-toggle .logout-btn .toggle-btn {
+    margin-left: auto;
+  }
+
+  .sidebar .toggle-btn {
+    display: none;
+  }
+
+  .main-content {
+    padding: 20px;
+    margin-left: 0;
+  }
+
+  /* Overlay untuk saat sidebar terbuka */
+  .overlay {
     position: fixed;
     top: 0;
     left: 0;
@@ -404,170 +541,52 @@ body.sidebar-collapsed .main-content {
     background-color: rgba(0, 0, 0, 0.5);
     display: none;
     z-index: 1500;
-}
+  }
 
-.panel-overlay.open {
+  .overlay.active {
     display: block;
-}
+  }
 
-/* Dynamic Form Styles */
-.dynamic-form-container .form-group {
-    margin-bottom: 20px;
-}
-
-.dynamic-form-container label {
+  /* Tombol untuk membuka sidebar */
+  .menu-toggle {
     display: block;
-    font-weight: 500;
-    margin-bottom: 8px;
-}
-
-.dynamic-form-container input,
-.dynamic-form-container select {
-    width: 100%;
-    padding: 12px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    box-sizing: border-box;
-    font-size: 1rem;
-}
-
-.dynamic-form-container h4 {
-    margin-top: 25px;
-    margin-bottom: 15px;
-    font-weight: 600;
-    border-bottom: 1px solid #eee;
-    padding-bottom: 5px;
-    color: var(--primary-color);
-}
-
-.dynamic-form-container .submit-btn {
-    width: 100%;
-    padding: 14px;
-    border: none;
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    z-index: 2500;
     background-color: var(--primary-color);
     color: white;
+    border: none;
     border-radius: 8px;
+    padding: 10px 15px;
     cursor: pointer;
-    font-weight: 600;
+    box-shadow: 0 2px 10px var(--shadow-color);
     transition: background-color 0.2s ease;
-}
+  }
 
-.dynamic-form-container .submit-btn:hover {
+  .menu-toggle:hover {
     background-color: var(--primary-color-dark);
-}
+  }
 
-/* Responsive Design for Mobile */
-@media (max-width: 768px) {
-    #app {
-        flex-direction: column;
-    }
+  /* Memastikan sidebar tidak bisa di-collapse di mobile */
+  .sidebar.collapsed {
+    width: 280px;
+    max-width: 90vw;
+    transform: translateX(-100%);
+  }
 
-    /* Sembunyikan sidebar di tampilan default mobile */
-    .sidebar {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 280px; 
-        max-width: 90vw;
-        height: 100%;
-        transform: translateX(-100%);
-        transition: transform 0.3s ease-in-out;
-        z-index: 2000;
-    }
+  body.sidebar-collapsed .main-content {
+    margin-left: 0;
+  }
 
-    /* Sidebar saat dibuka */
-    .sidebar.open {
-        transform: translateX(0);
-    }
-    
-    .sidebar-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 0 16px;
-        margin-bottom: 20px;
-    }
+  .login-container {
+    /* Kembali ke tengah untuk tampilan mobile */
+    justify-content: center;
+    padding: 20px;
+  }
 
-    .sidebar-header h2 {
-        display: block;
-    }
-
-    .sidebar-footer {
-        flex-direction: row;
-        justify-content: space-between;
-        align-items: center;
-        margin-top: 30px;
-    }
-
-    .sidebar-footer .theme-toggle .logout-btn .toggle-btn{
-        margin-left: auto;
-    }
-
-    .sidebar .toggle-btn {
-        display: none;
-    }
-
-    .main-content {
-        padding: 20px;
-        margin-left: 0;
-    }
-
-    /* Overlay untuk saat sidebar terbuka */
-    .overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.5);
-        display: none;
-        z-index: 1500;
-    }
-    
-    .overlay.active {
-        display: block;
-    }
-
-    /* Tombol untuk membuka sidebar */
-    .menu-toggle {
-        display: block;
-        position: fixed;
-        top: 20px;
-        left: 20px;
-        z-index: 2500;
-        background-color: var(--primary-color);
-        color: white;
-        border: none;
-        border-radius: 8px;
-        padding: 10px 15px;
-        cursor: pointer;
-        box-shadow: 0 2px 10px var(--shadow-color);
-        transition: background-color 0.2s ease;
-    }
-    
-    .menu-toggle:hover {
-        background-color: var(--primary-color-dark);
-    }
-
-    /* Memastikan sidebar tidak bisa di-collapse di mobile */
-    .sidebar.collapsed {
-        width: 280px;
-        max-width: 90vw;
-        transform: translateX(-100%);
-    }
-
-    body.sidebar-collapsed .main-content {
-        margin-left: 0;
-    }
-    
-    .login-container {
-        /* Kembali ke tengah untuk tampilan mobile */
-        justify-content: center;
-        padding: 20px;
-    }
-
-    .login-form-card {
-        /* Hapus margin-left: auto di mobile */
-        margin-left: 0;
-    }
+  .login-form-card {
+    /* Hapus margin-left: auto di mobile */
+    margin-left: 0;
+  }
 }

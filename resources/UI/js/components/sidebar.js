@@ -1,12 +1,12 @@
-import { toggleTheme } from './theme.js';
-import { handleRouting } from '../utils/router.js';
+import { toggleTheme } from './theme.js'
+import { handleRouting } from '../utils/router.js'
 
 export const renderSidebar = () => {
-    const isDarkMode = localStorage.getItem('darkMode') === 'true';
-    const moonIcon = '<i class="fa-solid fa-moon"></i>';
-    const sunIcon = '<i class="fa-solid fa-sun"></i>';
-    
-    return `
+  const isDarkMode = localStorage.getItem('darkMode') === 'true'
+  const moonIcon = '<i class="fa-solid fa-moon"></i>'
+  const sunIcon = '<i class="fa-solid fa-sun"></i>'
+
+  return `
         <aside class="sidebar">
             <h2 class="sidebar-header">Dashboard App</h2>
             <ul class="nav-links">
@@ -18,62 +18,64 @@ export const renderSidebar = () => {
                 <button class="theme-toggle" title="Toggle Dark Mode">${isDarkMode ? sunIcon : moonIcon}</button>
             </div>
         </aside>
-    `;
-};
+    `
+}
 
 export const setupSidebarEvents = () => {
-    const sidebar = document.querySelector('.sidebar');
-    const toggleBtn = sidebar.querySelector('.toggle-btn');
-    const themeBtn = sidebar.querySelector('.theme-toggle');
-    const overlay = document.querySelector('.overlay');
+  const sidebar = document.querySelector('.sidebar')
+  const toggleBtn = sidebar.querySelector('.toggle-btn')
+  const themeBtn = sidebar.querySelector('.theme-toggle')
+  const overlay = document.querySelector('.overlay')
 
-    // Toggle Sidebar (khusus untuk desktop)
-    if (toggleBtn) {
-        toggleBtn.addEventListener('click', () => {
-            // Logika ini hanya akan dijalankan jika lebar layar lebih dari 768px
-            if (window.innerWidth > 768) {
-                sidebar.classList.toggle('collapsed');
-                document.body.classList.toggle('sidebar-collapsed');
-            }
-        });
-    }
+  // Toggle Sidebar (khusus untuk desktop)
+  if (toggleBtn) {
+    toggleBtn.addEventListener('click', () => {
+      // Logika ini hanya akan dijalankan jika lebar layar lebih dari 768px
+      if (window.innerWidth > 768) {
+        sidebar.classList.toggle('collapsed')
+        document.body.classList.toggle('sidebar-collapsed')
+      }
+    })
+  }
 
-    // Toggle Theme (logika tetap sama)
-    themeBtn.addEventListener('click', () => {
-        toggleTheme();
-        const isDarkMode = document.body.classList.contains('dark-mode');
-        themeBtn.innerHTML = isDarkMode ? '<i class="fa-solid fa-sun"></i>' : '<i class="fa-solid fa-moon"></i>';
-    });
+  // Toggle Theme (logika tetap sama)
+  themeBtn.addEventListener('click', () => {
+    toggleTheme()
+    const isDarkMode = document.body.classList.contains('dark-mode')
+    themeBtn.innerHTML = isDarkMode
+      ? '<i class="fa-solid fa-sun"></i>'
+      : '<i class="fa-solid fa-moon"></i>'
+  })
 
-    // Handle routing
-    sidebar.addEventListener('click', (e) => {
-        const navLink = e.target.closest('.nav-link');
-        if (navLink) {
-            e.preventDefault();
-            const hash = navLink.getAttribute('href');
-            window.history.pushState({}, '', hash);
-            handleRouting();
-            
-            // Highlight active link
-            document.querySelectorAll('.nav-link').forEach(link => {
-                link.classList.remove('active');
-            });
-            navLink.classList.add('active');
-            
-            // Tutup sidebar setelah navigasi di mobile
-            if (window.innerWidth <= 768) {
-                sidebar.classList.remove('open');
-                if (overlay) {
-                    overlay.classList.remove('active');
-                }
-            }
+  // Handle routing
+  sidebar.addEventListener('click', (e) => {
+    const navLink = e.target.closest('.nav-link')
+    if (navLink) {
+      e.preventDefault()
+      const hash = navLink.getAttribute('href')
+      window.history.pushState({}, '', hash)
+      handleRouting()
+
+      // Highlight active link
+      document.querySelectorAll('.nav-link').forEach((link) => {
+        link.classList.remove('active')
+      })
+      navLink.classList.add('active')
+
+      // Tutup sidebar setelah navigasi di mobile
+      if (window.innerWidth <= 768) {
+        sidebar.classList.remove('open')
+        if (overlay) {
+          overlay.classList.remove('active')
         }
-    });
-
-    // Highlight active link on initial load
-    const currentHash = window.location.hash || '#dashboard';
-    const activeLink = sidebar.querySelector(`.nav-links a[href="${currentHash}"]`);
-    if (activeLink) {
-        activeLink.classList.add('active');
+      }
     }
-};
+  })
+
+  // Highlight active link on initial load
+  const currentHash = window.location.hash || '#dashboard'
+  const activeLink = sidebar.querySelector(`.nav-links a[href="${currentHash}"]`)
+  if (activeLink) {
+    activeLink.classList.add('active')
+  }
+}

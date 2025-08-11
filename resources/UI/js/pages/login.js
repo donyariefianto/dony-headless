@@ -1,13 +1,13 @@
-import { renderApp } from '../components/app.js';
-import { loadTheme } from '../components/theme.js';
+import { renderApp } from '../components/app.js'
+import { loadTheme } from '../components/theme.js'
 
 export const renderLogin = () => {
-    const app = document.getElementById('app');
-    
-    // Muat tema di sini juga, untuk memastikan halaman login memiliki tema yang benar
-    loadTheme();
-    
-    app.innerHTML = `
+  const app = document.getElementById('app')
+
+  // Muat tema di sini juga, untuk memastikan halaman login memiliki tema yang benar
+  loadTheme()
+
+  app.innerHTML = `
         <div class="login-container">
             <div class="login-form-card">
                 <h2>Selamat Datang</h2>
@@ -19,50 +19,51 @@ export const renderLogin = () => {
                 </form>
             </div>
         </div>
-    `;
+    `
 
-    const form = document.getElementById('login-form');
-    const loginButton = document.getElementById('login-button');
-    const errorMessage = document.getElementById('error-message');
+  const form = document.getElementById('login-form')
+  const loginButton = document.getElementById('login-button')
+  const errorMessage = document.getElementById('error-message')
 
-    form.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        
-        loginButton.disabled = true;
-        loginButton.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Loading...'; /* Ikon loading */
-        errorMessage.style.display = 'none';
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault()
 
-        const username = e.target.username.value;
-        const password = e.target.password.value;
-        
-        try {
-            const response = await fetch('https://dummyjson.com/auth/login', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    username: username,
-                    password: password,
-                })
-            });
+    loginButton.disabled = true
+    loginButton.innerHTML =
+      '<i class="fa-solid fa-spinner fa-spin"></i> Loading...' /* Ikon loading */
+    errorMessage.style.display = 'none'
 
-            if (!response.ok) {
-                // const errorData = await response.json();
-                // throw new Error(errorData.message || 'Login failed');
-            }
+    const username = e.target.username.value
+    const password = e.target.password.value
 
-            const data = await response.json();
-            
-            localStorage.setItem('isLoggedIn', 'true');
-            localStorage.setItem('userToken', data.token);
-            
-            renderApp();
-        } catch (error) {
-            errorMessage.textContent = error.message;
-            errorMessage.style.display = 'block';
-            console.error('Login error:', error);
-        } finally {
-            loginButton.disabled = false;
-            loginButton.innerHTML = 'Login';
-        }
-    });
-};
+    try {
+      const response = await fetch('https://dummyjson.com/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          username: username,
+          password: password,
+        }),
+      })
+
+      if (!response.ok) {
+        // const errorData = await response.json();
+        // throw new Error(errorData.message || 'Login failed');
+      }
+
+      const data = await response.json()
+
+      localStorage.setItem('isLoggedIn', 'true')
+      localStorage.setItem('userToken', data.token)
+
+      renderApp()
+    } catch (error) {
+      errorMessage.textContent = error.message
+      errorMessage.style.display = 'block'
+      console.error('Login error:', error)
+    } finally {
+      loginButton.disabled = false
+      loginButton.innerHTML = 'Login'
+    }
+  })
+}
