@@ -148,7 +148,7 @@ body.dark-mode {
 }
 
 body.sidebar-collapsed .main-content {
-  margin-left: 80px;
+  margin-left: 20px;
 }
 
 /* Login Page */
@@ -474,7 +474,138 @@ body.sidebar-collapsed .main-content {
 .dynamic-form-container .submit-btn:hover {
   background-color: var(--primary-color-dark);
 }
+/* Styling Choices.js baru berdasarkan classNames yang diberikan */
 
+/* Kontainer utama Choices.js */
+.choices {
+  font-family: 'Poppins', sans-serif;
+  position: relative;
+  margin-bottom: 20px;
+  font-size: 1rem;
+  width: 100%; /* Pastikan lebar 100% dari elemen induk */
+}
+
+/* Input container, border, dan padding */
+.choices__inner {
+  background-color: var(--surface-light);
+  border: 1px solid #ddd;
+  padding: 10px 14px;
+  border-radius: 8px;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  transition: all 0.3s ease;
+}
+
+body.dark-mode .choices__inner {
+  background-color: var(--surface-dark);
+  border-color: #4a5c7a;
+}
+
+/* Input text field yang dikloning */
+.choices__input--cloned {
+  color: var(--text-color);
+  background-color: transparent;
+  border: none;
+  padding: 0;
+  margin: 0;
+  width: 100%;
+}
+
+/* Dropdown list container */
+.choices__list--dropdown {
+  position: absolute;
+  width: 100%; /* Penting: Mengatasi masalah overflow */
+  background-color: var(--surface-light);
+  border: 1px solid var(--primary-color);
+  border-top: none;
+  border-radius: 0 0 8px 8px; /* Sudut rounded di bagian bawah */
+  box-shadow: 0 8px 15px var(--shadow-color);
+  z-index: 1000;
+  margin-top: -1px;
+}
+
+body.dark-mode .choices__list--dropdown {
+  background-color: var(--surface-dark);
+  border-color: #4a5c7a;
+  box-shadow: 0 8px 15px var(--shadow-color-dark);
+}
+
+/* Item di dalam dropdown yang bisa dipilih */
+.choices__item--selectable {
+  padding: 12px 14px;
+  font-size: 1rem;
+  color: var(--text-color); /* Warna teks agar kontras */
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+/* Item yang sedang di-highlight (di-hover atau di-fokus) */
+.choices__item--selectable.is-highlighted {
+  background-color: var(--primary-color);
+  color: white; /* Teks menjadi putih agar kontras */
+}
+
+/* Teks yang dipilih pada single select */
+.choices__list--single .choices__item {
+  color: var(--text-color);
+  padding: 0;
+  display: flex;
+  align-items: center;
+}
+
+/* Placeholder text */
+.choices__placeholder {
+  color: #999;
+}
+
+/* Tag untuk multiple select */
+.choices__list--multiple .choices__item {
+  background-color: var(--primary-color);
+  color: white;
+  border-radius: 20px;
+  padding: 6px 12px;
+  font-size: 0.9rem;
+  margin: 5px 5px 5px 0;
+  border: none;
+}
+
+.choices__list--multiple .choices__item .choices__button {
+  color: white;
+  border-left: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+/* Styling panah dropdown */
+.choices[data-type*="select-one"]::after {
+  content: '';
+  height: 0;
+  width: 0;
+  border-style: solid;
+  border-width: 5px 5px 0 5px;
+  border-color: var(--text-color) transparent transparent transparent;
+  position: absolute;
+  right: 18px;
+  top: 50%;
+  transform: translateY(-50%);
+  margin-top: -2.5px;
+  pointer-events: none;
+  transition: transform 0.3s ease;
+}
+
+.choices.is-open::after {
+  transform: translateY(-50%) rotate(180deg);
+}
+
+/* State saat fokus atau terbuka */
+.choices.is-focused .choices__inner,
+.choices.is-open .choices__inner {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(90, 125, 255, 0.2);
+}
+
+/* Perbaikan border-radius saat terbuka */
+.choices.is-open .choices__inner {
+  border-radius: 8px 8px 0 0;
+}
 /* Responsive Design for Mobile */
 @media (max-width: 768px) {
   #app {

@@ -3,8 +3,11 @@ import { handleRouting } from '../utils/router.js'
 
 export const renderSidebar = () => {
   const isDarkMode = localStorage.getItem('darkMode') === 'true'
+  const isCollapse = localStorage.getItem('collapse') === 'false'
   const moonIcon = '<i class="fa-solid fa-moon"></i>'
   const sunIcon = '<i class="fa-solid fa-sun"></i>'
+  const leftIcon = '<i class="fa-solid fa-angles-left"></i>'
+  const rightIcon = '<i class="fa-solid fa-angles-right"></i>' 
 
   return `
         <aside class="sidebar">
@@ -14,7 +17,7 @@ export const renderSidebar = () => {
                 <li><a href="#data-entries" class="nav-link"><i class="fa-solid fa-database icon"></i><span>Data Entries</span></a></li>
             </ul>
             <div class="sidebar-footer">
-                <button class="toggle-btn" title="Toggle Sidebar"><i class="fa-solid fa-angles-left"></i></button>
+                <button class="toggle-btn" title="Toggle Sidebar">${isCollapse ? leftIcon : rightIcon}</button>
                 <button class="theme-toggle" title="Toggle Dark Mode">${isDarkMode ? sunIcon : moonIcon}</button>
             </div>
         </aside>
@@ -32,8 +35,11 @@ export const setupSidebarEvents = () => {
     toggleBtn.addEventListener('click', () => {
       // Logika ini hanya akan dijalankan jika lebar layar lebih dari 768px
       if (window.innerWidth > 768) {
+        const isCollapse = document.body.classList.contains('collapsed')
         sidebar.classList.toggle('collapsed')
         document.body.classList.toggle('sidebar-collapsed')
+        localStorage.setItem('darkMode', isCollapse)
+        toggleBtn.innerHTML = isCollapse ? '<i class="fa-solid fa-angles-left"></i>' : '<i class="fa-solid fa-angles-right"></i>'
       }
     })
   }
