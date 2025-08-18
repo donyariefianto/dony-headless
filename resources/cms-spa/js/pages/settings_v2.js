@@ -3,6 +3,7 @@
 // Import fungsi render untuk setiap sub-menu
 import { renderDashboardSettingsPage } from './dashboardSettings.js'
 import { renderFormBuilderSettingsPage } from './formBuilderSettings.js'
+import { renderFormBuilderSettingsPageV2 } from './formBuilderSettingsV2.js'
 import { renderBusinessFlowSettingsPage } from './businessFlowSettings.js'
 
 // Definisikan item-item sub-menu di sini
@@ -21,6 +22,13 @@ const subMenuItems = [
     description: 'Buat dan kelola formulir kustom aplikasi Anda.',
     icon: 'fa-wpforms',
     renderFunction: renderFormBuilderSettingsPage,
+  },
+  {
+    id: 'formbuilder-settings-v2',
+    title: 'Form Builder Settings V2',
+    description: 'Buat dan kelola formulir kustom aplikasi Anda.',
+    icon: 'fa-wpforms',
+    renderFunction: renderFormBuilderSettingsPageV2,
   },
   {
     id: 'businessflow-settings',

@@ -71,7 +71,6 @@
     </div>
   </header>
 
-  <!-- TOOLBOX -->
   <aside id="toolbox">
     <div class="tool-title">Inputs</div>
     <div class="tool-item" data-type="text">Text</div>
@@ -89,16 +88,15 @@
     <div class="tool-item" data-type="file">File Upload</div>
     <div class="tool-item" data-type="relation">Relation</div>
     <div class="tool-item" data-type="group">Group / Section</div>
+    <div class="tool-item" data-type="calculated">Calculated</div>
   </aside>
 
-  <!-- CANVAS -->
   <section id="canvasWrap">
     <div id="canvas">
       <div class="hint">Drag komponen dari toolbox ke area ini. Gunakan “Group / Section” untuk membuat nested.</div>
     </div>
   </section>
 
-  <!-- PROPERTIES -->
   <aside id="props">
     <div class="props-section">
       <h3>Field Properties</h3>
@@ -115,7 +113,6 @@
     <small style="color:var(--muted)">Drag & drop didukung oleh SortableJS</small>
   </footer>
 
-  <!-- PREVIEW MODAL -->
   <div id="previewModal">
     <div class="modal-card">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
@@ -134,7 +131,7 @@ const $$ = (sel, ctx=document) => Array.from(ctx.querySelectorAll(sel))
 
 // ===== Sortable Setup =====
 const toolbox = document.getElementById('toolbox')
-const canvas  = document.getElementById('canvas')
+const canvas = document.getElementById('canvas')
 let selectedEl = null
 
 // Toolbox: clone only
@@ -180,7 +177,7 @@ function createFieldData(type){
   }
   if (type === 'relation') {
     base.targetTable = ''
-    base.foreignKey  = ''
+    base.foreignKey = ''
     base.relationType = 'one-to-one'
   }
   if (type === 'select' || type === 'radio') {
@@ -189,7 +186,195 @@ function createFieldData(type){
   if (type === 'group') {
     base.expanded = true
   }
+  // --- Penambahan untuk autofill ---
+  if (type === 'select') {
+    base.autofill = 'false';
+    base.autofillTarget = '';
+  }
+  // --- Penambahan untuk calculated ---
+  if (type === 'calculated') {
+    base.calculatedFormula = '';
+    base.calculatedType = 'number';
+  }
   return base
+}
+
+// ... (kode yang sudah ada) ...
+
+// ===== Canvas interactions =====
+canvas.addEventListener('click', ()=> selectField(null))
+
+function selectField(el){
+  $$('.field', canvas).forEach(n => n.classList.remove('selected'))
+  selectedEl = el
+  if (el){
+    el.classList.add('selected')
+    renderProps(el)
+  } else {
+    $('#propsBody').innerHTML = 'Pilih field di canvas untuk mengedit.'
+  }
+}
+
+function renderProps(el){
+  const d = el.dataset
+  const isChoice = d.type==='select' || d.type==='radio'
+  const isRel = d.type==='relation'
+  const isCalculated = d.type==='calculated';
+  const isAutofill = d.type==='select';
+
+  $('#propsBody').innerHTML = `
+    <div class="props-section">
+      <div class="row">
+        <div class="form-group">
+          <label>Label</label>
+          <input id="pLabel" type="text" value="${d.label||''}">
+        </div>
+        <div class="form-group">
+          <label>Field Name</label>
+          <input id="pName" type="text" value="${d.name||''}">
+        </div>
+      </div>
+      <div class="row">
+        <div class="form-group">
+          <label>Type</label>
+          <select id="pType">
+            ${['text','number','date','email','password','textarea','select','radio','checkbox','switch','file','relation','group','calculated'].map(t=>`<option value="${t}" ${d.type===t?'selected':''}>${t}</option>`).join('')}
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Display Width</label>
+          <select id="pWidth">
+            <option value="1/1" ${d.width==='1/1'?'selected':''}>1/1 (Full)</option>
+            <option value="1/2" ${d.width==='1/2'?'selected':''}>1/2 (Half)</option>
+          </select>
+        </div>
+      </div>
+      <div class="row">
+        <div class="form-group">
+          <label>Required</label>
+          <select id="pRequired">
+            <option value="false" ${d.required!=='true'?'selected':''}>No</option>
+            <option value="true" ${d.required==='true'?'selected':''}>Yes</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Default Value</label>
+          <input id="pDefault" type="text" value="${d.defaultValue||''}">
+        </div>
+      </div>
+    </div>
+
+    ${isChoice ? `
+    <div class="props-section">
+      <h3>Options</h3>
+      <div class="form-group">
+        <label>List (pisahkan dengan koma)</label>
+        <input id="pOptions" type="text" value="${(JSON.parse(d.options||'[]')).join(', ')}">
+      </div>
+    </div>` : ''}
+
+    ${isRel ? `
+    <div class="props-section">
+      <h3>Relation</h3>
+      <div class="form-group"><label>Target Table</label><input id="pTarget" type="text" value="${d.targetTable||''}"></div>
+      <div class="form-group"><label>Foreign Key</label><input id="pFK" type="text" value="${d.foreignKey||''}"></div>
+      <div class="form-group"><label>Relation Type</label>
+        <select id="pRelType">
+          <option value="one-to-one" ${d.relationType==='one-to-one'?'selected':''}>One to One</option>
+          <option value="one-to-many" ${d.relationType==='one-to-many'?'selected':''}>One to Many</option>
+          <option value="many-to-many" ${d.relationType==='many-to-many'?'selected':''}>Many to Many</option>
+        </select>
+      </div>
+    </div>` : ''}
+
+    ${isAutofill ? `
+    <div class="props-section">
+      <h3>Autofill</h3>
+      <div class="form-group">
+        <label>Enable Autofill</label>
+        <select id="pAutofill">
+          <option value="false" ${d.autofill!=='true'?'selected':''}>No</option>
+          <option value="true" ${d.autofill==='true'?'selected':''}>Yes</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Autofill Target (e.g., price, stock)</label>
+        <input id="pAutofillTarget" type="text" value="${d.autofillTarget||''}">
+      </div>
+    </div>
+    ` : ''}
+
+    ${isCalculated ? `
+    <div class="props-section">
+      <h3>Calculation</h3>
+      <div class="form-group">
+        <label>Formula (e.g., field_name1 + field_name2 * 0.1)</label>
+        <input id="pFormula" type="text" value="${d.calculatedFormula||''}">
+      </div>
+      <div class="form-group">
+        <label>Result Type</label>
+        <select id="pCalculatedType">
+          <option value="number" ${d.calculatedType==='number'?'selected':''}>Number</option>
+          <option value="text" ${d.calculatedType==='text'?'selected':''}>Text</option>
+        </select>
+      </div>
+    </div>
+    ` : ''}
+
+    <div class="row">
+      <button id="pDuplicate" class="btn ghost">Duplicate</button>
+      <button id="pDelete" class="btn danger">Delete</button>
+    </div>
+  `
+
+  // Bind change handlers
+  $('#pLabel').oninput = e => { d.label = e.target.value; $('.field-title', el).textContent = d.label }
+  $('#pName').oninput = e => d.name = e.target.value
+  $('#pType').onchange = e => {
+    d.type = e.target.value
+    // If switching to/from container types, rebuild children container
+    if (d.type==='group' || d.type==='relation'){
+      if (!$('.field-children', el)){
+        const c = document.createElement('div'); c.className='field-children'; c.textContent='Drop fields here'; el.appendChild(c); makeCanvasSortable(c)
+      }
+    } else {
+      const c = $('.field-children', el); if (c) c.remove()
+    }
+    $('.field-badge', el).textContent = d.type
+    renderProps(el)
+  }
+  $('#pWidth').onchange = e => d.width = e.target.value
+  $('#pRequired').onchange = e => d.required = e.target.value
+  $('#pDefault').oninput = e => d.defaultValue = e.target.value
+
+  if (isChoice){
+    $('#pOptions').oninput = e => d.options = JSON.stringify(e.target.value.split(',').map(s=>s.trim()).filter(Boolean))
+  }
+  if (isRel){
+    $('#pTarget').oninput = e => d.targetTable = e.target.value
+    $('#pFK').oninput = e => d.foreignKey = e.target.value
+    $('#pRelType').onchange= e => d.relationType = e.target.value
+  }
+
+  // --- Penambahan untuk autofill ---
+  if (isAutofill){
+    $('#pAutofill').onchange = e => d.autofill = e.target.value;
+    $('#pAutofillTarget').oninput = e => d.autofillTarget = e.target.value;
+  }
+
+  // --- Penambahan untuk calculated ---
+  if (isCalculated){
+    $('#pFormula').oninput = e => d.calculatedFormula = e.target.value;
+    $('#pCalculatedType').onchange = e => d.calculatedType = e.target.value;
+  }
+
+  $('#pDelete').onclick = () => { el.remove(); selectField(null) }
+  $('#pDuplicate').onclick = () => {
+    const cloneData = Object.assign({}, Object.fromEntries(Object.entries(d).map(([k,v])=>[k,v])))
+    cloneData.id = uid()
+    const newEl = buildFieldElement(cloneData)
+    el.after(newEl); bindField(newEl)
+  }
 }
 
 function buildFieldElement(data){
@@ -322,7 +507,7 @@ function renderProps(el){
 
   // Bind change handlers
   $('#pLabel').oninput = e => { d.label = e.target.value; $('.field-title', el).textContent = d.label }
-  $('#pName').oninput  = e => d.name = e.target.value
+  $('#pName').oninput = e => d.name = e.target.value
   $('#pType').onchange = e => {
     d.type = e.target.value
     // If switching to/from container types, rebuild children container
@@ -345,7 +530,7 @@ function renderProps(el){
   }
   if (isRel){
     $('#pTarget').oninput = e => d.targetTable = e.target.value
-    $('#pFK').oninput     = e => d.foreignKey  = e.target.value
+    $('#pFK').oninput = e => d.foreignKey = e.target.value
     $('#pRelType').onchange= e => d.relationType = e.target.value
   }
 
@@ -403,26 +588,28 @@ function renderPreviewField(f){
   switch(f.type){
     case 'text': case 'email': case 'password':
     case 'date': case 'number':
-      const inp = document.createElement('input'); inp.type = f.type==='switch'?'checkbox':(f.type==='text'?'text':f.type); wrap.appendChild(inp); break
+      const inp = document.createElement('input'); inp.type = f.type; inp.name = f.name; wrap.appendChild(inp); break
     case 'textarea':
-      const ta = document.createElement('textarea'); wrap.appendChild(ta); break
+      const ta = document.createElement('textarea'); ta.name = f.name; wrap.appendChild(ta); break
     case 'checkbox':
-      const cb = document.createElement('input'); cb.type='checkbox'; wrap.appendChild(cb); break
+      const cb = document.createElement('input'); cb.type='checkbox'; cb.name = f.name; wrap.appendChild(cb); break
     case 'radio':
       (f.options||[]).forEach(opt=>{ const l=document.createElement('label'); const r=document.createElement('input'); r.type='radio'; r.name=f.name; r.value=opt; l.append(r, document.createTextNode(' '+opt)); wrap.appendChild(l) })
       break
     case 'select':
-      const sel=document.createElement('select'); (f.options||[]).forEach(opt=>{ const o=document.createElement('option'); o.textContent=opt; sel.appendChild(o) }); wrap.appendChild(sel); break
+      const sel=document.createElement('select'); sel.name=f.name; (f.options||[]).forEach(opt=>{ const o=document.createElement('option'); o.textContent=opt; sel.appendChild(o) }); wrap.appendChild(sel); break
     case 'file':
-      const file=document.createElement('input'); file.type='file'; wrap.appendChild(file); break
+      const file=document.createElement('input'); file.type='file'; file.name=f.name; wrap.appendChild(file); break
     case 'switch':
-      const sw=document.createElement('input'); sw.type='checkbox'; wrap.appendChild(sw); break
+      const sw=document.createElement('input'); sw.type='checkbox'; sw.name=f.name; wrap.appendChild(sw); break
     case 'relation':
       const rel=document.createElement('div'); rel.style.fontSize='12px'; rel.style.color='#475569'; rel.textContent = `Relation → ${f.relation?.targetTable||''} (${f.relation?.type||''})`; wrap.appendChild(rel); break
     case 'group':
       const box=document.createElement('div'); box.style.border='1px solid var(--border)'; box.style.borderRadius='10px'; box.style.padding='10px'; box.style.background='#fafafa'; const cap=document.createElement('div'); cap.style.fontWeight='600'; cap.style.marginBottom='6px'; cap.textContent=f.label||'Group'; box.appendChild(cap);
       (f.children||[]).forEach(ch=> box.appendChild(renderPreviewField(ch)))
       wrap.appendChild(box); break
+    case 'calculated':
+      const calc = document.createElement('input'); calc.type = f.calculatedType==='number'?'number':'text'; calc.name = f.name; calc.readOnly = true; wrap.appendChild(calc); break
   }
   return wrap
 }
@@ -432,6 +619,65 @@ function openPreview(){
   const grid = document.getElementById('previewGrid')
   grid.innerHTML = ''
   data.forEach(f => grid.appendChild(renderPreviewField(f)))
+
+  // --- Penambahan: Logika untuk Calculated dan Autofill di Preview ---
+  // Fungsi untuk mendapatkan field berdasarkan nama, termasuk yang nested
+  function findFieldByName(name, fields) {
+    for (const f of fields) {
+      if (f.name === name) return f;
+      if (f.children && f.children.length > 0) {
+        const nestedField = findFieldByName(name, f.children);
+        if (nestedField) return nestedField;
+      }
+    }
+    return null;
+  }
+
+  // Menjalankan logika calculated
+  const calculatedFields = data.flat().filter(f => f.type === 'calculated');
+  calculatedFields.forEach(calcField => {
+    const formula = calcField.calculatedFormula;
+    const inputEl = $(`[name="${calcField.name}"]`, grid);
+    
+    // Temukan semua field yang terlibat dalam formula
+    const involvedFields = formula.match(/\w+/g) || [];
+    
+    involvedFields.forEach(fieldName => {
+      const fieldData = findFieldByName(fieldName, data);
+      if (fieldData) {
+        const sourceInput = $(`[name="${fieldName}"]`, grid);
+        if (sourceInput) {
+          sourceInput.addEventListener('input', () => {
+            let formulaStr = formula;
+            involvedFields.forEach(fName => {
+              const val = $(`[name="${fName}"]`, grid).value || '0';
+              formulaStr = formulaStr.replace(fName, `(${val})`);
+            });
+            try {
+              inputEl.value = eval(formulaStr);
+            } catch (e) {
+              inputEl.value = 'Error';
+            }
+          });
+        }
+      }
+    });
+  });
+
+  // Menjalankan logika autofill
+  const autofillFields = data.flat().filter(f => f.type === 'select' && f.autofill === 'true');
+  autofillFields.forEach(fillField => {
+    const selectEl = $(`[name="${fillField.name}"]`, grid);
+    const targetField = $(`[name="${fillField.autofillTarget}"]`, grid);
+
+    if (selectEl && targetField) {
+      selectEl.addEventListener('change', () => {
+        // Logika autofill sederhana: isi target dengan nilai yang dipilih
+        targetField.value = selectEl.value;
+      });
+    }
+  });
+
   document.getElementById('previewModal').style.display='flex'
 }
 
@@ -459,7 +705,6 @@ canvas.addEventListener('click', (e)=>{
   const f = e.target.closest('.field')
   if (f) selectField(f)
 })
-
 </script>
 </body>
 </html>

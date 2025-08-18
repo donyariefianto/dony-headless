@@ -560,7 +560,7 @@ input:checked + .slider:before {
 
 .content-area {
   flex-grow: 1;
-  padding: 30px;
+  padding: 10px;
 }
 
 /* Card Styles */
@@ -1886,4 +1886,59 @@ html.dark-mode .settings-list-items li:hover {
   display: flex;
   align-items: center;
   gap: 8px;
+}
+
+/* Sidebar and Toolbox */
+.app-sidebar {
+  width: 280px;
+  background-color: var(--card-bg);
+  box-shadow: var(--shadow-light);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  overflow-y: auto;
+  border-left: 1px solid var(--border-color);
+}
+
+.app-sidebar.app-properties {
+  border-right: 1px solid var(--border-color);
+  border-left: none;
+}
+
+.tool-group {
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  overflow: hidden;
+}
+
+.tool-group-title {
+  background-color: var(--hover-bg);
+  padding: 10px 15px;
+  margin: 0;
+  font-size: 1em;
+  font-weight: 600;
+  color: var(--text-color);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.tool-item {
+  padding: 12px 15px;
+  cursor: grab;
+  font-size: 0.95em;
+  color: var(--text-color);
+  transition: background-color var(--transition-speed);
+}
+
+.tool-item:hover {
+  background-color: var(--hover-bg);
+}
+
+.tool-item:active {
+  cursor: grabbing;
+}
+
+/* New hidden class for JavaScript use */
+.hidden {
+  display: none;
 }
