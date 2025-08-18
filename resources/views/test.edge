@@ -1,138 +1,465 @@
 <!DOCTYPE html>
-<html lang="id">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>
-      Pengaturan
-    </title>
-    <link rel="stylesheet" href="/resources/configs/index.css" />
-  </head>
-  <body>
-    <div class="container">
-      <header>
-        <div class="logo">
-          <h2>
-            Pengaturan
-          </h2>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Canvas Form Builder – Native HTML</title>
+  <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
+  <style>
+    :root{
+      --bg:#f5f7fb;--card:#ffffff;--border:#e5e7eb;--text:#1f2937;--muted:#6b7280;--primary:#2563eb;
+      --accent:#f0f6ff;--danger:#ef4444;--success:#16a34a
+    }
+    *{box-sizing:border-box;font-family:Inter,ui-sans-serif,system-ui,Segoe UI,Roboto,Helvetica,Arial}
+    body{margin:0;background:var(--bg);color:var(--text);height:100vh;display:grid;grid-template-columns:240px 1fr 320px;grid-template-rows:64px 1fr 56px;grid-template-areas:"header header header" "toolbox canvas props" "footer footer footer"}
+    header{grid-area:header;display:flex;align-items:center;gap:12px;padding:0 16px;background:#0f172a;color:#fff;border-bottom:1px solid #0b1220}
+    header h1{font-size:16px;margin:0;font-weight:600}
+    header .main-config{margin-left:auto;display:flex;align-items:center;gap:8px}
+    header input{padding:8px 10px;border-radius:8px;border:1px solid #172554;background:#0b1220;color:#e5edff}
+
+    #toolbox{grid-area:toolbox;padding:12px;border-right:1px solid var(--border);background:#0b1220;color:#e5edff;overflow:auto}
+    .tool-title{font-size:12px;text-transform:uppercase;opacity:.8;margin:8px 0}
+    .tool-item{background:#111827;border:1px solid #1f2937;color:#e5edff;padding:10px;border-radius:10px;margin-bottom:8px;cursor:grab;user-select:none;text-align:center;font-size:13px}
+    .tool-item:hover{border-color:#374151}
+
+    #canvasWrap{grid-area:canvas;padding:16px;overflow:auto}
+    #canvas{min-height:480px;background:var(--card);border:2px dashed var(--border);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:10px}
+    .hint{color:var(--muted);font-size:13px;text-align:center;margin:24px 0}
+
+    .field{background:#fff;border:1px solid var(--border);border-radius:12px;padding:12px;position:relative}
+    .field-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+    .field-badge{font-size:12px;background:var(--accent);color:#1d4ed8;padding:2px 8px;border-radius:999px}
+    .field-title{font-weight:600;font-size:14px}
+    .field-children{margin-top:10px;border:1px dashed #cdd6f4;background:#fbfdff;border-radius:10px;padding:10px;min-height:42px}
+    .selected{outline:2px solid #93c5fd}
+
+    #props{grid-area:props;padding:16px;border-left:1px solid var(--border);background:var(--card);overflow:auto}
+    .props-section{margin-bottom:16px}
+    .props-section h3{font-size:13px;text-transform:uppercase;color:var(--muted);margin:0 0 8px}
+    .form-group{margin-bottom:10px}
+    .form-group label{display:block;font-size:13px;margin-bottom:6px;color:#374151}
+    .form-group input,.form-group select,.form-group textarea{width:100%;padding:8px 10px;border-radius:10px;border:1px solid var(--border);background:#fff}
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .btn{appearance:none;border:1px solid var(--border);background:#fff;border-radius:10px;padding:8px 10px;cursor:pointer}
+    .btn.primary{background:var(--primary);color:#fff;border-color:transparent}
+    .btn.danger{background:var(--danger);color:#fff;border-color:transparent}
+    .btn.ghost{background:#f8fafc}
+
+    footer{grid-area:footer;border-top:1px solid var(--border);background:var(--card);display:flex;align-items:center;justify-content:space-between;padding:8px 12px}
+
+    /* Preview modal */
+    #previewModal{position:fixed;inset:0;background:rgba(2,6,23,.65);display:none;align-items:center;justify-content:center;padding:20px}
+    .modal-card{background:#fff;max-width:980px;width:100%;max-height:90vh;overflow:auto;border-radius:14px;padding:16px}
+    .preview-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+    .preview-item[data-width="1/1"]{grid-column:span 2}
+    .preview-item label{font-size:13px;margin-bottom:6px;display:block}
+    .preview-item input,.preview-item select,.preview-item textarea{width:100%;padding:10px;border:1px solid var(--border);border-radius:10px}
+
+    /* Drag visuals */
+    .sortable-ghost{opacity:.4}
+    .sortable-chosen{transform:scale(.98)}
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Canvas Form Builder</h1>
+    <div class="main-config">
+      <label for="mainTable">Target Table</label>
+      <input id="mainTable" type="text" placeholder="e.g. users" />
+      <button id="btnPreview" class="btn ghost">Preview</button>
+      <button id="btnExport" class="btn primary">Export JSON</button>
+    </div>
+  </header>
+
+  <!-- TOOLBOX -->
+  <aside id="toolbox">
+    <div class="tool-title">Inputs</div>
+    <div class="tool-item" data-type="text">Text</div>
+    <div class="tool-item" data-type="number">Number</div>
+    <div class="tool-item" data-type="date">Date</div>
+    <div class="tool-item" data-type="email">Email</div>
+    <div class="tool-item" data-type="password">Password</div>
+    <div class="tool-item" data-type="textarea">Textarea</div>
+    <div class="tool-title">Choices</div>
+    <div class="tool-item" data-type="select">Select</div>
+    <div class="tool-item" data-type="radio">Radio</div>
+    <div class="tool-item" data-type="checkbox">Checkbox</div>
+    <div class="tool-item" data-type="switch">Switch</div>
+    <div class="tool-title">Others</div>
+    <div class="tool-item" data-type="file">File Upload</div>
+    <div class="tool-item" data-type="relation">Relation</div>
+    <div class="tool-item" data-type="group">Group / Section</div>
+  </aside>
+
+  <!-- CANVAS -->
+  <section id="canvasWrap">
+    <div id="canvas">
+      <div class="hint">Drag komponen dari toolbox ke area ini. Gunakan “Group / Section” untuk membuat nested.</div>
+    </div>
+  </section>
+
+  <!-- PROPERTIES -->
+  <aside id="props">
+    <div class="props-section">
+      <h3>Field Properties</h3>
+      <div id="propsBody">Pilih field di canvas untuk mengedit.</div>
+    </div>
+  </aside>
+
+  <footer>
+    <div style="display:flex;gap:8px;align-items:center">
+      <button id="btnClear" class="btn danger">Clear</button>
+      <button id="btnCollapse" class="btn ghost">Collapse All</button>
+      <button id="btnExpand" class="btn ghost">Expand All</button>
+    </div>
+    <small style="color:var(--muted)">Drag & drop didukung oleh SortableJS</small>
+  </footer>
+
+  <!-- PREVIEW MODAL -->
+  <div id="previewModal">
+    <div class="modal-card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <h3 style="margin:0">Preview</h3>
+        <button id="btnClosePreview" class="btn">Close</button>
+      </div>
+      <div class="preview-grid" id="previewGrid"></div>
+    </div>
+  </div>
+
+<script>
+// ===== Utilities =====
+const uid = () => Math.random().toString(36).slice(2)
+const $ = (sel, ctx=document) => ctx.querySelector(sel)
+const $$ = (sel, ctx=document) => Array.from(ctx.querySelectorAll(sel))
+
+// ===== Sortable Setup =====
+const toolbox = document.getElementById('toolbox')
+const canvas  = document.getElementById('canvas')
+let selectedEl = null
+
+// Toolbox: clone only
+Sortable.create(toolbox, {
+  group: { name: 'form', pull: 'clone', put: false },
+  sort: false,
+  animation: 150,
+})
+
+// Canvas: accepts drops & reorders
+function makeCanvasSortable(container){
+  Sortable.create(container, {
+    group: { name: 'form', pull: true, put: true },
+    animation: 150,
+    handle: undefined,
+    ghostClass: 'sortable-ghost',
+    onAdd: (evt) => {
+      // If item came from toolbox, evt.item has .tool-item markup
+      const type = evt.item.dataset.type
+      if (type) {
+        const newField = buildFieldElement(createFieldData(type))
+        evt.item.replaceWith(newField)
+        bindField(newField)
+      } else {
+        // Moved existing field into new container – ensure it stays bound
+        bindField(evt.item)
+      }
+    },
+  })
+}
+makeCanvasSortable(canvas)
+
+// ===== Data Model (dataset on elements) =====
+function createFieldData(type){
+  const base = {
+    id: uid(),
+    label: `${type[0].toUpperCase()+type.slice(1)} Field`,
+    name: type+"_"+uid().slice(0,5),
+    type,
+    width: '1/1',
+    required: false,
+    defaultValue: '',
+  }
+  if (type === 'relation') {
+    base.targetTable = ''
+    base.foreignKey  = ''
+    base.relationType = 'one-to-one'
+  }
+  if (type === 'select' || type === 'radio') {
+    base.options = ['Option 1','Option 2']
+  }
+  if (type === 'group') {
+    base.expanded = true
+  }
+  return base
+}
+
+function buildFieldElement(data){
+  const el = document.createElement('div')
+  el.className = 'field'
+  Object.entries(data).forEach(([k,v]) => el.dataset[k] = Array.isArray(v)? JSON.stringify(v): v)
+
+  const header = document.createElement('div')
+  header.className = 'field-header'
+  const title = document.createElement('div')
+  title.className = 'field-title'
+  title.textContent = data.label
+  const badge = document.createElement('span')
+  badge.className = 'field-badge'
+  badge.textContent = data.type
+  header.append(title,badge)
+  el.appendChild(header)
+
+  if (data.type === 'group' || data.type === 'relation'){
+    const children = document.createElement('div')
+    children.className = 'field-children'
+    children.textContent = 'Drop fields here'
+    el.appendChild(children)
+    makeCanvasSortable(children)
+  }
+  return el
+}
+
+function bindField(el){
+  el.onclick = (e)=>{
+    if (!el.isConnected) return
+    // Avoid selecting container when clicking children text
+    if (!el.classList.contains('field')) return
+  }
+  el.addEventListener('click', (e)=>{
+    e.stopPropagation()
+    selectField(el)
+  })
+}
+
+// ===== Canvas interactions =====
+canvas.addEventListener('click', ()=> selectField(null))
+
+function selectField(el){
+  $$('.field', canvas).forEach(n => n.classList.remove('selected'))
+  selectedEl = el
+  if (el){
+    el.classList.add('selected')
+    renderProps(el)
+  } else {
+    $('#propsBody').innerHTML = 'Pilih field di canvas untuk mengedit.'
+  }
+}
+
+function renderProps(el){
+  const d = el.dataset
+  const isChoice = d.type==='select' || d.type==='radio'
+  const isRel = d.type==='relation'
+
+  $('#propsBody').innerHTML = `
+    <div class="props-section">
+      <div class="row">
+        <div class="form-group">
+          <label>Label</label>
+          <input id="pLabel" type="text" value="${d.label||''}">
         </div>
-      </header>
-
-      <main class="main-layout">
-        <section class="content-area">
-          <!-- Grid View -->
-          <div id="gridView" class="settings-grid">
-            <div class="settings-card" onclick="openDetail('general')">
-              <h4>
-                Umum
-              </h4>
-              <p>
-                Info aplikasi & tema
-              </p>
-            </div>
-            <div class="settings-card" onclick="openDetail('account')">
-              <h4>
-                Akun
-              </h4>
-              <p>
-                Profil & sandi
-              </p>
-            </div>
-            <div class="settings-card" onclick="openDetail('notifications')">
-              <h4>
-                Notifikasi
-              </h4>
-              <p>
-                Email & sistem
-              </p>
-            </div>
-          </div>
-
-          <!-- Detail: General -->
-          <div id="detail-general" class="settings-detail">
-            <button class="back-btn" onclick="showGrid()">← Kembali</button>
-            <h3>
-              Pengaturan Umum
-            </h3>
-            <div class="form-group">
-              <label>Nama Aplikasi</label>
-              <input type="text" class="form-control" placeholder="DashboardKu" />
-            </div>
-            <div class="form-group">
-              <label>Tema</label>
-              <select class="form-control">
-                <option value="light">
-                  Terang
-                </option>
-                <option value="dark">
-                  Gelap
-                </option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label>Bahasa</label>
-              <select class="form-control">
-                <option value="id">
-                  Bahasa Indonesia
-                </option>
-                <option value="en">
-                  English
-                </option>
-              </select>
-            </div>
-          </div>
-
-          <!-- Detail: Account -->
-          <div id="detail-account" class="settings-detail">
-            <button class="back-btn" onclick="showGrid()">← Kembali</button>
-            <h3>
-              Pengaturan Akun
-            </h3>
-            <div class="form-group">
-              <label>Nama Pengguna</label>
-              <input type="text" class="form-control" placeholder="Nama Anda" />
-            </div>
-            <div class="form-group">
-              <label>Email</label>
-              <input type="email" class="form-control" placeholder="nama@email.com" />
-            </div>
-            <div class="form-group">
-              <label>Kata Sandi</label>
-              <input type="password" class="form-control" placeholder="••••••••" />
-            </div>
-          </div>
-
-          <!-- Detail: Notifications -->
-          <div id="detail-notifications" class="settings-detail">
-            <button class="back-btn" onclick="showGrid()">← Kembali</button>
-            <h3>
-              Notifikasi
-            </h3>
-            <div class="form-group">
-              <label>                <input type="checkbox" />Kirim email notifikasi</label>
-            </div>
-            <div class="form-group">
-              <label>                <input type="checkbox" />Kirim notifikasi sistem</label>
-            </div>
-            <div class="form-group">
-              <label>                <input type="checkbox" />Ringkasan mingguan</label>
-            </div>
-          </div>
-        </section>
-      </main>
+        <div class="form-group">
+          <label>Field Name</label>
+          <input id="pName" type="text" value="${d.name||''}">
+        </div>
+      </div>
+      <div class="row">
+        <div class="form-group">
+          <label>Type</label>
+          <select id="pType">
+            ${['text','number','date','email','password','textarea','select','radio','checkbox','switch','file','relation','group'].map(t=>`<option value="${t}" ${d.type===t?'selected':''}>${t}</option>`).join('')}
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Display Width</label>
+          <select id="pWidth">
+            <option value="1/1" ${d.width==='1/1'?'selected':''}>1/1 (Full)</option>
+            <option value="1/2" ${d.width==='1/2'?'selected':''}>1/2 (Half)</option>
+          </select>
+        </div>
+      </div>
+      <div class="row">
+        <div class="form-group">
+          <label>Required</label>
+          <select id="pRequired">
+            <option value="false" ${d.required!=='true'?'selected':''}>No</option>
+            <option value="true" ${d.required==='true'?'selected':''}>Yes</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Default Value</label>
+          <input id="pDefault" type="text" value="${d.defaultValue||''}">
+        </div>
+      </div>
     </div>
 
-    <script>
-      function openDetail(id) {
-        document.getElementById("gridView").style.display = "none";
-        document.querySelectorAll(".settings-detail").forEach(el => el.classList.remove("active"));
-        document.getElementById("detail-" + id).classList.add("active");
+    ${isChoice ? `
+    <div class="props-section">
+      <h3>Options</h3>
+      <div class="form-group">
+        <label>List (pisahkan dengan koma)</label>
+        <input id="pOptions" type="text" value="${(JSON.parse(d.options||'[]')).join(', ')}">
+      </div>
+    </div>` : ''}
+
+    ${isRel ? `
+    <div class="props-section">
+      <h3>Relation</h3>
+      <div class="form-group"><label>Target Table</label><input id="pTarget" type="text" value="${d.targetTable||''}"></div>
+      <div class="form-group"><label>Foreign Key</label><input id="pFK" type="text" value="${d.foreignKey||''}"></div>
+      <div class="form-group"><label>Relation Type</label>
+        <select id="pRelType">
+          <option value="one-to-one" ${d.relationType==='one-to-one'?'selected':''}>One to One</option>
+          <option value="one-to-many" ${d.relationType==='one-to-many'?'selected':''}>One to Many</option>
+          <option value="many-to-many" ${d.relationType==='many-to-many'?'selected':''}>Many to Many</option>
+        </select>
+      </div>
+    </div>` : ''}
+
+    <div class="row">
+      <button id="pDuplicate" class="btn ghost">Duplicate</button>
+      <button id="pDelete" class="btn danger">Delete</button>
+    </div>
+  `
+
+  // Bind change handlers
+  $('#pLabel').oninput = e => { d.label = e.target.value; $('.field-title', el).textContent = d.label }
+  $('#pName').oninput  = e => d.name = e.target.value
+  $('#pType').onchange = e => {
+    d.type = e.target.value
+    // If switching to/from container types, rebuild children container
+    if (d.type==='group' || d.type==='relation'){
+      if (!$('.field-children', el)){
+        const c = document.createElement('div'); c.className='field-children'; c.textContent='Drop fields here'; el.appendChild(c); makeCanvasSortable(c)
       }
-      
-      function showGrid() {
-        document.getElementById("gridView").style.display = "grid";
-        document.querySelectorAll(".settings-detail").forEach(el => el.classList.remove("active"));
-      }
-    </script>
-  </body>
+    } else {
+      const c = $('.field-children', el); if (c) c.remove()
+    }
+    $('.field-badge', el).textContent = d.type
+    renderProps(el)
+  }
+  $('#pWidth').onchange = e => d.width = e.target.value
+  $('#pRequired').onchange = e => d.required = e.target.value
+  $('#pDefault').oninput = e => d.defaultValue = e.target.value
+
+  if (isChoice){
+    $('#pOptions').oninput = e => d.options = JSON.stringify(e.target.value.split(',').map(s=>s.trim()).filter(Boolean))
+  }
+  if (isRel){
+    $('#pTarget').oninput = e => d.targetTable = e.target.value
+    $('#pFK').oninput     = e => d.foreignKey  = e.target.value
+    $('#pRelType').onchange= e => d.relationType = e.target.value
+  }
+
+  $('#pDelete').onclick = () => { el.remove(); selectField(null) }
+  $('#pDuplicate').onclick = () => {
+    const cloneData = Object.assign({}, Object.fromEntries(Object.entries(d).map(([k,v])=>[k,v])))
+    cloneData.id = uid()
+    const newEl = buildFieldElement(cloneData)
+    el.after(newEl); bindField(newEl)
+  }
+}
+
+// ===== Add initial empty state click =====
+canvas.addEventListener('dragover', ()=>{ $('.hint', canvas)?.remove() })
+
+// ===== Export Schema (recursive) =====
+function buildSchema(container){
+  const arr = []
+  $$('.field', container).forEach(el=>{
+    // Only direct children
+    if (el.parentElement !== container) return
+    const d = el.dataset
+    const obj = {
+      id: d.id,
+      label: d.label || '',
+      name: d.name || '',
+      type: d.type,
+      width: d.width || '1/1',
+      required: d.required === 'true',
+      defaultValue: d.defaultValue || ''
+    }
+    if (d.type==='select' || d.type==='radio'){
+      obj.options = JSON.parse(d.options||'[]')
+    }
+    if (d.type==='relation'){
+      obj.relation = { targetTable: d.targetTable||'', foreignKey: d.foreignKey||'', type: d.relationType||'one-to-one' }
+    }
+    if (d.type==='group' || d.type==='relation'){
+      const childWrap = $('.field-children', el)
+      obj.children = childWrap ? buildSchema(childWrap) : []
+    }
+    arr.push(obj)
+  })
+  return arr
+}
+
+// ===== Preview =====
+function renderPreviewField(f){
+  const wrap = document.createElement('div')
+  wrap.className = 'preview-item'
+  wrap.dataset.width = f.width || '1/1'
+  if (f.type!=='group'){
+    const lbl = document.createElement('label'); lbl.textContent = f.label || f.type; wrap.appendChild(lbl)
+  }
+  switch(f.type){
+    case 'text': case 'email': case 'password':
+    case 'date': case 'number':
+      const inp = document.createElement('input'); inp.type = f.type==='switch'?'checkbox':(f.type==='text'?'text':f.type); wrap.appendChild(inp); break
+    case 'textarea':
+      const ta = document.createElement('textarea'); wrap.appendChild(ta); break
+    case 'checkbox':
+      const cb = document.createElement('input'); cb.type='checkbox'; wrap.appendChild(cb); break
+    case 'radio':
+      (f.options||[]).forEach(opt=>{ const l=document.createElement('label'); const r=document.createElement('input'); r.type='radio'; r.name=f.name; r.value=opt; l.append(r, document.createTextNode(' '+opt)); wrap.appendChild(l) })
+      break
+    case 'select':
+      const sel=document.createElement('select'); (f.options||[]).forEach(opt=>{ const o=document.createElement('option'); o.textContent=opt; sel.appendChild(o) }); wrap.appendChild(sel); break
+    case 'file':
+      const file=document.createElement('input'); file.type='file'; wrap.appendChild(file); break
+    case 'switch':
+      const sw=document.createElement('input'); sw.type='checkbox'; wrap.appendChild(sw); break
+    case 'relation':
+      const rel=document.createElement('div'); rel.style.fontSize='12px'; rel.style.color='#475569'; rel.textContent = `Relation → ${f.relation?.targetTable||''} (${f.relation?.type||''})`; wrap.appendChild(rel); break
+    case 'group':
+      const box=document.createElement('div'); box.style.border='1px solid var(--border)'; box.style.borderRadius='10px'; box.style.padding='10px'; box.style.background='#fafafa'; const cap=document.createElement('div'); cap.style.fontWeight='600'; cap.style.marginBottom='6px'; cap.textContent=f.label||'Group'; box.appendChild(cap);
+      (f.children||[]).forEach(ch=> box.appendChild(renderPreviewField(ch)))
+      wrap.appendChild(box); break
+  }
+  return wrap
+}
+
+function openPreview(){
+  const data = buildSchema(canvas)
+  const grid = document.getElementById('previewGrid')
+  grid.innerHTML = ''
+  data.forEach(f => grid.appendChild(renderPreviewField(f)))
+  document.getElementById('previewModal').style.display='flex'
+}
+
+// ===== Buttons =====
+$('#btnPreview').onclick = openPreview
+$('#btnClosePreview').onclick = ()=> $('#previewModal').style.display='none'
+$('#btnExport').onclick = ()=>{
+  const out = {
+    mainTargetTable: $('#mainTable').value || '',
+    fields: buildSchema(canvas)
+  }
+  const blob = new Blob([JSON.stringify(out,null,2)], {type:'application/json'})
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'form-schema.json'; a.click()
+}
+$('#btnClear').onclick = ()=>{ canvas.innerHTML = '<div class="hint">Drag komponen dari toolbox ke area ini. Gunakan “Group / Section” untuk membuat nested.</div>' }
+$('#btnCollapse').onclick = ()=>{
+  $$('.field-children', canvas).forEach(c=> c.style.display='none')
+}
+$('#btnExpand').onclick = ()=>{
+  $$('.field-children', canvas).forEach(c=> c.style.display='block')
+}
+
+// Click to select existing elements (delegation)
+canvas.addEventListener('click', (e)=>{
+  const f = e.target.closest('.field')
+  if (f) selectField(f)
+})
+
+</script>
+</body>
 </html>
