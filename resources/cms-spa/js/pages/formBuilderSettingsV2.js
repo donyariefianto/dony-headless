@@ -20,7 +20,13 @@ let selectedEl = null;
 const renderFormGenerator = (formdata, container) => {
   container.innerHTML = `
     <div class="settings-group">
-      <h4>Buat Formulir</h4>
+      <div class="table-controls">
+        <div class="search-box"><h2>Buat Formulir</h2></div>
+        <div class="right-controls">
+          <button id="btnClear" class="btn danger">Hapus Semua</button>
+          <button id="btnExport" class="btn ghost">Simpan</button>
+        </div>
+      </div>
       <div class="container-formbuilder">
         <div class="column-formbuilder toolbox-formbuilder scroll-container">
           <aside id="toolbox">
@@ -64,21 +70,12 @@ const renderFormGenerator = (formdata, container) => {
           <div id="canvas-column"></div>
         </div>
         <div class="column-formbuilder properties-formbuilder scroll-container">
-          <h2>Field Properties</h2>
+          <h4>Field Properties</h4>
           <div id="propsBody">
             Pilih field di canvas untuk mengedit.
           </div>
         </div>
       </div>
-      <footer>
-        <div style="display:flex;gap:8px;align-items:center">
-          <button id="btnClear" class="btn danger">Clear</button>
-          <button id="btnCollapse" class="btn ghost">Collapse All</button>
-          <button id="btnExpand" class="btn ghost">Expand All</button>
-          <button id="btnExport" class="btn ghost">Export</button>
-        </div>
-        <small style="color:var(--muted)">Drag & drop didukung oleh SortableJS</small>
-      </footer>
     </div>
   ` 
   attachFormGeneratorEventListeners() 
@@ -167,18 +164,12 @@ function attachFormGeneratorEventListeners() {
   makeCanvasSortable(canvas);
   btnExport.addEventListener('click', () => {
     console.log(buildSchema(canvas));
-    
   })
   btnClear.addEventListener('click', () => {
     if (confirm('Apakah Anda yakin ingin menghapus semua field?')) {
       canvas.innerHTML = '';
       selectField(null,canvas);
     }
-  });
-  btnCollapse.addEventListener('click', () => {
-    
-  });
-  btnExpand.addEventListener('click', () => {
   });
 }
 
@@ -211,7 +202,7 @@ function buildSchema(container) {
       };
     }
     if (d.type === "group") {
-      const childWrap = $(".field-children", el);
+      const childWrap = $(".field-children-formbuilder", el);
       obj.children = childWrap ? buildSchema(childWrap) : [];
       if (d.type === "group") { // <-- Tambahkan blok ini
           obj.collection = d.collection || "";
@@ -307,9 +298,9 @@ function buildFieldElement(data) {
   el.className = "field";
   Object.entries(data).forEach(([ k, v ]) => el.dataset[k] = Array.isArray(v) ? JSON.stringify(v) : v);
   const header = document.createElement("div");
-  header.className = ".field-header-formbuilder";
+  header.className = "field-header-formbuilder";
   const title = document.createElement("div");
-  title.className = "field-title";
+  title.className = "field-title-formbuilder";
   title.textContent = data.label;
   const badge = document.createElement("span");
   badge.className = "field-badge-formbuilder";

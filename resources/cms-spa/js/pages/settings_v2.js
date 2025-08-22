@@ -45,7 +45,7 @@ export function loadSettingsPage(container) {
   container.innerHTML = `
         <div class="settings-main-container">
             <div class="settings-header">
-                <button id="backToSettingsBtn" class="btn btn-secondary" style="display:none;"><i class="fa-solid fa-arrow-left"></i> Kembali</button>
+                <button id="backToSettingsBtn" class="btn btn-secondary" style="display:none;">Kembali</button>
                 <h2 id="settingsTitle">Pengaturan Aplikasi</h2>
             </div>
             <p id="settingsIntro" class="settings-intro">Pilih kategori pengaturan yang ingin Anda kelola.</p>

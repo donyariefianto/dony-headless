@@ -1150,7 +1150,7 @@ html.dark-mode .settings-list-items li:hover {
     font-size: 1.6em;
   }
   .settings-group {
-    padding: 20px;
+    padding: 8px;
   }
   .form-group label {
     font-size: 0.9em;
@@ -1721,14 +1721,14 @@ html.dark-mode .settings-list-items li:hover {
 /* ========================================= */
 
 .settings-main-container {
-  padding: 20px;
+  padding: 10px;
 }
 
 .settings-header {
   display: flex;
   align-items: center;
   gap: 15px;
-  margin-bottom: 20px;
+  margin-bottom: 10px;
 }
 
 .settings-header h2 {
