@@ -1,7 +1,8 @@
 export const renderDataEntries = () => {
   return `
-        <div class="page-container">
-            <h1>Data Entries</h1>
+      <div class="page-container">
+          <h1>Data Entries</h1>
+          <div id="content-view-container">
             <p>Kelola konfigurasi form builder di sini. Gunakan pencarian untuk menemukan entri spesifik.</p>
             <div class="data-controls">
                 <input type="text" id="search-input" placeholder="Cari...">
@@ -14,17 +15,18 @@ export const renderDataEntries = () => {
                 <span id="page-info"></span>
                 <button id="next-btn" disabled>Next</button>
             </div>
-        </div>
-        <div id="form-panel" class="form-panel">
-            <div class="panel-header">
-                <h3 id="form-panel-title"></h3>
-                <button id="close-panel-btn"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-            <div class="panel-body">
-                </div>
-            <div id="form-message" class="form-message"></div>
-        </div>
-        <div id="panel-overlay" class="panel-overlay"></div>
+          </div>
+      </div>
+      <div id="form-panel" class="form-panel">
+          <div class="panel-header">
+              <h3 id="form-panel-title"></h3>
+              <button id="close-panel-btn"><i class="fa-solid fa-xmark"></i></button>
+          </div>
+          <div class="panel-body">
+          </div>
+          <div id="form-message" class="form-message"></div>
+      </div>
+      <div id="panel-overlay" class="panel-overlay"></div>
     `
 }
 
@@ -38,6 +40,9 @@ export const setupDataEntries = () => {
   const titleformPanel = document.getElementById('form-panel-title')
   const panelOverlay = document.getElementById('panel-overlay')
   const formMessageContainer = document.getElementById('form-message')
+  const contentContainer = document.getElementById('content-view-container')
+
+  let currentView = 'grid' // Bisa 'grid' atau 'table'
 
   const ITEMS_PER_PAGE = 10
   let currentPage = 1
@@ -47,7 +52,7 @@ export const setupDataEntries = () => {
   const fetchData = async () => {
     try {
       gridContainer.innerHTML = `<p>Loading data...</p>`
-      const endpoint = `http://localhost:3333/configuration/formbuilder/list?page=${currentPage}&limit=${ITEMS_PER_PAGE}&search=${searchTerm}`
+      const endpoint = `/configuration/formbuilder/list?page=${currentPage}&limit=${ITEMS_PER_PAGE}&search=${searchTerm}`
 
       const response = await fetch(endpoint, {
         headers: {
@@ -62,7 +67,6 @@ export const setupDataEntries = () => {
 
       const result = await response.json()
       const data = result.data
-
       if (data && data.documents) {
         renderGrid(data.documents)
         totalPages = data.totalPages
@@ -92,6 +96,7 @@ export const setupDataEntries = () => {
                 <h3>${doc.name}</h3>
                 <p>${doc.description}</p>
                 <div class="grid-actions">
+                    <button class="icon-table-btn" data-id="${doc._id}"><i class="fa-solid fa-eye"></i></button>
                     <button class="icon-only-btn" data-id="${doc._id}"><i class="fa-solid fa-plus"></i></button>
                 </div>
             </div>
@@ -107,6 +112,300 @@ export const setupDataEntries = () => {
         renderFormPanel(id)
       })
     })
+    document.querySelectorAll('.grid-item .icon-table-btn').forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        const id = e.currentTarget.dataset.id
+        showTableView(id)
+      })
+    })
+  }
+
+  const createTableFromConfig = (config) => {
+    let tableHtml = `
+            <div class="table-container-scroll">
+                <h3>Main Fields</h3>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Nama Field</th>
+                            <th>Label</th>
+                            <th>Tipe</th>
+                            <th>Wajib</th>
+                            <th>Opsi Tambahan</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${config.fields
+                          .map(
+                            (field) => `
+                            <tr>
+                                <td>${field.name}</td>
+                                <td>${field.label}</td>
+                                <td>${field.type}</td>
+                                <td>${field.required ? 'Ya' : 'Tidak'}</td>
+                                <td>${JSON.stringify(field.options)}</td>
+                            </tr>
+                        `
+                          )
+                          .join('')}
+                    </tbody>
+                </table>
+            </div>
+        `
+
+    // Tambahkan tabel untuk setiap subform
+    config.subforms.forEach((subform) => {
+      if (subform.label) {
+        tableHtml += `
+                    <div class="table-container-scroll">
+                        <h3>Subform: ${subform.label}</h3>
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Nama Field</th>
+                                    <th>Label</th>
+                                    <th>Tipe</th>
+                                    <th>Wajib</th>
+                                    <th>Opsi Tambahan</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${subform.fields
+                                  .map(
+                                    (field) => `
+                                    <tr>
+                                        <td>${field.name}</td>
+                                        <td>${field.label}</td>
+                                        <td>${field.type}</td>
+                                        <td>${field.required ? 'Ya' : 'Tidak'}</td>
+                                        <td>${JSON.stringify(field.options)}</td>
+                                    </tr>
+                                `
+                                  )
+                                  .join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                `
+      }
+    })
+
+    return tableHtml
+  }
+
+  const createTableFromData = (formConfig, data) => {
+    // Ambil field dari konfigurasi form untuk header tabel
+    const mainFields = formConfig.fields
+    const subforms = formConfig.subforms
+
+    if (!data || data.length === 0) {
+      return '<p>Tidak ada data yang tersedia untuk formulir ini.</p>'
+    }
+
+    let tableHtml = `
+        <div class="data-table-container">
+            <h3>Main Data</h3>
+            <div class="table-container-scroll">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            ${mainFields.map((field) => `<th>${field.label}</th>`).join('')}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${data
+                          .map(
+                            (entry) => `
+                            <tr>
+                                ${mainFields.map((field) => `<td>${entry[field.name] || '-'}</td>`).join('')}
+                            </tr>
+                        `
+                          )
+                          .join('')}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    `
+
+    // Tambahkan tabel untuk setiap subform jika data tersedia
+    subforms.forEach((subform) => {
+      if (subform.label) {
+        let subformTableHtml = `
+                <div class="subform-table-container">
+                    <h3>Subform: ${subform.label}</h3>
+                    <div class="table-container-scroll">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    ${subform.fields.map((field) => `<th>${field.label}</th>`).join('')}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${data
+                                  .map(
+                                    (entry) => `
+                                    <tr>
+                                        ${
+                                          entry[subform.table_name] &&
+                                          entry[subform.table_name].length > 0
+                                            ? entry[subform.table_name]
+                                                .map(
+                                                  (subEntry) => `
+                                                <tr>
+                                                    ${subform.fields.map((field) => `<td>${subEntry[field.name] || '-'}</td>`).join('')}
+                                                </tr>
+                                              `
+                                                )
+                                                .join('')
+                                            : `<tr><td colspan="${subform.fields.length}">Tidak ada data subform.</td></tr>`
+                                        }
+                                    </tr>
+                                `
+                                  )
+                                  .join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `
+        tableHtml += subformTableHtml
+      }
+    })
+
+    return tableHtml
+  }
+
+  const showTableView = async (id) => {
+    try {
+      contentContainer.innerHTML = `<p>Loading tabel...</p>`
+      const endpoint = `http://localhost:3333/configuration/formbuilder/read/${id}`
+      const response = await fetch(endpoint, {
+        headers: {
+          Authorization: 'Bearer ' + localStorage.getItem('userToken'),
+        },
+      })
+
+      if (!response.ok) {
+        throw new Error('Gagal mengambil konfigurasi form.')
+      }
+
+      const result = await response.json()
+      const formConfig = result.data
+
+      if (formConfig) {
+        const tableHtml = `
+              <div class="table-view">
+                  <div class="table-header">
+                      <h2>Tabel : ${formConfig.name}</h2>
+                      <div class="table-controls">
+                          <input type="text" id="data-search-input" placeholder="Cari data...">
+                          <button id="back-to-grid-btn"><i class="fa-solid fa-arrow-left"></i> Kembali</button>
+                      </div>
+                  </div>
+                  <div id="data-table-container">
+                      <p>Loading data...</p>
+                  </div>
+                  <div class="pagination" id="data-pagination-controls">
+                      <button id="data-prev-btn" disabled>Previous</button>
+                      <span id="data-page-info"></span>
+                      <button id="data-next-btn" disabled>Next</button>
+                  </div>
+              </div>
+          `
+        contentContainer.innerHTML = tableHtml
+
+        // Dapatkan elemen-elemen baru
+        const dataTableContainer = document.getElementById('data-table-container')
+        const dataSearchInput = document.getElementById('data-search-input')
+        const dataPrevBtn = document.getElementById('data-prev-btn')
+        const dataNextBtn = document.getElementById('data-next-btn')
+        const dataPageInfo = document.getElementById('data-page-info')
+
+        let currentPage = 1
+        let totalPages = 1
+        let searchTerm = ''
+        const ITEMS_PER_PAGE = 10
+
+        // Fungsi untuk mengambil dan merender data tabel
+        const fetchAndRenderTableData = async () => {
+          dataTableContainer.innerHTML = `<p>Loading data...</p>`
+          try {
+            const dataEndpoint = `http://localhost:3333/api/${formConfig.table_name}?page=${currentPage}&limit=${ITEMS_PER_PAGE}&search=${searchTerm}`
+            const dataResponse = await fetch(dataEndpoint, {
+              headers: { Authorization: 'Bearer ' + localStorage.getItem('userToken') },
+            })
+            if (!dataResponse.ok) {
+              throw new Error('Gagal mengambil data.')
+            }
+            const resultData = await dataResponse.json()
+            const documents = resultData.data.documents
+
+            // Render tabel dengan data yang sudah difilter/dipaginasi
+            const renderedTable = createTableFromData(formConfig, documents)
+            dataTableContainer.innerHTML = renderedTable
+
+            // Perbarui kontrol paginasi
+            totalPages = resultData.data.totalPages
+            dataPrevBtn.disabled = currentPage === 1
+            dataNextBtn.disabled = currentPage >= totalPages
+            dataPageInfo.textContent = `Page ${currentPage} of ${totalPages}`
+          } catch (error) {
+            dataTableContainer.innerHTML = `<p style="color: red;">${error.message}</p>`
+            console.error('Error fetching table data:', error)
+          }
+        }
+
+        // Event listener untuk pencarian
+        dataSearchInput.addEventListener('input', () => {
+          searchTerm = dataSearchInput.value
+          currentPage = 1 // Kembali ke halaman pertama saat mencari
+          fetchAndRenderTableData()
+        })
+
+        // Event listener untuk paginasi
+        dataPrevBtn.addEventListener('click', () => {
+          if (currentPage > 1) {
+            currentPage--
+            fetchAndRenderTableData()
+          }
+        })
+
+        dataNextBtn.addEventListener('click', () => {
+          if (currentPage < totalPages) {
+            currentPage++
+            fetchAndRenderTableData()
+          }
+        })
+
+        // Event listener untuk tombol kembali
+        document.getElementById('back-to-grid-btn').addEventListener('click', () => {
+          contentContainer.innerHTML = `
+                  <p>Kelola konfigurasi form builder di sini. Gunakan pencarian untuk menemukan entri spesifik.</p>
+                  <div class="data-controls">
+                      <input type="text" id="search-input" placeholder="Cari...">
+                  </div>
+                  <div id="grid-container" class="grid-view">
+                      <p>Loading data...</p>
+                  </div>
+                  <div class="pagination" id="pagination-controls">
+                      <button id="prev-btn" disabled>Previous</button>
+                      <span id="page-info"></span>
+                      <button id="next-btn" disabled>Next</button>
+                  </div>
+              `
+          setupDataEntries()
+        })
+
+        // Panggil fungsi pertama kali untuk menampilkan data
+        fetchAndRenderTableData()
+      } else {
+        contentContainer.innerHTML = '<p style="color: red;">Konfigurasi form tidak ditemukan.</p>'
+      }
+    } catch (error) {
+      contentContainer.innerHTML = `<p style="color: red;">${error.message}</p>`
+      console.error('Error fetching form config:', error)
+    }
   }
 
   const updatePaginationControls = () => {
@@ -494,37 +793,43 @@ export const setupDataEntries = () => {
       }
 
       const formData = collectFormData(formConfig, form)
-      console.log('Submitting data:', formData)
+      await saveDynamicFormConfig(formConfig, formData)
+      // try {
+      //   const response = await fetch(`http://localhost:3333/configuration/formbuilder/submit`, {
+      //     method: 'POST',
+      //     headers: {
+      //       'Content-Type': 'application/json',
+      //       'Authorization': 'Bearer ' + localStorage.getItem('userToken'),
+      //     },
+      //     body: JSON.stringify(formData),
+      //   })
 
-      try {
-        const response = await fetch(`http://localhost:3333/configuration/formbuilder/submit`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer ' + localStorage.getItem('userToken'),
-          },
-          body: JSON.stringify(formData),
-        })
+      //   if (!response.ok) {
+      //     const errorData = await response.json()
+      //     throw new Error(errorData.message_en || 'Gagal mengirim data.')
+      //   }
 
-        if (!response.ok) {
-          const errorData = await response.json()
-          throw new Error(errorData.message_en || 'Gagal mengirim data.')
-        }
-
-        formMessageContainer.innerHTML = '<p style="color: green;">Data berhasil dikirim!</p>'
-        setTimeout(() => {
-          formPanel.classList.remove('open')
-          panelOverlay.classList.remove('open')
-          fetchData()
-        }, 2000)
-      } catch (error) {
-        formMessageContainer.innerHTML = `<p style="color: red;">${error.message}</p>`
-        console.error('Submit error:', error)
-      }
+      //   formMessageContainer.innerHTML = '<p style="color: green;">Data berhasil dikirim!</p>'
+      //   setTimeout(() => {
+      //     formPanel.classList.remove('open')
+      //     panelOverlay.classList.remove('open')
+      //     fetchData()
+      //   }, 2000)
+      // } catch (error) {
+      //   formMessageContainer.innerHTML = `<p style="color: red;">${error.message}</p>`
+      //   console.error('Submit error:', error)
+      // }
     })
     initializeChoicesJS(form)
     initializeAutofill(form, formConfig)
     // updateAllCalculatedFields(formConfig);
+  }
+
+  const saveDynamicFormConfig = async (formConfig, formData) => {
+    let mainTable = formConfig.table_name
+    let subTable = formConfig.subforms.filter((x) => x.table_name !== null).map((x) => x.table_name)
+    console.log(mainTable)
+    console.log(subTable)
   }
 
   const validateForm = (formConfig, form) => {
@@ -561,7 +866,6 @@ export const setupDataEntries = () => {
         subformRows.forEach((row) => {
           const rowData = {}
           subform.fields.forEach((subField) => {
-            console.log(subField)
             const el = row.querySelector(
               `[name="${subform.table_name}[]_${subField.name}_${row.dataset.rowid}"]`
             )

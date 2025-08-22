@@ -7,7 +7,7 @@ export const renderSidebar = () => {
   const moonIcon = '<i class="fa-solid fa-moon"></i>'
   const sunIcon = '<i class="fa-solid fa-sun"></i>'
   const leftIcon = '<i class="fa-solid fa-angles-left"></i>'
-  const rightIcon = '<i class="fa-solid fa-angles-right"></i>' 
+  const rightIcon = '<i class="fa-solid fa-angles-right"></i>'
 
   return `
         <aside class="sidebar">
@@ -39,7 +39,9 @@ export const setupSidebarEvents = () => {
         sidebar.classList.toggle('collapsed')
         document.body.classList.toggle('sidebar-collapsed')
         localStorage.setItem('darkMode', isCollapse)
-        toggleBtn.innerHTML = isCollapse ? '<i class="fa-solid fa-angles-left"></i>' : '<i class="fa-solid fa-angles-right"></i>'
+        toggleBtn.innerHTML = isCollapse
+          ? '<i class="fa-solid fa-angles-left"></i>'
+          : '<i class="fa-solid fa-angles-right"></i>'
       }
     })
   }

@@ -1,0 +1,331 @@
+/* CSS untuk tata letak 3 kolom */
+.container-formbuilder {
+    display: flex; /* Mengaktifkan Flexbox pada kontainer */
+    justify-content: space-between; /* Memberikan ruang yang sama di antara kolom */
+    /* Tambahkan variabel dark mode di sini */
+    color: var(--text-color);
+    transition: background-color var(--transition-speed), color var(--transition-speed);
+}
+
+.column-formbuilder {
+    padding: 20px;
+    box-sizing: border-box;
+    transition: border-color var(--transition-speed);
+    max-height: 60vh;
+    overflow-y: auto;
+}
+
+/* .toolbox-formbuilder, .properties-formbuilder {
+} */
+
+.toolbox-formbuilder {
+    width: 20%;
+    border-radius: var(--border-radius) 0 0 var(--border-radius);
+    background-color: var(--card-bg);
+    transition: background-color var(--transition-speed);
+}
+
+.properties-formbuilder {
+    width: 20%;
+    border-radius: 0 var(--border-radius) var(--border-radius) 0;
+    border-left: 1px solid var(--border-color); /* Menambahkan border kiri */
+}
+
+/* Toolbox Styling */
+#toolbox {
+    padding: 0;
+}
+
+.tool-group {
+    margin-bottom: 10px;
+}
+
+.tool-title {
+    font-weight: bold;
+    font-size: 1.1em;
+    margin-bottom: 10px;
+    cursor: pointer;
+    padding-bottom: 5px;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: var(--text-color);
+    transition: color var(--transition-speed), border-bottom-color var(--transition-speed);
+}
+
+.tool-title span {
+    transition: transform var(--transition-speed);
+}
+
+.tool-title.collapsed span {
+    transform: rotate(-90deg);
+}
+
+.tool-items-container {
+    transition: max-height var(--transition-speed) ease-out, opacity var(--transition-speed) ease;
+    overflow: hidden;
+    max-height: 500px;
+    opacity: 1;
+}
+
+.tool-items-container.collapsed {
+    max-height: 0;
+    opacity: 0;
+}
+
+.tool-item {
+    padding: 8px 12px;
+    background-color: var(--bg-color);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    margin-top: 8px;
+    cursor: pointer;
+    transition: background-color var(--transition-speed), border-color var(--transition-speed);
+    color: var(--text-color);
+}
+
+.tool-item:hover {
+    background-color: var(--hover-bg);
+}
+
+/* Pengaturan lebar spesifik untuk setiap kolom */
+.canvas-formbuilder {
+    width: 60%;
+}
+
+/* Style for dragged item in canvas */
+* {
+    box-sizing: border-box;
+    font-family: Inter,ui-sans-serif,system-ui,Segoe UI,Roboto,Helvetica,Arial;
+}
+
+#propsBody {
+    flex-grow: 1; /* Mengisi ruang yang tersedia */padding: 16px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+}
+
+#canvasWrap {
+    grid-area: canvas;
+    padding: 16px;
+    overflow: auto;
+    transition: background-color var(--transition-speed);
+}
+
+#canvas-column {
+    min-height: 480px;
+    border-radius: 14px;
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    transition: background-color var(--transition-speed), border-color var(--transition-speed);
+}
+
+.canvas-item {
+    background-color: var(--primary-color);
+    color: var(--light-text-color); /* Menggunakan light-text-color untuk kontras */
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: var(--border-radius);
+    transition: background-color var(--transition-speed), color var(--transition-speed);
+}
+
+.nested-form table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+    font-size: 14px;
+    color: var(--text-color);
+    transition: color var(--transition-speed);
+}
+
+.nested-form th, .nested-form td {
+    border: 1px solid var(--border-color);
+    padding: 6px 8px;
+    transition: border-color var(--transition-speed);
+}
+
+.nested-form th {
+    background: var(--hover-bg); /* Menggunakan hover-bg untuk header tabel */
+    transition: background var(--transition-speed);
+}
+
+.nested-form td {
+    background: var(--card-bg);
+    transition: background var(--transition-speed);
+}
+
+.hint {
+    color: var(--secondary-color); /* Menggunakan secondary-color */
+    font-size: 13px;
+    text-align: center;
+    margin: 24px 0;
+    transition: color var(--transition-speed);
+}
+
+.field {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 12px;
+    position: relative;
+    transition: background var(--transition-speed), border-color var(--transition-speed);
+}
+
+.field-header-formbuilder {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+}
+
+.field-badge-formbuilder {
+    font-size: 12px;
+    background: var(--primary-color); /* Menggunakan primary-color */
+    color: var(--light-text-color);
+    padding: 2px 8px;
+    border-radius: 999px;
+    transition: background var(--transition-speed), color var(--transition-speed);
+}
+
+.field-title-formbuilder {
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--text-color);
+    transition: color var(--transition-speed);
+}
+
+.field-children-formbuilder {
+    margin-top: 10px;
+    border: 1px dashed var(--border-color); /* Menggunakan border-color */
+    background: var(--bg-color); /* Menggunakan bg-color */
+    border-radius: 10px;
+    padding: 10px;
+    min-height: 42px;
+    transition: border-color var(--transition-speed), background var(--transition-speed);
+}
+
+.selected {
+    outline: 2px solid var(--primary-color);
+    transition: outline-color var(--transition-speed);
+}
+
+.props-section {
+    margin-bottom: 5px;
+}
+
+.props-section h3 {
+    font-size: 13px;
+    text-transform: uppercase;
+    color: var(--secondary-color);
+    margin: 0 0 8px;
+    transition: color var(--transition-speed);
+}
+
+.sortable-ghost {
+    opacity: .4;
+}
+
+.sortable-chosen {
+    transform: scale(.98);
+}
+
+/* Style tambahan untuk form-group */
+.form-group-formbuilder {
+    margin-bottom: 10px;
+}
+
+.form-group-formbuilder label {
+    display: block;
+    font-size: 13px;
+    margin-bottom: 6px;
+    color: var(--text-color); /* Menggunakan variabel CSS untuk dukungan dark mode */
+    transition: color var(--transition-speed);
+}
+
+.form-group-formbuilder input,
+.form-group-formbuilder select,
+.form-group-formbuilder textarea {
+    width: 100%;
+    padding: 8px 10px;
+    border-radius: 10px;
+    border: 1px solid var(--border-color);
+    background: var(--card-bg);
+    color: var(--text-color);
+    transition: border-color var(--transition-speed), background var(--transition-speed), color var(--transition-speed);
+}
+
+.row-formbuilder {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.btn-formbuilder {
+    appearance: none;
+    border: 1px solid var(--border-color);
+    background: var(--card-bg);
+    border-radius: 10px;
+    padding: 8px 10px;
+    cursor: pointer;
+    transition: background var(--transition-speed), border-color var(--transition-speed), color var(--transition-speed);
+}
+
+.btn-formbuilder.primary {
+    background: var(--primary-color);
+    color: var(--light-text-color);
+    border-color: transparent;
+}
+
+.btn-formbuilder.danger {
+    background: var(--danger-color);
+    color: var(--light-text-color);
+    border-color: transparent;
+}
+
+.btn-formbuilder.ghost {
+    background: var(--hover-bg);
+    color: var(--text-color);
+    border-color: transparent;
+}
+
+footer {
+    grid-area: footer;
+    border-top: 1px solid var(--border-color);
+    background: var(--card-bg);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 12px;
+    color: var(--text-color);
+    transition: border-top-color var(--transition-speed), background var(--transition-speed), color var(--transition-speed);
+}
+
+/* Keseluruhan scrollbar */
+.scroll-container::-webkit-scrollbar {
+    width: 12px;
+}
+
+/* Bagian track (jalur) dari scrollbar */
+.scroll-container::-webkit-scrollbar-track {
+    background: var(--bg-color);
+    border-radius: 10px;
+}
+
+/* Bagian thumb (jempol) yang bisa digeser */
+.scroll-container::-webkit-scrollbar-thumb {
+    background-color: var(--primary-color);
+    border-radius: 10px;
+    border: 3px solid var(--bg-color);
+    transition: background-color var(--transition-speed);
+}
+
+/* Gaya saat mouse di atas thumb */
+.scroll-container::-webkit-scrollbar-thumb:hover {
+    background-color: var(--hover-bg);
+}

@@ -3,15 +3,15 @@
   --primary-color: #5a7dff;
   --primary-color-dark: #4a6ddb;
   --text-color: #333;
-  --background-light: #f0f4f8;
-  --surface-light: #ffffff;
-  --shadow-color: rgba(0, 0, 0, 0.08);
+  --background-light: #d3d3d3;
+  --surface-light: #e7e9f0;
+  --shadow-color: rgba(151, 143, 143, 0.08);
 
   /* Dark Mode Variables */
   --text-color-dark: #e0e6f0;
   --background-dark: #1f2a40;
   --surface-dark: #293448;
-  --shadow-color-dark: rgba(0, 0, 0, 0.2);
+  --shadow-color-dark: rgba(0, 0, 0, 0.3);
 }
 
 body {
@@ -24,12 +24,34 @@ body {
     color 0.3s ease;
 }
 
+::-webkit-scrollbar {
+  width: 10px; /* Lebar scrollbar vertikal */
+  height: 10px; /* Tinggi scrollbar horizontal */
+}
+
+/* Scrollbar pada Light Mode (default) */
+::-webkit-scrollbar {
+  background-color: var(--background-light);
+}
+
+/* Styling thumb (bagian yang bisa digeser) */
+::-webkit-scrollbar-thumb {
+  background-color: var(--primary-color); /* Warna thumb */
+  border-radius: 10px; /* Sudut melengkung */
+  border: 2px solid var(--background-light); /* Jarak antar thumb dan track */
+}
+
 /* Dark Mode */
 body.dark-mode {
   --text-color: var(--text-color-dark);
   --background-light: var(--background-dark);
   --surface-light: var(--surface-dark);
   --shadow-color: var(--shadow-color-dark);
+}
+
+/* Efek saat thumb di-hover */
+::-webkit-scrollbar-thumb:hover {
+  background-color: var(--primary-color-dark); /* Warna saat di-hover */
 }
 
 /* Layout */
@@ -314,7 +336,8 @@ body.sidebar-collapsed .main-content {
   gap: 10px;
 }
 
-.icon-only-btn {
+.icon-only-btn,
+.icon-table-btn {
   background-color: transparent;
   border: 1px solid #ddd;
   border-radius: 8px;
@@ -327,7 +350,8 @@ body.sidebar-collapsed .main-content {
     border-color 0.2s ease;
 }
 
-.icon-only-btn:hover {
+.icon-only-btn:hover,
+.icon-table-btn:hover {
   background-color: var(--primary-color);
   color: white;
   border-color: var(--primary-color);
@@ -410,7 +434,7 @@ body.sidebar-collapsed .main-content {
 }
 
 .panel-body {
-  padding: 20px;
+  padding: 25px;
   overflow-y: auto;
 }
 
@@ -437,7 +461,7 @@ body.sidebar-collapsed .main-content {
 .dynamic-form-container label {
   display: block;
   font-weight: 500;
-  margin-bottom: 8px;
+  margin: 8px;
 }
 
 .dynamic-form-container input,
@@ -475,14 +499,13 @@ body.sidebar-collapsed .main-content {
   background-color: var(--primary-color-dark);
 }
 /* Styling Choices.js baru berdasarkan classNames yang diberikan */
-
 /* Kontainer utama Choices.js */
 .choices {
   font-family: 'Poppins', sans-serif;
   position: relative;
   margin-bottom: 20px;
   font-size: 1rem;
-  width: 100%; /* Pastikan lebar 100% dari elemen induk */
+  width: 100%;
 }
 
 /* Input container, border, dan padding */
@@ -497,6 +520,7 @@ body.sidebar-collapsed .main-content {
   transition: all 0.3s ease;
 }
 
+/* Dark Mode untuk inner container */
 body.dark-mode .choices__inner {
   background-color: var(--surface-dark);
   border-color: #4a5c7a;
@@ -504,7 +528,7 @@ body.dark-mode .choices__inner {
 
 /* Input text field yang dikloning */
 .choices__input--cloned {
-  color: var(--text-color);
+  color: var(--text-color-dark);
   background-color: transparent;
   border: none;
   padding: 0;
@@ -512,22 +536,50 @@ body.dark-mode .choices__inner {
   width: 100%;
 }
 
+/* Dark Mode untuk input text */
+body.dark-mode .choices__input--cloned {
+  color: var(--text-color-dark);
+}
+
 /* Dropdown list container */
 .choices__list--dropdown {
   position: absolute;
-  width: 100%; /* Penting: Mengatasi masalah overflow */
+  width: 100%;
   background-color: var(--surface-light);
   border: 1px solid var(--primary-color);
   border-top: none;
-  border-radius: 0 0 8px 8px; /* Sudut rounded di bagian bawah */
+  border-radius: 0 0 8px 8px;
   box-shadow: 0 8px 15px var(--shadow-color);
   z-index: 1000;
   margin-top: -1px;
 }
 
+/* Khusus untuk dropdown Choices.js */
+.choices__list--dropdown {
+  /* ... styling dropdown Anda yang sudah ada ... */
+  overflow-y: auto; /* Memastikan scrollbar muncul saat kontennya melebihi tinggi */
+  max-height: 200px; /* Batasi tinggi dropdown */
+}
+
+.choices__list--dropdown::-webkit-scrollbar {
+  width: 8px; /* Atur lebar scrollbar khusus untuk dropdown */
+}
+
+.choices__list--dropdown::-webkit-scrollbar-thumb {
+  background-color: var(--primary-color);
+  border-radius: 8px;
+  border: 2px solid var(--surface-light);
+}
+
+body.dark-mode .choices__list--dropdown::-webkit-scrollbar-thumb {
+  background-color: var(--primary-color-dark);
+  border: 2px solid var(--surface-dark);
+}
+
+/* Dark Mode untuk dropdown */
 body.dark-mode .choices__list--dropdown {
   background-color: var(--surface-dark);
-  border-color: #4a5c7a;
+  border-color: var(--primary-color-dark);
   box-shadow: 0 8px 15px var(--shadow-color-dark);
 }
 
@@ -535,14 +587,22 @@ body.dark-mode .choices__list--dropdown {
 .choices__item--selectable {
   padding: 12px 14px;
   font-size: 1rem;
-  color: var(--text-color); /* Warna teks agar kontras */
-  transition: background-color 0.2s ease, color 0.2s ease;
+  color: var(--text-color);
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
+}
+
+/* Dark Mode untuk item yang bisa dipilih */
+body.dark-mode .choices__item--selectable {
+  /* background-color: var(--primary-color-dark); */
+  color: var(--shadow-color-dark);
 }
 
 /* Item yang sedang di-highlight (di-hover atau di-fokus) */
 .choices__item--selectable.is-highlighted {
   background-color: var(--primary-color);
-  color: white; /* Teks menjadi putih agar kontras */
+  color: var(--shadow-color-dark);
 }
 
 /* Teks yang dipilih pada single select */
@@ -551,6 +611,11 @@ body.dark-mode .choices__list--dropdown {
   padding: 0;
   display: flex;
   align-items: center;
+}
+
+/* Dark Mode untuk teks single select */
+body.dark-mode .choices__list--single .choices__item {
+  color: var(--text-color-dark);
 }
 
 /* Placeholder text */
@@ -575,7 +640,7 @@ body.dark-mode .choices__list--dropdown {
 }
 
 /* Styling panah dropdown */
-.choices[data-type*="select-one"]::after {
+.choices[data-type*='select-one']::after {
   content: '';
   height: 0;
   width: 0;
@@ -586,9 +651,13 @@ body.dark-mode .choices__list--dropdown {
   right: 18px;
   top: 50%;
   transform: translateY(-50%);
-  margin-top: -2.5px;
   pointer-events: none;
   transition: transform 0.3s ease;
+}
+
+/* Dark Mode untuk panah dropdown */
+body.dark-mode .choices[data-type*='select-one']::after {
+  border-color: var(--text-color-dark) transparent transparent transparent;
 }
 
 .choices.is-open::after {
@@ -600,6 +669,13 @@ body.dark-mode .choices__list--dropdown {
 .choices.is-open .choices__inner {
   border-color: var(--primary-color);
   box-shadow: 0 0 0 3px rgba(90, 125, 255, 0.2);
+}
+
+/* Dark Mode untuk state fokus/terbuka */
+body.dark-mode .choices.is-focused .choices__inner,
+body.dark-mode .choices.is-open .choices__inner {
+  border-color: var(--primary-color-dark);
+  box-shadow: 0 0 0 3px rgba(74, 109, 219, 0.2);
 }
 
 /* Perbaikan border-radius saat terbuka */

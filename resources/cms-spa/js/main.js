@@ -16,7 +16,8 @@ const sidebarNavLinks = document.querySelectorAll('.sidebar-nav a')
 const themeToggle = document.getElementById('theme-toggle')
 const sidebarToggleBtn = document.getElementById('sidebar-toggle-btn')
 const loadingOverlay = document.getElementById('loadingOverlay')
-
+const errorMessage = document.getElementById('error-message')
+const successMessage = document.getElementById('success-message')
 // --- Loading Overlay Functions ---
 export function showLoadingOverlay() {
   loadingOverlay.classList.add('show')

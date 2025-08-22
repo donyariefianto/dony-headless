@@ -33,10 +33,13 @@
       referrerpolicy="no-referrer"
     />
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
   </head>
   <body>
-    <div class="app-container">
+    <div class="app-container"> 
       <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">
           <h3>
@@ -140,7 +143,12 @@
       <div class="side-panel-content" id="sidePanelContent">
       </div>
     </div>
-
+    <div id="notification-area">
+      <div id="error-message" class="notification error" style="display: none;">
+      </div>
+      <div id="success-message" class="notification success" style="display: none;">
+      </div>
+    </div>
     <script type="module" src="/resources/cms-spa/js/main.js">
       
     </script>
