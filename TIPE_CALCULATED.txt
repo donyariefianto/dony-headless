@@ -1,0 +1,156 @@
+[
+    {
+        "id": "lb9o8y0ji9a",
+        "label": "Transaksi",
+        "name": "group_n4485",
+        "type": "group",
+        "width": "1/1",
+        "required": false,
+        "defaultValue": "",
+        "children": [
+            {
+                "id": "vyn58yjtr6e",
+                "label": "Pelanggan",
+                "name": "relation_d507y",
+                "type": "relation",
+                "width": "1/1",
+                "required": true,
+                "defaultValue": "",
+                "options": [],
+                "relation": {
+                    "targetTable": "",
+                    "foreignKey": "",
+                    "type": "one-to-one",
+                    "sourceTable": "pelanggan",
+                    "labelField": "nama",
+                    "valueField": "_id",
+                    "allowSearch": true
+                }
+            },
+            {
+                "id": "fxwhngl0cr",
+                "label": "Total",
+                "name": "calculated_8cvlm",
+                "type": "calculated",
+                "width": "1/1",
+                "required": false,
+                "defaultValue": "",
+                "calculated": {
+                    "formula": "",
+                    "dependencies": []
+                }
+            },
+            {
+                "id": "tca4ko09h4",
+                "label": "Items",
+                "name": "group_9i1r8",
+                "type": "group",
+                "width": "1/1",
+                "required": false,
+                "defaultValue": "",
+                "children": [
+                    {
+                        "id": "cbxy535xb7g",
+                        "label": "Harga",
+                        "name": "harga",
+                        "type": "number",
+                        "width": "1/1",
+                        "required": false,
+                        "defaultValue": ""
+                    },
+                    {
+                        "id": "uvjhhgu9dc",
+                        "label": "Nama",
+                        "name": "nama",
+                        "type": "text",
+                        "width": "1/1",
+                        "required": false,
+                        "defaultValue": ""
+                    }
+                ],
+                "collection": "detail_transaksi",
+                "isRepeatable": true
+            }
+        ],
+        "collection": "",
+        "isRepeatable": false
+    }
+]
+
+Konfigurasi yang Anda berikan adalah skema JSON untuk form builder, dan Anda ingin tahu bagaimana cara membuat formula untuk field bertipe calculated (calculated_8cvlm) yang bisa menghitung total dari field harga di dalam nested group yang repeatable (group_9i1r8).
+
+Solusinya adalah menggunakan notasi titik (.) untuk mereferensikan field di dalam nested group dan menggunakan fungsi agregat seperti SUM atau AVG yang dapat bekerja pada group yang bisa diulang.
+
+Menentukan Formula
+Untuk menghitung total harga dari semua item di dalam grup Items, Anda perlu menargetkan field harga yang berada di dalam grup group_9i1r8.
+
+Formula untuk calculated_8cvlm akan terlihat seperti ini:
+
+JavaScript
+
+// Formula untuk menghitung total harga dari group "Items"
+SUM(group_9i1r8.harga)
+Mari kita pecah formula ini:
+
+SUM(): Ini adalah fungsi agregat yang akan menjumlahkan semua nilai.
+
+group_9i1r8: Ini adalah nama (name) dari grup repeatable (Items).
+
+.harga: Ini adalah nama dari field yang ingin dijumlahkan, yang berada di dalam grup group_9i1r8.
+
+Jadi, formula SUM(group_9i1r8.harga) secara efektif akan melakukan iterasi pada setiap instance dari grup Items dan menjumlahkan nilai dari field harga di dalamnya.
+
+Cara Menangani Perhitungan di JavaScript
+Dalam logika JavaScript Anda, saat nilai harga pada salah satu item berubah, Anda harus memicu perhitungan ulang. Anda dapat membuat fungsi rekursif yang dapat menelusuri struktur JSON Anda.
+
+Berikut adalah pendekatan logis untuk implementasinya:
+
+Dengarkan Perubahan: Pasang event listener pada semua input harga. Setiap kali nilai berubah, panggil fungsi perhitungan.
+
+Identifikasi Formula: Ambil formula dari field calculated_8cvlm.
+
+Parser Formula: Buat fungsi parser yang dapat menginterpretasi formula seperti SUM(group_9i1r8.harga).
+
+Menelusuri Tree JSON: Gunakan fungsi rekursif untuk menemukan grup yang ditargetkan (group_9i1r8).
+
+Iterasi dan Agregasi: Setelah grup ditemukan, karena properti isRepeatable-nya adalah true, Anda perlu mengiterasi setiap instance (baris) dari grup tersebut.
+
+Jumlahkan Nilai: Untuk setiap baris, ambil nilai dari field harga dan tambahkan ke dalam total.
+
+Perbarui Hasil: Setelah perhitungan selesai, masukkan nilai total ke dalam input untuk field calculated_8cvlm.
+
+Contoh Pseudocode untuk Logika Perhitungan
+JavaScript
+
+function recalculateTotal() {
+    // Dapatkan data form dari DOM atau state
+    const formData = getFormData(); // Fungsi untuk mengambil nilai dari form
+
+    // Temukan field 'Total' (calculated_8cvlm)
+    const totalField = findFieldByName(formData, 'calculated_8cvlm');
+
+    // Dapatkan formulanya
+    const formula = totalField.calculated.formula; // Yaitu "SUM(group_9i1r8.harga)"
+
+    // Dapatkan nama grup yang ditargetkan dari formula
+    const targetGroupName = 'group_9i1r8'; 
+
+    // Temukan grup yang ditargetkan dalam struktur data
+    const itemGroup = findGroupByName(formData, targetGroupName);
+
+    if (itemGroup && itemGroup.isRepeatable) {
+        let sum = 0;
+        
+        // Iterasi pada setiap instance dari grup yang bisa diulang
+        itemGroup.instances.forEach(itemInstance => {
+            const harga = findFieldByName(itemInstance.children, 'harga');
+            if (harga && typeof harga.value === 'number') {
+                sum += harga.value;
+            }
+        });
+        
+        // Perbarui nilai field Total
+        totalField.value = sum;
+    }
+}
+Dengan pendekatan ini, Anda bisa secara efektif mengelola dan menghitung nilai dari field yang berada di dalam nested group yang berulang.
