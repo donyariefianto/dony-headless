@@ -10,7 +10,7 @@
 import router from '@adonisjs/core/services/router'
 import { middleware } from '#start/kernel'
 
-router.get('/', '#controllers/settings_controller.UIdash')
+router.get('/', '#controllers/settings_controller.UIdashV2')
 router.get('/login', '#controllers/settings_controller.AuthenticationUI')
 
 router
