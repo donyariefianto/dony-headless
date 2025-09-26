@@ -8,10 +8,10 @@ import {
 } from '../main.js'
 
 // ===== Utilities =====
-const uid = () => Math.random().toString(36).slice(2);
-const $ = (sel, ctx = document) => ctx.querySelector(sel);
+const uid = () => Math.random().toString(36).slice(2)
+const $ = (sel, ctx = document) => ctx.querySelector(sel)
 const $$ = (sel, ctx = document) => Array.from(ctx.querySelectorAll(sel))
-let selectedEl = null;
+let selectedEl = null
 
 /**
  * Merender form generator.
@@ -23,8 +23,8 @@ const renderFormGenerator = (formdata, container) => {
       <div class="table-controls">
         <div class="search-box"><h2>Buat Formulir</h2></div>
         <div class="right-controls">
-          <button id="btnClear" class="btn danger">Hapus Semua</button>
-          <button id="btnExport" class="btn ghost">Simpan</button>
+          <button id="btnClear" class="btn danger">Clear All Feild</button>
+          <button id="btnExport" class="btn ghost">Save Form</button>
         </div>
       </div>
       <div class="container-formbuilder">
@@ -77,8 +77,8 @@ const renderFormGenerator = (formdata, container) => {
         </div>
       </div>
     </div>
-  ` 
-  attachFormGeneratorEventListeners() 
+  `
+  attachFormGeneratorEventListeners()
 }
 
 const fetchFormById = async (formId) => {
@@ -103,288 +103,329 @@ const fetchFormById = async (formId) => {
 
 function attachFormGeneratorEventListeners() {
   // --- Logic untuk Collapse Toolbox (sama seperti sebelumnya) ---
-  const toolTitles = document.querySelectorAll('.tool-title');
-  toolTitles.forEach(title => {
-    const container = title.nextElementSibling;
+  const toolTitles = document.querySelectorAll('.tool-title')
+  toolTitles.forEach((title) => {
+    const container = title.nextElementSibling
     // auto collapsed saat load
-    title.classList.add('collapsed');
-    container.classList.add('collapsed');
+    title.classList.add('collapsed')
+    container.classList.add('collapsed')
 
     // toggle saat diklik
-    title.addEventListener('click', function() {
-      this.classList.toggle('collapsed');
-      container.classList.toggle('collapsed');
-    });
-  });
+    title.addEventListener('click', function () {
+      this.classList.toggle('collapsed')
+      container.classList.toggle('collapsed')
+    })
+  })
 
   // --- Logic Drag-and-Drop dengan Sortable.js ---
-  const canvas = document.getElementById('canvas-column');
-  const toolboxContainers = document.querySelectorAll('.tool-items-container');
+  const canvas = document.getElementById('canvas-column')
+  const toolboxContainers = document.querySelectorAll('.tool-items-container')
   // Toolbox: clone only
-  
-  // Menginisialisasi Sortable untuk setiap kontainer toolbox
-  toolboxContainers.forEach(container => {
-      new Sortable(container, {
-          group: {
-            name: 'shared',
-            pull: 'clone',
-            put: false
-          },
-          sort: false,
-          animation: 150
-      });
-  });
-  canvas.addEventListener("click", () => selectField(null));
-  canvas.addEventListener("dragover", () => {
-    $(".hint", canvas)?.remove();
-  });
-  canvas.addEventListener("click", e => {
-    const f = e.target.closest(".field");
-    if (f) selectField(f);
-  });
-  // Menginisialisasi Sortable untuk canvas
-  // new Sortable(canvas, {
-  //     group: 'shared',
-  //     animation: 150,
-  //     onAdd: function (evt) {
-  //         // evt.item adalah elemen yang baru saja ditambahkan oleh Sortable
-  //         const newlyAddedElement = evt.item;
-  //         const dataType = newlyAddedElement.dataset.type;
 
-  //         // Membuat elemen baru yang akan menggantikan elemen bawaan Sortable
-  //         const newItem = document.createElement('div');
-  //         newItem.textContent = `${dataType.charAt(0).toUpperCase() + dataType.slice(1)} Item`;
-  //         newItem.classList.add('tool-item');
-  //         newItem.classList.add('canvas-item');
-          
-  //         // Mengganti elemen bawaan Sortable dengan elemen kustom kita
-  //         evt.to.replaceChild(newItem, newlyAddedElement);
-  //     }
-  // });
-  makeCanvasSortable(canvas);
-  btnExport.addEventListener('click', () => {
-    console.log(buildSchema(canvas));
+  // Menginisialisasi Sortable untuk setiap kontainer toolbox
+  toolboxContainers.forEach((container) => {
+    new Sortable(container, {
+      group: {
+        name: 'shared',
+        pull: 'clone',
+        put: false,
+      },
+      sort: false,
+      animation: 150,
+    })
+  })
+  canvas.addEventListener('click', () => selectField(null))
+  canvas.addEventListener('dragover', () => {
+    $('.hint', canvas)?.remove()
+  })
+  canvas.addEventListener('click', (e) => {
+    const f = e.target.closest('.field')
+    if (f) selectField(f)
+  })
+  makeCanvasSortable(canvas)
+  btnExport.addEventListener('click', async () => {
+    const currentTheme = localStorage.getItem('theme')
+    let config_swal = {
+      title: 'Submit your formbuilder name',
+      input: 'text',
+      inputAttributes: {
+        autocapitalize: 'on',
+      },
+      showCancelButton: true,
+      confirmButtonText: 'Save',
+      showLoaderOnConfirm: true,
+      preConfirm: async (name) => {
+        try {
+          if (!name) {
+            Swal.showValidationMessage(`
+              Request failed: formbuilder name is required`)
+          }
+          let schema = buildSchema(canvas),
+            url_data = `${BASE_API_URL}/configuration/formbuilder/create`
+          const response = await fetch(url_data, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              data: {
+                name: name.charAt(0).toUpperCase() + name.substr(1).toLowerCase(),
+                slug: name,
+                fields: schema,
+              },
+            }),
+          })
+          return await response.json()
+        } catch (error) {
+          Swal.showValidationMessage(`
+            Request failed: ${error}
+          `)
+        }
+      },
+      allowOutsideClick: () => !Swal.isLoading(),
+    }
+    if (currentTheme === 'dark-mode') {
+      config_swal.theme = 'dark'
+    }
+    Swal.fire(config_swal).then((result) => {
+      if (result.isConfirmed) {
+        Swal.fire({
+          title: `Formulir berhasil disimpan.`,
+          // imageUrl: result.value.avatar_url
+        })
+      }
+    })
   })
   btnClear.addEventListener('click', () => {
     if (confirm('Apakah Anda yakin ingin menghapus semua field?')) {
-      canvas.innerHTML = '';
-      selectField(null,canvas);
+      canvas.innerHTML = ''
+      selectField(null, canvas)
     }
-  });
+  })
 }
 
 function buildSchema(container) {
-  const arr = [];
-  $$(".field", container).forEach(el => {
-    if (el.parentElement !== container) return;
-    const d = el.dataset;
+  const arr = []
+  $$('.field', container).forEach((el) => {
+    if (el.parentElement !== container) return
+    const d = el.dataset
     const obj = {
       id: d.id,
-      label: d.label || "",
-      name: d.name || "",
+      label: d.label || '',
+      name: d.name || '',
       type: d.type,
-      width: d.width || "1/1",
-      required: d.required === "true",
-      defaultValue: d.defaultValue || ""
-    };
-    if (d.type === "select" || d.type === "radio" || d.type === "relation") {
-      obj.options = JSON.parse(d.options || "[]");
+      width: d.width || '1/1',
+      required: d.required === 'true',
+      defaultValue: d.defaultValue || '',
     }
-    if (d.type === "relation") {
+    if (d.type === 'select' || d.type === 'radio' || d.type === 'relation') {
+      obj.options = JSON.parse(d.options || '[]')
+    }
+    if (d.type === 'relation') {
       obj.relation = {
-        targetTable: d.targetTable || "",
-        foreignKey: d.foreignKey || "",
-        type: d.relationType || "one-to-one",
-        sourceTable: d.sourceTable || "",
-        labelField: d.labelField || "",
-        valueField: d.valueField || "",
-        allowSearch: d.allowSearch === "true"
-      };
-    }
-    if (d.type === "group") {
-      const childWrap = $(".field-children-formbuilder", el);
-      obj.children = childWrap ? buildSchema(childWrap) : [];
-      if (d.type === "group") { // <-- Tambahkan blok ini
-          obj.collection = d.collection || "";
-          obj.isRepeatable = d.isRepeatable === "true";
+        targetTable: d.targetTable || '',
+        foreignKey: d.foreignKey || '',
+        type: d.relationType || 'one-to-one',
+        sourceTable: d.sourceTable || '',
+        labelField: d.labelField || '',
+        valueField: d.valueField || '',
+        allowSearch: d.allowSearch === 'true',
       }
     }
-    if (d.type === "calculated") {
+    if (d.type === 'group') {
+      const childWrap = $('.field-children-formbuilder', el)
+      obj.children = childWrap ? buildSchema(childWrap) : []
+      if (d.type === 'group') {
+        // <-- Tambahkan blok ini
+        obj.collection = d.collection || ''
+        obj.isRepeatable = d.isRepeatable === 'true'
+      }
+    }
+    if (d.type === 'calculated') {
       obj.calculated = {
-        formula: d.formula || "",
-        dependencies: (d.dependencies || "").split(",").map(s => s.trim()).filter(Boolean)
-      };
+        formula: d.formula || '',
+        dependencies: (d.dependencies || '')
+          .split(',')
+          .map((s) => s.trim())
+          .filter(Boolean),
+      }
     }
-    if (d.type === "autofill") {
+    if (d.type === 'autofill') {
       obj.autofill = {
-        sourceField: d.sourceField || "",
-        mode: d.autofillMode || "copy-label",
-        mapRules: JSON.parse(d.mapRules || "[]")
-      };
+        sourceField: d.sourceField || '',
+        mode: d.autofillMode || 'copy-label',
+        mapRules: JSON.parse(d.mapRules || '[]'),
+      }
     }
-    arr.push(obj);
-  });
-  return arr;
+    arr.push(obj)
+  })
+  return arr
 }
 
 function makeCanvasSortable(canvas) {
   Sortable.create(canvas, {
     group: {
-      name: "form",
+      name: 'form',
       pull: true,
-      put: true
+      put: true,
     },
     animation: 150,
     handle: undefined,
-    ghostClass: "sortable-ghost",
+    ghostClass: 'sortable-ghost',
     onAdd: function (evt) {
-      const type = evt.item.dataset.type;
+      const type = evt.item.dataset.type
       if (type) {
-        const newField = buildFieldElement(createFieldData(type));
-        evt.item.replaceWith(newField);
-        bindField(newField);
+        const newField = buildFieldElement(createFieldData(type))
+        evt.item.replaceWith(newField)
+        bindField(newField)
       } else {
-        bindField(evt.item,canvas);
+        bindField(evt.item, canvas)
       }
-    }
-  });
+    },
+  })
 }
 
 function createFieldData(type) {
   const base = {
     id: uid(),
     label: `${type[0].toUpperCase() + type.slice(1)} Field`,
-    name: type + "_" + uid().slice(0, 5),
+    name: type + '_' + uid().slice(0, 5),
     type: type,
-    width: "1/1",
+    width: '1/1',
     required: false,
-    defaultValue: ""
-  };
-  if (type === "relation") {
-    base.targetTable = "";
-    base.foreignKey = "";
-    base.relationType = "one-to-one";
-    base.options = JSON.stringify([]); // start empty for relational select
+    defaultValue: '',
+  }
+  if (type === 'relation') {
+    base.targetTable = ''
+    base.foreignKey = ''
+    base.relationType = 'one-to-one'
+    base.options = JSON.stringify([]) // start empty for relational select
     // new relational-specific props
-    base.sourceTable = "";
-    base.labelField = "";
-    base.valueField = "";
-    base.allowSearch = "false";
+    base.sourceTable = ''
+    base.labelField = ''
+    base.valueField = ''
+    base.allowSearch = 'false'
   }
-  if (type === "select" || type === "radio") {
-    base.options = JSON.stringify([ "Option 1", "Option 2" ]);
+  if (type === 'select' || type === 'radio') {
+    base.options = JSON.stringify(['Option 1', 'Option 2'])
   }
-  if (type === "group") {
-    base.expanded = true;
-    base.isRepeatable = false;
-    base.collection = ""; // collection target
+  if (type === 'group') {
+    base.expanded = true
+    base.isRepeatable = false
+    base.collection = '' // collection target
   }
-  if (type === "calculated") {
-    base.formula = "";
-    base.dependencies = ""; // comma separated names
-    base.readonly = true;
+  if (type === 'calculated') {
+    base.formula = ''
+    base.dependencies = '' // comma separated names
+    base.readonly = true
   }
-  if (type === "autofill") {
-    base.sourceField = "";
-    base.autofillMode = "copy-label"; // copy-label | copy-value | map
-    base.mapRules = JSON.stringify([]); // [[fromValue, toText], ...]
-    base.readonly = true;
+  if (type === 'autofill') {
+    base.sourceField = ''
+    base.autofillMode = 'copy-label' // copy-label | copy-value | map
+    base.mapRules = JSON.stringify([]) // [[fromValue, toText], ...]
+    base.readonly = true
   }
-  return base;
+  return base
 }
 
 function buildFieldElement(data) {
-  const el = document.createElement("div");
-  el.className = "field";
-  Object.entries(data).forEach(([ k, v ]) => el.dataset[k] = Array.isArray(v) ? JSON.stringify(v) : v);
-  const header = document.createElement("div");
-  header.className = "field-header-formbuilder";
-  const title = document.createElement("div");
-  title.className = "field-title-formbuilder";
-  title.textContent = data.label;
-  const badge = document.createElement("span");
-  badge.className = "field-badge-formbuilder";
-  badge.textContent = data.type;
-  header.append(title, badge);
-  el.appendChild(header);
-  if (data.type === "group") {
-    const children = document.createElement("div");
-    children.className = "field-children-formbuilder";
-    children.textContent = "Drop fields here";
-    el.appendChild(children);
-    makeCanvasSortable(children);
+  const el = document.createElement('div')
+  el.className = 'field'
+  Object.entries(data).forEach(
+    ([k, v]) => (el.dataset[k] = Array.isArray(v) ? JSON.stringify(v) : v)
+  )
+  const header = document.createElement('div')
+  header.className = 'field-header-formbuilder'
+  const title = document.createElement('div')
+  title.className = 'field-title-formbuilder'
+  title.textContent = data.label
+  const badge = document.createElement('span')
+  badge.className = 'field-badge-formbuilder'
+  badge.textContent = data.type
+  header.append(title, badge)
+  el.appendChild(header)
+  if (data.type === 'group') {
+    const children = document.createElement('div')
+    children.className = 'field-children-formbuilder'
+    children.textContent = 'Drop fields here'
+    el.appendChild(children)
+    makeCanvasSortable(children)
   }
-  return el;
+  return el
 }
 
 function bindField(el) {
-  el.onclick = e => {
-    if (!el.isConnected) return;
-    if (!el.classList.contains("field")) return;
-  };
-  el.addEventListener("click", e => {
-    e.stopPropagation();
-    selectField(el);
-  });
+  el.onclick = (e) => {
+    if (!el.isConnected) return
+    if (!el.classList.contains('field')) return
+  }
+  el.addEventListener('click', (e) => {
+    e.stopPropagation()
+    selectField(el)
+  })
 }
 
 // ===== Canvas interactions =====
-function selectField(el,canvas) {
-  $$(".field", canvas).forEach(n => n.classList.remove("selected"));
-  selectedEl = el;
+function selectField(el, canvas) {
+  $$('.field', canvas).forEach((n) => n.classList.remove('selected'))
+  selectedEl = el
   if (el) {
-    el.classList.add("selected");
-    renderProps(el,canvas);
+    el.classList.add('selected')
+    renderProps(el, canvas)
   } else {
-    $("#propsBody").innerHTML = "Pilih field di canvas untuk mengedit.";
+    $('#propsBody').innerHTML = 'Pilih field di canvas untuk mengedit.'
   }
 }
 
-function optionsOfFields(predicate,canvas) {
-  const names = [];
-  $$(".field", canvas).forEach(el => {
-    const d = el.dataset;
-    if (predicate(d)) names.push({
-      name: d.name,
-      label: d.label,
-      type: d.type
-    });
-  });
-  return names;
+function optionsOfFields(predicate, canvas) {
+  const names = []
+  $$('.field', canvas).forEach((el) => {
+    const d = el.dataset
+    if (predicate(d))
+      names.push({
+        name: d.name,
+        label: d.label,
+        type: d.type,
+      })
+  })
+  return names
 }
 
-function renderProps(el,canvas) {
-  const d = el.dataset;
-  const isChoice = d.type === "select" || d.type === "radio";
-  const isRel = d.type === "relation";
-  const isCalc = d.type === "calculated";
-  const isAuto = d.type === "autofill";
-  const relationFieldOptions = optionsOfFields(dd => dd.type === "relation" || dd.type === "select",canvas);
-  const isGroup = d.type === "group"; 
-  $("#propsBody").innerHTML = `
+function renderProps(el, canvas) {
+  const d = el.dataset
+  const isChoice = d.type === 'select' || d.type === 'radio'
+  const isRel = d.type === 'relation'
+  const isCalc = d.type === 'calculated'
+  const isAuto = d.type === 'autofill'
+  const relationFieldOptions = optionsOfFields(
+    (dd) => dd.type === 'relation' || dd.type === 'select',
+    canvas
+  )
+  const isGroup = d.type === 'group'
+  $('#propsBody').innerHTML = `
     <div class="props-section">
       <div class="row-fomrbuilder">
         <div class="form-group-formbuilder">
           <label>Label</label>
-          <input id="pLabel" type="text" value="${d.label || ""}">
+          <input id="pLabel" type="text" value="${d.label || ''}">
         </div>
         <div class="form-group-formbuilder">
           <label>Field Name</label>
-          <input id="pName" type="text" value="${d.name || ""}">
+          <input id="pName" type="text" value="${d.name || ''}">
         </div>
       </div>
       <div class="row-fomrbuilder">
         <div class="form-group-formbuilder">
           <label>Type</label>
           <select id="pType">
-            ${[ "text", "number", "date", "email", "password", "textarea", "select", "radio", "checkbox", "switch", "file", "relation", "group", "calculated", "autofill", "nested" ].map(t => `<option value="${t}" ${d.type === t ? "selected" : ""}>${t}</option>`).join("")}
+            ${['text', 'number', 'date', 'email', 'password', 'textarea', 'select', 'radio', 'checkbox', 'switch', 'file', 'relation', 'group', 'calculated', 'autofill', 'nested'].map((t) => `<option value="${t}" ${d.type === t ? 'selected' : ''}>${t}</option>`).join('')}
           </select>
         </div>
         <div class="form-group-formbuilder">
           <label>Display Width</label>
           <select id="pWidth">
-            <option value="1/1" ${d.width === "1/1" ? "selected" : ""}>1/1 (Full)</option>
-            <option value="1/2" ${d.width === "1/2" ? "selected" : ""}>1/2 (Half)</option>
+            <option value="1/1" ${d.width === '1/1' ? 'selected' : ''}>1/1 (Full)</option>
+            <option value="1/2" ${d.width === '1/2' ? 'selected' : ''}>1/2 (Half)</option>
           </select>
         </div>
       </div>
@@ -392,168 +433,208 @@ function renderProps(el,canvas) {
         <div class="form-group-formbuilder">
           <label>Required</label>
           <select id="pRequired">
-            <option value="false" ${d.required !== "true" ? "selected" : ""}>No</option>
-            <option value="true" ${d.required === "true" ? "selected" : ""}>Yes</option>
+            <option value="false" ${d.required !== 'true' ? 'selected' : ''}>No</option>
+            <option value="true" ${d.required === 'true' ? 'selected' : ''}>Yes</option>
           </select>
         </div>
         <div class="form-group-formbuilder">
           <label>Default Value</label>
-          <input id="pDefault" type="text" value="${d.defaultValue || ""}">
+          <input id="pDefault" type="text" value="${d.defaultValue || ''}">
         </div>
       </div>
     </div>
 
-    ${isChoice ? `
+    ${
+      isChoice
+        ? `
     <div class="props-section">
       <h3>Options</h3>
       <div class="form-group-formbuilder">
         <label>List (pisahkan dengan koma)</label>
-        <input id="pOptions" type="text" value="${JSON.parse(d.options || "[]").join(", ")}">
+        <input id="pOptions" type="text" value="${JSON.parse(d.options || '[]').join(', ')}">
       </div>
-    </div>` : ""}
+    </div>`
+        : ''
+    }
 
-    ${isRel ? `
+    ${
+      isRel
+        ? `
     <div class="props-section">
       <h3>Relation</h3>
-      <div class="form-group-formbuilder"><label>Source Table</label><input id="pSourceTable" type="text" value="${d.sourceTable || ""}"></div>
-      <div class="form-group-formbuilder"><label>Label Field</label><input id="pLabelField" type="text" value="${d.labelField || ""}"></div>
-      <div class="form-group-formbuilder"><label>Value Field</label><input id="pValueField" type="text" value="${d.valueField || ""}"></div>
+      <div class="form-group-formbuilder"><label>Source Table</label><input id="pSourceTable" type="text" value="${d.sourceTable || ''}"></div>
+      <div class="form-group-formbuilder"><label>Label Field</label><input id="pLabelField" type="text" value="${d.labelField || ''}"></div>
+      <div class="form-group-formbuilder"><label>Value Field</label><input id="pValueField" type="text" value="${d.valueField || ''}"></div>
       <div class="form-group-formbuilder"><label>Allow Search</label>
         <select id="pAllowSearch">
-          <option value="false" ${d.allowSearch !== "true" ? "selected" : ""}>No</option>
-          <option value="true" ${d.allowSearch === "true" ? "selected" : ""}>Yes</option>
+          <option value="false" ${d.allowSearch !== 'true' ? 'selected' : ''}>No</option>
+          <option value="true" ${d.allowSearch === 'true' ? 'selected' : ''}>Yes</option>
         </select>
       </div>
-      <div class="form-group-formbuilder"><label>Preview Options (opsional, koma)</label><input id="pRelOptions" type="text" value="${JSON.parse(d.options || "[]").join(", ")}"></div>
-    </div>` : ""}
+      <div class="form-group-formbuilder"><label>Preview Options (opsional, koma)</label><input id="pRelOptions" type="text" value="${JSON.parse(d.options || '[]').join(', ')}"></div>
+    </div>`
+        : ''
+    }
 
-    ${isCalc ? `
+    ${
+      isCalc
+        ? `
     <div class="props-section">
       <h3>Calculated</h3>
-      <div class="form-group-formbuilder"><label>Formula</label><input id="pFormula" type="text" placeholder="contoh: quantity * price" value="${d.formula || ""}"></div>
-      <div class="form-group-formbuilder"><label>Dependencies (nama field, koma)</label><input id="pDeps" type="text" placeholder="quantity, price" value="${d.dependencies || ""}"></div>
+      <div class="form-group-formbuilder"><label>Formula</label><input id="pFormula" type="text" placeholder="contoh: quantity * price" value="${d.formula || ''}"></div>
+      <div class="form-group-formbuilder"><label>Dependencies (nama field, koma)</label><input id="pDeps" type="text" placeholder="quantity, price" value="${d.dependencies || ''}"></div>
       <small class="muted">Gunakan nama <em>Field Name</em> dari field lain sebagai variabel.</small>
-    </div>` : ""}
+    </div>`
+        : ''
+    }
 
-    ${isAuto ? `
+    ${
+      isAuto
+        ? `
     <div class="props-section">
       <h3>Autofill</h3>
       <div class="form-group-formbuilder"><label>Source Relation/Select Field</label>
         <select id="pSourceField">
           <option value="">-- pilih --</option>
-          ${relationFieldOptions.map(o => `<option value="${o.name}" ${d.sourceField === o.name ? "selected" : ""}>${o.label} (${o.name})</option>`).join("")}
+          ${relationFieldOptions.map((o) => `<option value="${o.name}" ${d.sourceField === o.name ? 'selected' : ''}>${o.label} (${o.name})</option>`).join('')}
         </select>
       </div>
       <div class="form-group-formbuilder"><label>Mode</label>
         <select id="pAutoMode">
-          <option value="copy-label" ${d.autofillMode === "copy-label" ? "selected" : ""}>Copy label option</option>
-          <option value="copy-value" ${d.autofillMode === "copy-value" ? "selected" : ""}>Copy value</option>
-          <option value="map" ${d.autofillMode === "map" ? "selected" : ""}>Mapping rules</option>
+          <option value="copy-label" ${d.autofillMode === 'copy-label' ? 'selected' : ''}>Copy label option</option>
+          <option value="copy-value" ${d.autofillMode === 'copy-value' ? 'selected' : ''}>Copy value</option>
+          <option value="map" ${d.autofillMode === 'map' ? 'selected' : ''}>Mapping rules</option>
         </select>
       </div>
       <div class="form-group-formbuilder"><label>Mapping Rules (satu per baris, format: nilai =&gt; hasil)</label>
-        <textarea id="pMapRules" row-fomrbuilders="4">${JSON.parse(d.mapRules || "[]").map(([ a, b ]) => `${a} => ${b}`).join("")}</textarea>
+        <textarea id="pMapRules" row-fomrbuilders="4">${JSON.parse(d.mapRules || '[]')
+          .map(([a, b]) => `${a} => ${b}`)
+          .join('')}</textarea>
       </div>
       <small class="muted">Contoh rules: <code>VIP =&gt; Pelanggan Prioritas</code></small>
-    </div>` : ""}
+    </div>`
+        : ''
+    }
 
-    ${isGroup ? `
+    ${
+      isGroup
+        ? `
     <div class="props-section">
       <h3>Group Settings</h3>
       <div class="form-group-formbuilder">
         <label>Collection Target</label>
-        <input id="pCollection" type="text" value="${d.collection || ""}">
+        <input id="pCollection" type="text" value="${d.collection || ''}">
       </div>
       <div class="form-group-formbuilder">
         <label>Allow add/delete row-fomrbuilders?</label>
         <select id="pIsRepeatable">
-          <option value="false" ${d.isRepeatable !== "true" ? "selected" : ""}>No</option>
-          <option value="true" ${d.isRepeatable === "true" ? "selected" : ""}>Yes</option>
+          <option value="false" ${d.isRepeatable !== 'true' ? 'selected' : ''}>No</option>
+          <option value="true" ${d.isRepeatable === 'true' ? 'selected' : ''}>Yes</option>
         </select>
       </div>
-    </div>` : ""}
+    </div>`
+        : ''
+    }
 
     <div class="row-fomrbuilder">
       <button id="pDuplicate" class="btn-fomrbuilder ghost">Duplicate</button>
       <button id="pDelete" class="btn-fomrbuilder danger">Delete</button>
     </div>
-  `;
+  `
   // Bind change handlers
-  $("#pLabel").oninput = e => {
-    d.label = e.target.value;
-    $(".field-title-formbuilder", el).textContent = d.label;
-  };
-  $("#pName").oninput = e => d.name = e.target.value;
-  $("#pType").onchange = e => {
-    d.type = e.target.value;
-    if (d.type === "group") {
-      if (!$(".field-children-formbuilder", el)) {
-        const c = document.createElement("div");
-        c.className = "field-children-formbuilder";
-        c.textContent = "Drop fields here";
-        el.appendChild(c);
-        makeCanvasSortable(c);
+  $('#pLabel').oninput = (e) => {
+    d.label = e.target.value
+    $('.field-title-formbuilder', el).textContent = d.label
+  }
+  $('#pName').oninput = (e) => (d.name = e.target.value)
+  $('#pType').onchange = (e) => {
+    d.type = e.target.value
+    if (d.type === 'group') {
+      if (!$('.field-children-formbuilder', el)) {
+        const c = document.createElement('div')
+        c.className = 'field-children-formbuilder'
+        c.textContent = 'Drop fields here'
+        el.appendChild(c)
+        makeCanvasSortable(c)
       }
     } else {
-      const c = $(".field-children-formbuilder", el);
-      if (c) c.remove();
+      const c = $('.field-children-formbuilder', el)
+      if (c) c.remove()
     }
-    $(".field-badge-formbuilder", el).textContent = d.type;
-    renderProps(el,canvas);
-  };
-  $("#pWidth").onchange = e => d.width = e.target.value;
-  $("#pRequired").onchange = e => d.required = e.target.value;
-  $("#pDefault").oninput = e => d.defaultValue = e.target.value;
+    $('.field-badge-formbuilder', el).textContent = d.type
+    renderProps(el, canvas)
+  }
+  $('#pWidth').onchange = (e) => (d.width = e.target.value)
+  $('#pRequired').onchange = (e) => (d.required = e.target.value)
+  $('#pDefault').oninput = (e) => (d.defaultValue = e.target.value)
   if (isGroup) {
-    $("#pCollection").oninput = e => d.collection = e.target.value;
-    $("#pIsRepeatable").onchange = e => {
-      d.isRepeatable = e.target.value;
+    $('#pCollection').oninput = (e) => (d.collection = e.target.value)
+    $('#pIsRepeatable').onchange = (e) => {
+      d.isRepeatable = e.target.value
       // Panggil renderProps lagi untuk memperbarui tampilan jika ada perubahan lainnya
-      renderProps(el,canvas);
-    };
+      renderProps(el, canvas)
+    }
   }
   if (isChoice) {
-    $("#pOptions").oninput = e => d.options = JSON.stringify(e.target.value.split(",").map(s => s.trim()).filter(Boolean));
+    $('#pOptions').oninput = (e) =>
+      (d.options = JSON.stringify(
+        e.target.value
+          .split(',')
+          .map((s) => s.trim())
+          .filter(Boolean)
+      ))
   }
   if (isRel) {
-    $("#pSourceTable").oninput = e => d.sourceTable = e.target.value;
-    $("#pLabelField").oninput = e => d.labelField = e.target.value;
-    $("#pValueField").oninput = e => d.valueField = e.target.value;
-    $("#pAllowSearch").onchange = e => d.allowSearch = e.target.value;
-    $("#pRelOptions").oninput = e => d.options = JSON.stringify(e.target.value.split(",").map(s => s.trim()).filter(Boolean));
+    $('#pSourceTable').oninput = (e) => (d.sourceTable = e.target.value)
+    $('#pLabelField').oninput = (e) => (d.labelField = e.target.value)
+    $('#pValueField').oninput = (e) => (d.valueField = e.target.value)
+    $('#pAllowSearch').onchange = (e) => (d.allowSearch = e.target.value)
+    $('#pRelOptions').oninput = (e) =>
+      (d.options = JSON.stringify(
+        e.target.value
+          .split(',')
+          .map((s) => s.trim())
+          .filter(Boolean)
+      ))
   }
   if (isCalc) {
-    $("#pFormula").oninput = e => d.formula = e.target.value;
-    $("#pDeps").oninput = e => d.dependencies = e.target.value;
+    $('#pFormula').oninput = (e) => (d.formula = e.target.value)
+    $('#pDeps').oninput = (e) => (d.dependencies = e.target.value)
   }
   if (isAuto) {
-    $("#pSourceField").onchange = e => d.sourceField = e.target.value;
-    $("#pAutoMode").onchange = e => d.autofillMode = e.target.value;
-    $("#pMapRules").oninput = e => {
-      const lines = e.target.value.split("+").map(l => l.trim()).filter(Boolean);
-      const pairs = [];
-      lines.forEach(line => {
-        const m = line.split("=>");
+    $('#pSourceField').onchange = (e) => (d.sourceField = e.target.value)
+    $('#pAutoMode').onchange = (e) => (d.autofillMode = e.target.value)
+    $('#pMapRules').oninput = (e) => {
+      const lines = e.target.value
+        .split('+')
+        .map((l) => l.trim())
+        .filter(Boolean)
+      const pairs = []
+      lines.forEach((line) => {
+        const m = line.split('=>')
         if (m.length >= 2) {
-          pairs.push([ m[0].trim(), m.slice(1).join("=>").trim() ]);
+          pairs.push([m[0].trim(), m.slice(1).join('=>').trim()])
         }
-      });
-      d.mapRules = JSON.stringify(pairs);
-    };
+      })
+      d.mapRules = JSON.stringify(pairs)
+    }
   }
-  $("#pDelete").onclick = () => {
-    el.remove();
-    selectField(null);
-  };
-  $("#pDuplicate").onclick = () => {
-    const cloneData = Object.assign({}, Object.fromEntries(Object.entries(d).map(([ k, v ]) => [ k, v ])));
-    cloneData.id = uid();
-    const newEl = buildFieldElement(cloneData);
-    el.after(newEl);
-    bindField(newEl);
-  };
-}      
-      
+  $('#pDelete').onclick = () => {
+    el.remove()
+    selectField(null)
+  }
+  $('#pDuplicate').onclick = () => {
+    const cloneData = Object.assign(
+      {},
+      Object.fromEntries(Object.entries(d).map(([k, v]) => [k, v]))
+    )
+    cloneData.id = uid()
+    const newEl = buildFieldElement(cloneData)
+    el.after(newEl)
+    bindField(newEl)
+  }
+}
+
 export function renderFormBuilderSettingsPageV2(container) {
   let currentPage = 1
   let currentLimit = 10

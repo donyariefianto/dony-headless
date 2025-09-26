@@ -669,7 +669,6 @@ export default class SettingsController {
       return response.internalServerError({ message: err.message })
     }
   }
-
   // DELETE a document
   async deleteCollections({ request, response }: HttpContext) {
     try {
@@ -721,7 +720,6 @@ export default class SettingsController {
       },
     })
   }
-
   async AuthenticationUI({ view }) {
     return view.render('authentication/index', { base_url: env.get('APP_URL') })
   }
@@ -862,7 +860,7 @@ export default class SettingsController {
     return view.render('configs/dash2', { base_url: env.get('APP_URL') })
   }
   async Test({ view }) {
-    return view.render('test', { base_url: env.get('APP_URL') })
+    return view.render('test3', { base_url: env.get('APP_URL') })
   }
   async UIFlowManager({ view }) {
     return view.render('configs/flowManager', { base_url: env.get('APP_URL') })

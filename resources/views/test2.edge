@@ -69,20 +69,23 @@
         background: #0b1220;
         color: #e5edff;
       }
+      
       .nested-form table {
         width: 100%;
         border-collapse: collapse;
         margin-top: 10px;
         font-size: 14px;
       }
-      .nested-form th, .nested-form td {
+      
+      .nested-form th,
+      .nested-form td {
         border: 1px solid #ddd;
         padding: 6px 8px;
       }
+      
       .nested-form th {
         background: #f8f9fa;
       }
-
       
       #toolbox {
         grid-area: toolbox;
@@ -601,120 +604,120 @@
         const isCalc = d.type === "calculated";
         const isAuto = d.type === "autofill";
         const relationFieldOptions = optionsOfFields(dd => dd.type === "relation" || dd.type === "select");
-        const isGroup = d.type === "group"; 
+        const isGroup = d.type === "group";
         $("#propsBody").innerHTML = `
-          <div class="props-section">
-            <div class="row">
-              <div class="form-group">
-                <label>Label</label>
-                <input id="pLabel" type="text" value="${d.label || ""}">
-              </div>
-              <div class="form-group">
-                <label>Field Name</label>
-                <input id="pName" type="text" value="${d.name || ""}">
-              </div>
-            </div>
-            <div class="row">
-              <div class="form-group">
-                <label>Type</label>
-                <select id="pType">
-                  ${[ "text", "number", "date", "email", "password", "textarea", "select", "radio", "checkbox", "switch", "file", "relation", "group", "calculated", "autofill" ].map(t => `<option value="${t}" ${d.type === t ? "selected" : ""}>${t}</option>`).join("")}
-                </select>
-              </div>
-              <div class="form-group">
-                <label>Display Width</label>
-                <select id="pWidth">
-                  <option value="1/1" ${d.width === "1/1" ? "selected" : ""}>1/1 (Full)</option>
-                  <option value="1/2" ${d.width === "1/2" ? "selected" : ""}>1/2 (Half)</option>
-                </select>
-              </div>
-            </div>
-            <div class="row">
-              <div class="form-group">
-                <label>Required</label>
-                <select id="pRequired">
-                  <option value="false" ${d.required !== "true" ? "selected" : ""}>No</option>
-                  <option value="true" ${d.required === "true" ? "selected" : ""}>Yes</option>
-                </select>
-              </div>
-              <div class="form-group">
-                <label>Default Value</label>
-                <input id="pDefault" type="text" value="${d.defaultValue || ""}">
-              </div>
-            </div>
-          </div>
-      
-          ${isChoice ? `
-          <div class="props-section">
-            <h3>Options</h3>
-            <div class="form-group">
-              <label>List (pisahkan dengan koma)</label>
-              <input id="pOptions" type="text" value="${JSON.parse(d.options || "[]").join(", ")}">
-            </div>
-          </div>` : ""}
-      
-          ${isRel ? `
-          <div class="props-section">
-            <h3>Relation</h3>
-            <div class="form-group"><label>Source Table</label><input id="pSourceTable" type="text" value="${d.sourceTable || ""}"></div>
-            <div class="form-group"><label>Label Field</label><input id="pLabelField" type="text" value="${d.labelField || ""}"></div>
-            <div class="form-group"><label>Value Field</label><input id="pValueField" type="text" value="${d.valueField || ""}"></div>
-            <div class="form-group"><label>Allow Search</label>
-              <select id="pAllowSearch">
-                <option value="false" ${d.allowSearch !== "true" ? "selected" : ""}>No</option>
-                <option value="true" ${d.allowSearch === "true" ? "selected" : ""}>Yes</option>
-              </select>
-            </div>
-            <div class="form-group"><label>Preview Options (opsional, koma)</label><input id="pRelOptions" type="text" value="${JSON.parse(d.options || "[]").join(", ")}"></div>
-          </div>` : ""}
-      
-          ${isCalc ? `
-          <div class="props-section">
-            <h3>Calculated</h3>
-            <div class="form-group"><label>Formula</label><input id="pFormula" type="text" placeholder="contoh: quantity * price" value="${d.formula || ""}"></div>
-            <div class="form-group"><label>Dependencies (nama field, koma)</label><input id="pDeps" type="text" placeholder="quantity, price" value="${d.dependencies || ""}"></div>
-            <small class="muted">Gunakan nama <em>Field Name</em> dari field lain sebagai variabel.</small>
-          </div>` : ""}
-      
-          ${isAuto ? `
-          <div class="props-section">
-            <h3>Autofill</h3>
-            <div class="form-group"><label>Source Relation/Select Field</label>
-              <select id="pSourceField">
-                <option value="">-- pilih --</option>
-                ${relationFieldOptions.map(o => `<option value="${o.name}" ${d.sourceField === o.name ? "selected" : ""}>${o.label} (${o.name})</option>`).join("")}
-              </select>
-            </div>
-            <div class="form-group"><label>Mode</label>
-              <select id="pAutoMode">
-                <option value="copy-label" ${d.autofillMode === "copy-label" ? "selected" : ""}>Copy label option</option>
-                <option value="copy-value" ${d.autofillMode === "copy-value" ? "selected" : ""}>Copy value</option>
-                <option value="map" ${d.autofillMode === "map" ? "selected" : ""}>Mapping rules</option>
-              </select>
-            </div>
-            <div class="form-group"><label>Mapping Rules (satu per baris, format: nilai =&gt; hasil)</label>
-              <textarea id="pMapRules" rows="4">${JSON.parse(d.mapRules || "[]").map(([ a, b ]) => `${a} => ${b}`).join("")}</textarea>
-            </div>
-            <small class="muted">Contoh rules: <code>VIP =&gt; Pelanggan Prioritas</code></small>
-          </div>` : ""}
-
-          ${isGroup ? `
-          <div class="props-section">
-            <h3>Group Settings</h3>
-            <div class="form-group">
-              <label>Allow add/delete rows?</label>
-              <select id="pIsRepeatable">
-                <option value="false" ${d.isRepeatable !== "true" ? "selected" : ""}>No</option>
-                <option value="true" ${d.isRepeatable === "true" ? "selected" : ""}>Yes</option>
-              </select>
-            </div>
-          </div>` : ""}
-
-          <div class="row">
-            <button id="pDuplicate" class="btn ghost">Duplicate</button>
-            <button id="pDelete" class="btn danger">Delete</button>
-          </div>
-        `;
+                                        <div class="props-section">
+                                          <div class="row">
+                                            <div class="form-group">
+                                              <label>Label</label>
+                                              <input id="pLabel" type="text" value="${d.label || ""}">
+                                            </div>
+                                            <div class="form-group">
+                                              <label>Field Name</label>
+                                              <input id="pName" type="text" value="${d.name || ""}">
+                                            </div>
+                                          </div>
+                                          <div class="row">
+                                            <div class="form-group">
+                                              <label>Type</label>
+                                              <select id="pType">
+                                                ${[ "text", "number", "date", "email", "password", "textarea", "select", "radio", "checkbox", "switch", "file", "relation", "group", "calculated", "autofill" ].map(t => `<option value="${t}" ${d.type === t ? "selected" : ""}>${t}</option>`).join("")}
+                                              </select>
+                                            </div>
+                                            <div class="form-group">
+                                              <label>Display Width</label>
+                                              <select id="pWidth">
+                                                <option value="1/1" ${d.width === "1/1" ? "selected" : ""}>1/1 (Full)</option>
+                                                <option value="1/2" ${d.width === "1/2" ? "selected" : ""}>1/2 (Half)</option>
+                                              </select>
+                                            </div>
+                                          </div>
+                                          <div class="row">
+                                            <div class="form-group">
+                                              <label>Required</label>
+                                              <select id="pRequired">
+                                                <option value="false" ${d.required !== "true" ? "selected" : ""}>No</option>
+                                                <option value="true" ${d.required === "true" ? "selected" : ""}>Yes</option>
+                                              </select>
+                                            </div>
+                                            <div class="form-group">
+                                              <label>Default Value</label>
+                                              <input id="pDefault" type="text" value="${d.defaultValue || ""}">
+                                            </div>
+                                          </div>
+                                        </div>
+                                    
+                                        ${isChoice ? `
+                                        <div class="props-section">
+                                          <h3>Options</h3>
+                                          <div class="form-group">
+                                            <label>List (pisahkan dengan koma)</label>
+                                            <input id="pOptions" type="text" value="${JSON.parse(d.options || "[]").join(", ")}">
+                                          </div>
+                                        </div>` : ""}
+                                    
+                                        ${isRel ? `
+                                        <div class="props-section">
+                                          <h3>Relation</h3>
+                                          <div class="form-group"><label>Source Table</label><input id="pSourceTable" type="text" value="${d.sourceTable || ""}"></div>
+                                          <div class="form-group"><label>Label Field</label><input id="pLabelField" type="text" value="${d.labelField || ""}"></div>
+                                          <div class="form-group"><label>Value Field</label><input id="pValueField" type="text" value="${d.valueField || ""}"></div>
+                                          <div class="form-group"><label>Allow Search</label>
+                                            <select id="pAllowSearch">
+                                              <option value="false" ${d.allowSearch !== "true" ? "selected" : ""}>No</option>
+                                              <option value="true" ${d.allowSearch === "true" ? "selected" : ""}>Yes</option>
+                                            </select>
+                                          </div>
+                                          <div class="form-group"><label>Preview Options (opsional, koma)</label><input id="pRelOptions" type="text" value="${JSON.parse(d.options || "[]").join(", ")}"></div>
+                                        </div>` : ""}
+                                    
+                                        ${isCalc ? `
+                                        <div class="props-section">
+                                          <h3>Calculated</h3>
+                                          <div class="form-group"><label>Formula</label><input id="pFormula" type="text" placeholder="contoh: quantity * price" value="${d.formula || ""}"></div>
+                                          <div class="form-group"><label>Dependencies (nama field, koma)</label><input id="pDeps" type="text" placeholder="quantity, price" value="${d.dependencies || ""}"></div>
+                                          <small class="muted">Gunakan nama <em>Field Name</em> dari field lain sebagai variabel.</small>
+                                        </div>` : ""}
+                                    
+                                        ${isAuto ? `
+                                        <div class="props-section">
+                                          <h3>Autofill</h3>
+                                          <div class="form-group"><label>Source Relation/Select Field</label>
+                                            <select id="pSourceField">
+                                              <option value="">-- pilih --</option>
+                                              ${relationFieldOptions.map(o => `<option value="${o.name}" ${d.sourceField === o.name ? "selected" : ""}>${o.label} (${o.name})</option>`).join("")}
+                                            </select>
+                                          </div>
+                                          <div class="form-group"><label>Mode</label>
+                                            <select id="pAutoMode">
+                                              <option value="copy-label" ${d.autofillMode === "copy-label" ? "selected" : ""}>Copy label option</option>
+                                              <option value="copy-value" ${d.autofillMode === "copy-value" ? "selected" : ""}>Copy value</option>
+                                              <option value="map" ${d.autofillMode === "map" ? "selected" : ""}>Mapping rules</option>
+                                            </select>
+                                          </div>
+                                          <div class="form-group"><label>Mapping Rules (satu per baris, format: nilai =&gt; hasil)</label>
+                                            <textarea id="pMapRules" rows="4">${JSON.parse(d.mapRules || "[]").map(([ a, b ]) => `${a} => ${b}`).join("")}</textarea>
+                                          </div>
+                                          <small class="muted">Contoh rules: <code>VIP =&gt; Pelanggan Prioritas</code></small>
+                                        </div>` : ""}
+                              
+                                        ${isGroup ? `
+                                        <div class="props-section">
+                                          <h3>Group Settings</h3>
+                                          <div class="form-group">
+                                            <label>Allow add/delete rows?</label>
+                                            <select id="pIsRepeatable">
+                                              <option value="false" ${d.isRepeatable !== "true" ? "selected" : ""}>No</option>
+                                              <option value="true" ${d.isRepeatable === "true" ? "selected" : ""}>Yes</option>
+                                            </select>
+                                          </div>
+                                        </div>` : ""}
+                              
+                                        <div class="row">
+                                          <button id="pDuplicate" class="btn ghost">Duplicate</button>
+                                          <button id="pDelete" class="btn danger">Delete</button>
+                                        </div>
+                                      `;
         // Bind change handlers
         $("#pLabel").oninput = e => {
           d.label = e.target.value;
@@ -827,8 +830,9 @@
           if (d.type === "group" || d.type === "relation") {
             const childWrap = $(".field-children", el);
             obj.children = childWrap ? buildSchema(childWrap) : [];
-            if (d.type === "group") { // <-- Tambahkan blok ini
-                obj.isRepeatable = d.isRepeatable === "true";
+            if (d.type === "group") {
+              // <-- Tambahkan blok ini
+              obj.isRepeatable = d.isRepeatable === "true";
             }
           }
           if (d.type === "group" || d.type === "relation") {
@@ -865,7 +869,8 @@
           const wrap = document.createElement("div");
           wrap.className = "preview-item";
           wrap.dataset.width = f.width || "1/1";
-          if (f.type !== "group" && f.type !== "nested") { // Perbaikan: abaikan label untuk group & nested
+          if (f.type !== "group" && f.type !== "nested") {
+            // Perbaikan: abaikan label untuk group & nested
             const lbl = document.createElement("label");
             lbl.textContent = f.label || f.type;
             wrap.appendChild(lbl);
@@ -882,16 +887,19 @@
             node.name = f.name;
             if (f.defaultValue) node.value = f.defaultValue;
             break;
+      
            case "textarea":
             node = document.createElement("textarea");
             node.name = f.name;
             if (f.defaultValue) node.value = f.defaultValue;
             break;
+      
            case "checkbox":
             node = document.createElement("input");
             node.type = "checkbox";
             node.name = f.name;
             break;
+      
            case "radio":
             node = document.createElement("div");
             (f.options || []).forEach(opt => {
@@ -904,6 +912,7 @@
               node.appendChild(l);
             });
             break;
+      
            case "select":
             node = document.createElement("select");
             node.name = f.name;
@@ -914,6 +923,7 @@
               node.appendChild(o);
             });
             break;
+      
            case "relation":
             node = document.createElement("select");
             node.name = f.name;
@@ -947,101 +957,99 @@
               });
             }
             break;
+      
            case "nested":
            case "group":
-              if (f.type === "group" && f.isRepeatable !== true) {
-                  // Logic for non-repeatable group (static container)
-                  const box = document.createElement("div");
-                  box.style.border = "1px solid var(--border)";
-                  box.style.borderRadius = "10px";
-                  box.style.padding = "10px";
-                  box.style.background = "#fafafa";
-                  const cap = document.createElement("div");
-                  cap.style.fontWeight = "600";
-                  cap.style.marginBottom = "6px";
-                  cap.textContent = f.label || "Group";
-                  box.appendChild(cap);
-                  (f.children || []).forEach(ch => {
-                      const childEl = renderField(ch);
-                      box.appendChild(childEl);
-                  });
-                  wrap.appendChild(box);
-                  return wrap;
-              }
-              // Logic for repeatable group (same as nested)
-              const nestedWrapper = document.createElement("div");
-              nestedWrapper.className = "nested-form";
-              const nestedLabel = document.createElement("div");
-              nestedLabel.style.fontWeight = "600";
-              nestedLabel.style.marginBottom = "6px";
-              nestedLabel.textContent = f.label || "Detail";
-              nestedWrapper.appendChild(nestedLabel);
-
-              const table = document.createElement("table");
-              table.className = "nested-table";
-              table.style.width = "100%";
-              table.style.borderCollapse = "collapse";
-
-              const thead = document.createElement("thead");
-              const headRow = document.createElement("tr");
+            if (f.type === "group" && f.isRepeatable !== true) {
+              // Logic for non-repeatable group (static container)
+              const box = document.createElement("div");
+              box.style.border = "1px solid var(--border)";
+              box.style.borderRadius = "10px";
+              box.style.padding = "10px";
+              box.style.background = "#fafafa";
+              const cap = document.createElement("div");
+              cap.style.fontWeight = "600";
+              cap.style.marginBottom = "6px";
+              cap.textContent = f.label || "Group";
+              box.appendChild(cap);
               (f.children || []).forEach(ch => {
-                  const th = document.createElement("th");
-                  th.textContent = ch.label || ch.name;
-                  th.style.border = "1px solid #ccc";
-                  th.style.padding = "4px";
-                  headRow.appendChild(th);
+                const childEl = renderField(ch);
+                box.appendChild(childEl);
               });
-              const thAction = document.createElement("th");
-              thAction.textContent = "Aksi";
-              headRow.appendChild(thAction);
-              thead.appendChild(headRow);
-
-              const tbody = document.createElement("tbody");
-              table.appendChild(thead);
-              table.appendChild(tbody);
-              nestedWrapper.appendChild(table);
-
-              function addRow() {
-                  const tr = document.createElement("tr");
-                  (f.children || []).forEach(ch => {
-                      const td = document.createElement("td");
-                      td.style.border = "1px solid #ccc";
-                      td.style.padding = "4px";
-                      const fieldEl = renderField(ch);
-                      td.appendChild(fieldEl);
-                      tr.appendChild(td);
-                  });
-                  const tdAction = document.createElement("td");
-                  tdAction.style.border = "1px solid #ccc";
-                  tdAction.style.padding = "4px";
-                  const btnRemove = document.createElement("button");
-                  btnRemove.type = "button";
-                  btnRemove.textContent = "Hapus";
-                  btnRemove.onclick = () => tr.remove();
-                  tdAction.appendChild(btnRemove);
-                  tr.appendChild(tdAction);
-                  tbody.appendChild(tr);
-              }
-
-              const addBtn = document.createElement("button");
-              addBtn.type = "button";
-              addBtn.textContent = "Tambah Baris";
-              addBtn.style.marginTop = "6px";
-              addBtn.onclick = () => addRow();
-              nestedWrapper.appendChild(addBtn);
-
-              addRow();
-              return nestedWrapper;
+              wrap.appendChild(box);
+              return wrap;
+            }
+            // Logic for repeatable group (same as nested)
+            const nestedWrapper = document.createElement("div");
+            nestedWrapper.className = "nested-form";
+            const nestedLabel = document.createElement("div");
+            nestedLabel.style.fontWeight = "600";
+            nestedLabel.style.marginBottom = "6px";
+            nestedLabel.textContent = f.label || "Detail";
+            nestedWrapper.appendChild(nestedLabel);
+            const table = document.createElement("table");
+            table.className = "nested-table";
+            table.style.width = "100%";
+            table.style.borderCollapse = "collapse";
+            const thead = document.createElement("thead");
+            const headRow = document.createElement("tr");
+            (f.children || []).forEach(ch => {
+              const th = document.createElement("th");
+              th.textContent = ch.label || ch.name;
+              th.style.border = "1px solid #ccc";
+              th.style.padding = "4px";
+              headRow.appendChild(th);
+            });
+            const thAction = document.createElement("th");
+            thAction.textContent = "Aksi";
+            headRow.appendChild(thAction);
+            thead.appendChild(headRow);
+            const tbody = document.createElement("tbody");
+            table.appendChild(thead);
+            table.appendChild(tbody);
+            nestedWrapper.appendChild(table);
+            function addRow() {
+              const tr = document.createElement("tr");
+              (f.children || []).forEach(ch => {
+                const td = document.createElement("td");
+                td.style.border = "1px solid #ccc";
+                td.style.padding = "4px";
+                const fieldEl = renderField(ch);
+                td.appendChild(fieldEl);
+                tr.appendChild(td);
+              });
+              const tdAction = document.createElement("td");
+              tdAction.style.border = "1px solid #ccc";
+              tdAction.style.padding = "4px";
+              const btnRemove = document.createElement("button");
+              btnRemove.type = "button";
+              btnRemove.textContent = "Hapus";
+              btnRemove.onclick = () => tr.remove();
+              tdAction.appendChild(btnRemove);
+              tr.appendChild(tdAction);
+              tbody.appendChild(tr);
+            }
+            const addBtn = document.createElement("button");
+            addBtn.type = "button";
+            addBtn.textContent = "Tambah Baris";
+            addBtn.style.marginTop = "6px";
+            addBtn.onclick = () => addRow();
+            nestedWrapper.appendChild(addBtn);
+            addRow();
+            return nestedWrapper;
+      
            case "file":
             node = document.createElement("input");
             node.type = "file";
             node.name = f.name;
             break;
+      
            case "switch":
             node = document.createElement("input");
             node.type = "checkbox";
             node.name = f.name;
             break;
+      
            case "calculated":
             node = document.createElement("input");
             node.type = "text";
@@ -1052,6 +1060,7 @@
               node: node
             });
             break;
+      
            case "autofill":
             node = document.createElement("input");
             node.type = "text";
@@ -1062,6 +1071,7 @@
               node: node
             });
             break;
+      
            default:
             node = document.createElement("input");
             node.type = "text";
@@ -1138,9 +1148,7 @@
               value,
               label
             } = valueAndLabelOfSelect(src);
-            if (mode === "copy-label") node.value = label;
-            else if (mode === "copy-value") node.value = value;
-            else if (mode === "map") {
+            if (mode === "copy-label") node.value = label; else if (mode === "copy-value") node.value = value; else if (mode === "map") {
               const dict = Object.fromEntries(f.autofill?.mapRules || []);
               node.value = dict[value] ?? "";
             }

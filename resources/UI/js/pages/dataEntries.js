@@ -120,79 +120,6 @@ export const setupDataEntries = () => {
     })
   }
 
-  const createTableFromConfig = (config) => {
-    let tableHtml = `
-            <div class="table-container-scroll">
-                <h3>Main Fields</h3>
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th>Nama Field</th>
-                            <th>Label</th>
-                            <th>Tipe</th>
-                            <th>Wajib</th>
-                            <th>Opsi Tambahan</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${config.fields
-                          .map(
-                            (field) => `
-                            <tr>
-                                <td>${field.name}</td>
-                                <td>${field.label}</td>
-                                <td>${field.type}</td>
-                                <td>${field.required ? 'Ya' : 'Tidak'}</td>
-                                <td>${JSON.stringify(field.options)}</td>
-                            </tr>
-                        `
-                          )
-                          .join('')}
-                    </tbody>
-                </table>
-            </div>
-        `
-
-    // Tambahkan tabel untuk setiap subform
-    config.subforms.forEach((subform) => {
-      if (subform.label) {
-        tableHtml += `
-                    <div class="table-container-scroll">
-                        <h3>Subform: ${subform.label}</h3>
-                        <table class="data-table">
-                            <thead>
-                                <tr>
-                                    <th>Nama Field</th>
-                                    <th>Label</th>
-                                    <th>Tipe</th>
-                                    <th>Wajib</th>
-                                    <th>Opsi Tambahan</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                ${subform.fields
-                                  .map(
-                                    (field) => `
-                                    <tr>
-                                        <td>${field.name}</td>
-                                        <td>${field.label}</td>
-                                        <td>${field.type}</td>
-                                        <td>${field.required ? 'Ya' : 'Tidak'}</td>
-                                        <td>${JSON.stringify(field.options)}</td>
-                                    </tr>
-                                `
-                                  )
-                                  .join('')}
-                            </tbody>
-                        </table>
-                    </div>
-                `
-      }
-    })
-
-    return tableHtml
-  }
-
   const createTableFromData = (formConfig, data) => {
     // Ambil field dari konfigurasi form untuk header tabel
     const mainFields = formConfig.fields
@@ -279,7 +206,7 @@ export const setupDataEntries = () => {
   const showTableView = async (id) => {
     try {
       contentContainer.innerHTML = `<p>Loading tabel...</p>`
-      const endpoint = `http://localhost:3333/configuration/formbuilder/read/${id}`
+      const endpoint = `/configuration/formbuilder/read/${id}`
       const response = await fetch(endpoint, {
         headers: {
           Authorization: 'Bearer ' + localStorage.getItem('userToken'),
@@ -331,9 +258,11 @@ export const setupDataEntries = () => {
         const fetchAndRenderTableData = async () => {
           dataTableContainer.innerHTML = `<p>Loading data...</p>`
           try {
-            const dataEndpoint = `http://localhost:3333/api/${formConfig.table_name}?page=${currentPage}&limit=${ITEMS_PER_PAGE}&search=${searchTerm}`
+            const dataEndpoint = `/api/${formConfig.table_name}?page=${currentPage}&limit=${ITEMS_PER_PAGE}&search=${searchTerm}`
             const dataResponse = await fetch(dataEndpoint, {
-              headers: { Authorization: 'Bearer ' + localStorage.getItem('userToken') },
+              headers: {
+                Authorization: 'Bearer ' + localStorage.getItem('userToken'),
+              },
             })
             if (!dataResponse.ok) {
               throw new Error('Gagal mengambil data.')
@@ -428,7 +357,7 @@ export const setupDataEntries = () => {
     panelOverlay.classList.add('open')
 
     try {
-      const endpoint = `http://localhost:3333/configuration/formbuilder/read/${id}`
+      const endpoint = `/configuration/formbuilder/read/${id}`
       const response = await fetch(endpoint, {
         headers: {
           Authorization: 'Bearer ' + localStorage.getItem('userToken'),
@@ -652,60 +581,270 @@ export const setupDataEntries = () => {
     })
   }
 
+  /**
+   * Helper function to generate HTML for a single form field.
+   * @param {object} fieldConfig - Configuration object for the field.
+   * @returns {string} - The HTML string for the field.
+   */
+  const createFieldHtml = (fieldConfig) => {
+    const { id, label, name, type, required, defaultValue, options } = fieldConfig
+    const isRequired = required ? 'required' : ''
+    let fieldHtml = ''
+
+    // Tentukan class lebar kolom. Asumsi width seperti "1/2", "1/1", dsb.
+    // fieldConfig.width harus selalu ada, jika tidak ada, gunakan default 1/1
+    const widthClass = fieldConfig.width ? `col-${fieldConfig.width.replace('/', '-')}` : 'col-1-1'
+
+    switch (type) {
+      case 'text':
+      case 'email':
+      case 'password':
+      case 'number':
+      case 'date':
+      case 'file':
+        fieldHtml = `
+                <div class="form-field">
+                    <label for="${id}">${label} ${required ? '*' : ''}</label>
+                    <input type="${type}" id="${id}" name="${name}" value="${defaultValue || ''}" ${isRequired}>
+                </div>
+            `
+        break
+      case 'textarea':
+        fieldHtml = `
+                <div class="form-field">
+                    <label for="${id}">${label} ${required ? '*' : ''}</label>
+                    <textarea id="${id}" name="${name}" ${isRequired}>${defaultValue || ''}</textarea>
+                </div>
+            `
+        break
+      case 'select':
+        const selectOptions = options
+          .map((opt) => {
+            // Asumsi options adalah array string atau array object {value, label}
+            const optValue = typeof opt === 'object' ? opt.value : opt
+            const optLabel = typeof opt === 'object' ? opt.label : opt
+            return `<option value="${optValue}" ${defaultValue === optValue ? 'selected' : ''}>${optLabel}</option>`
+          })
+          .join('')
+        fieldHtml = `
+                <div class="form-field">
+                    <label for="${id}">${label} ${required ? '*' : ''}</label>
+                    <select id="${id}" name="${name}" ${isRequired}>
+                        ${selectOptions}
+                    </select>
+                </div>
+            `
+        break
+      case 'radio':
+        const radioOptions = options
+          .map((opt) => {
+            // Asumsi options adalah array string atau array object {value, label}
+            const optValue = typeof opt === 'object' ? opt.value : opt
+            const optLabel = typeof opt === 'object' ? opt.label : opt
+            return `
+                            <div class="radio-option">
+                                <input type="radio" id="${id}_${optValue}" name="${name}" value="${optValue}" ${defaultValue === optValue ? 'checked' : ''} ${isRequired}>
+                                <label for="${id}_${optValue}">${optLabel}</label>
+                            </div>
+                        `
+          })
+          .join('')
+        fieldHtml = `
+                <div class="form-field">
+                    <label>${label} ${required ? '*' : ''}</label>
+                    <div class="radio-group">${radioOptions}</div>
+                </div>
+            `
+        break
+      case 'checkbox':
+      case 'switch':
+        fieldHtml = `
+                <div class="form-field form-field-inline">
+                    <input type="checkbox" id="${id}" name="${name}" value="1" ${defaultValue ? 'checked' : ''} ${isRequired}>
+                    <label for="${id}">${label} ${required ? '*' : ''}</label>
+                </div>
+            `
+        break
+      case 'group':
+        const groupFieldsHtml = fieldConfig.children
+          .map((childField) => createFieldHtml(childField))
+          .join('')
+        fieldHtml = `
+                <fieldset class="form-group">
+                    <legend>${label}</legend>
+                    <div class="dynamic-form-container">${groupFieldsHtml}</div>
+                </fieldset>
+            `
+        break
+
+      // --- IMPLEMENTASI FIELD RELATION ---
+      case 'relation':
+        const relationConfig = fieldConfig.relation || {}
+        const { targetTable, labelField, valueField, allowSearch } = relationConfig
+
+        // Asumsi defaultValue untuk relation adalah objek {value: string, label: string}
+        const defaultOption =
+          defaultValue &&
+          typeof defaultValue === 'object' &&
+          defaultValue.value &&
+          defaultValue.label
+            ? `<option value="${defaultValue.value}" selected>${defaultValue.label}</option>`
+            : ''
+
+        fieldHtml = `
+                <div class="form-field">
+                    <label for="${id}">${label} ${required ? '*' : ''}</label>
+                    <select 
+                        class="choices-select" 
+                        id="${id}" 
+                        name="${name}" 
+                        data-name="${targetTable || ''}" 
+                        form-value="${valueField || ''}" 
+                        form-label="${labelField || ''}" 
+                        data-allow-search="${allowSearch ? 'true' : 'false'}"
+                        ${isRequired}>
+                        ${defaultOption}
+                    </select>
+                </div>
+            `
+        break
+
+      // --- IMPLEMENTASI FIELD AUTOFILL ---
+      case 'autofill':
+        fieldHtml = `
+                <div class="form-field">
+                    <label for="${id}">${label} ${required ? '*' : ''}</label>
+                    <input 
+                        type="text" 
+                        id="${id}" 
+                        name="${name}" 
+                        value="${defaultValue || ''}" 
+                        class="autofill-target" 
+                        readonly 
+                        ${isRequired}>
+                    <p class="special-field-info">Nilai ini akan diisi otomatis berdasarkan pilihan field lain.</p>
+                </div>
+            `
+        break
+
+      case 'calculated':
+        fieldHtml = `
+                <div class="form-field">
+                    <label for="${id}">${label} (calculated) ${required ? '*' : ''}</label>
+                    <input type="text" id="${id}" name="${name}" value="${defaultValue || ''}" class="calculated-target" readonly ${isRequired}>
+                    <p class="special-field-info">Nilai ini dihitung otomatis.</p>
+                </div>
+            `
+        break
+      default:
+        fieldHtml = `<p>Unsupported field type: ${type}</p>`
+        break
+    }
+
+    return `<div class="field-container ${widthClass}">${fieldHtml}</div>`
+  }
+
+  /**
+   * Main function to create a dynamic form based on a configuration object.
+   * @param {object} config - The form configuration JSON.
+   * @returns {string} - The full HTML string for the form.
+   */
   const createDynamicForm = (config) => {
     let formHtml = `<form id="dynamic-form" class="dynamic-form-container">`
-    titleformPanel.textContent = config.name || 'Form'
-    config.fields.forEach(async (field) => {
-      let fieldHtml = `<div class="form-group">`
-      fieldHtml += `<label for="${field.name}">${field.label}</label>`
-      switch (field.type) {
-        case 'select':
-          if (field.options && field.options.mode === 'relation') {
-            const autofillFields = field.options.relation.autofill_fields
-              ? field.options.relation.autofill_fields
-              : ''
-            const table_target = config.table_name ? config.table_name : ''
-            fieldHtml += `
-                            <select id="${field.name}" data-tabletarget="${table_target}" data-name="${field.name}" data-autofill-fields="${autofillFields}" form-value="${field.options.relation.value_column}" form-label="${field.options.relation.label_column}" class="choices-select" name="${field.name}" ${field.required ? 'required' : ''}>
-                            </select>`
-          } else {
-            fieldHtml += `
-                            <select id="${field.name}" name="${field.name}" ${field.required ? 'required' : ''}>
-                                <option value="">Pilih...</option>
-                            </select>`
-          }
-          break
-        case 'number':
-          fieldHtml += `<input type="number" id="${field.name}" name="${field.name}" ${field.required ? 'required' : ''}>`
-          break
-        case 'calculated':
-          fieldHtml += `<input type="text" id="${field.name}" name="${field.name}" value="0.00" data-formula="${field.options?.formula || ''}" readonly>`
-          break
-        default:
-          fieldHtml += `<input type="text" id="${field.name}" name="${field.name}" ${field.required ? 'required' : ''}>`
-          break
-      }
-      fieldHtml += `<div class="error-message" id="error-${field.name}"></div>`
-      fieldHtml += `</div>`
-      formHtml += fieldHtml
-    })
 
-    config.subforms.forEach((subform, index) => {
-      if (subform.label) {
-        let subformHtml = `<div class="subform-container" data-subform-index="${index}" data-table-name="${subform.table_name}">`
-        subformHtml += `<h4>${subform.label} <button type="button" class="add-row-btn" data-subform-index="${index}"><i class="fa-solid fa-plus"></i></button></h4>`
-        subformHtml += `<div class="subform-rows">`
-        subformHtml += createSubformRow(subform.fields, subform.table_name)
-        subformHtml += `</div>`
-        subformHtml += `</div>`
-        formHtml += subformHtml
-      }
-    })
+    // Set form title
+    const titleformPanel = document.getElementById('titleformPanel')
+    if (titleformPanel) {
+      titleformPanel.textContent = config.name || 'Form'
+    }
 
-    formHtml += `<button type="submit" class="submit-btn">${config.submit_label}</button>`
+    // Map through the main field groups
+    const formFieldsHtml = config.fields
+      .map((groupConfig) => {
+        if (groupConfig.isRepeatable) {
+          // Logic for repeatable groups
+          const repeatableFields = groupConfig.children
+            .map((field) => createFieldHtml(field))
+            .join('')
+          return `
+                <div class="repeatable-group" data-group-name="${groupConfig.name}">
+                    <h4>${groupConfig.label}</h4>
+                    <button type="button" class="add-group-btn">Add More</button>
+                    <div class="repeatable-content">
+                        ${repeatableFields}
+                    </div>
+                </div>
+            `
+        } else {
+          // Logic for non-repeatable groups (or single fields)
+          return createFieldHtml(groupConfig)
+        }
+      })
+      .join('')
+
+    formHtml += formFieldsHtml
+    formHtml += `<button type="submit" class="submit-btn">Save</button>`
     formHtml += `</form>`
 
     return formHtml
+  }
+
+  const activateRepeatableGroups = () => {
+    document.querySelectorAll('.add-group-btn').forEach((button) => {
+      button.addEventListener('click', (e) => {
+        const repeatableGroup = e.target.closest('.repeatable-group')
+        const repeatableContent = repeatableGroup.querySelector(':scope > .repeatable-content')
+        const groupName = repeatableGroup.dataset.groupName
+
+        const existingGroupsCount = repeatableGroup.querySelectorAll(
+          ':scope > .repeatable-content'
+        ).length
+        const newGroupClone = repeatableContent.cloneNode(true)
+        updateNamesAndResetValues(newGroupClone, groupName, existingGroupsCount)
+        let removeButton = newGroupClone.querySelector('.remove-group-btn')
+        if (!removeButton) {
+          removeButton = document.createElement('button')
+          removeButton.type = 'button'
+          removeButton.className = 'remove-group-btn'
+          removeButton.innerHTML = '<i class="fa-solid fa-minus"></i> Hapus Grup'
+          newGroupClone.appendChild(removeButton)
+        }
+        removeButton.addEventListener('click', () => {
+          newGroupClone.remove()
+        })
+        repeatableGroup.insertBefore(newGroupClone, repeatableGroup.querySelector('.button-group'))
+        initializeChoicesJS(newGroupClone)
+        initializeAutofill(newGroupClone)
+      })
+    })
+    document.querySelectorAll('.remove-group-btn').forEach((removeButton) => {
+      removeButton.addEventListener('click', () => {
+        removeButton.closest('.repeatable-content').remove()
+      })
+    })
+  }
+
+  const updateNamesAndResetValues = (element, groupName, instanceIndex) => {
+    element.querySelectorAll('[name]').forEach((input) => {
+      let oldName = input.getAttribute('name')
+      const nameRegex = new RegExp(`(${groupName})\\[\\d+\\]`)
+      let newName = oldName.replace(nameRegex, `$1[${instanceIndex}]`)
+      const mainIndexString = `${groupName}[${instanceIndex}]`
+      const mainIndexPosition = newName.indexOf(mainIndexString) + mainIndexString.length
+
+      if (mainIndexPosition !== -1) {
+        const prefix = newName.substring(0, mainIndexPosition)
+        let suffix = newName.substring(mainIndexPosition)
+        suffix = suffix.replace(/\[\d+\]/g, '[0]')
+        newName = prefix + suffix
+      }
+      input.setAttribute('name', newName)
+      if (input.type !== 'file' && input.type !== 'checkbox' && input.type !== 'radio') {
+        input.value = ''
+      } else if (input.type === 'checkbox' || input.type === 'radio') {
+        input.checked = false
+      }
+    })
   }
 
   const createSubformRow = (fields, tableName) => {
@@ -748,6 +887,9 @@ export const setupDataEntries = () => {
 
   const setupFormListeners = (formConfig) => {
     const form = document.getElementById('dynamic-form')
+
+    // Menambahkan listener untuk tombol Add More
+    activateRepeatableGroups()
 
     document.querySelectorAll('.add-row-btn').forEach((button) => {
       button.addEventListener('click', (e) => {
@@ -853,10 +995,36 @@ export const setupDataEntries = () => {
   const collectFormData = (formConfig, form) => {
     const data = {}
 
+    // Mengambil data dari main fields
     formConfig.fields.forEach((field) => {
-      data[field.name] = form.querySelector(`#${field.name}`).value
+      if (field.isRepeatable) {
+        // Proses repeatable group
+        data[field.name] = []
+        const repeatableGroups = form.querySelectorAll(
+          `.repeatable-group[data-group-name="${field.name}"]`
+        )
+        repeatableGroups.forEach((group) => {
+          const groupData = {}
+          group.querySelectorAll('input, select, textarea').forEach((input) => {
+            // Pola name: groupName[instanceIndex][fieldName]
+            const fieldNameMatch = input.name.match(/\[(\w+)\]$/)
+            if (fieldNameMatch) {
+              const fieldName = fieldNameMatch[1]
+              groupData[fieldName] = input.value
+            }
+          })
+          data[field.name].push(groupData)
+        })
+      } else {
+        // Proses non-repeatable fields
+        const input = form.querySelector(`#${field.name}`)
+        if (input) {
+          data[field.name] = input.value
+        }
+      }
     })
 
+    // Mengambil data dari subforms (jika ada)
     formConfig.subforms.forEach((subform) => {
       if (subform.label) {
         data[subform.table_name] = []
@@ -882,6 +1050,7 @@ export const setupDataEntries = () => {
   }
 
   const updateAllCalculatedFields = (formConfig) => {
+    return
     // Step 1: Hitung total per baris di dalam subform
     formConfig.subforms.forEach((subform) => {
       const subformRows = document.querySelectorAll(

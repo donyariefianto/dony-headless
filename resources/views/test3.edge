@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>
+      Form Dinamis dengan Styling Baru
+    </title>
+    <style>
+      /* Global Styles & Variables */
+      
+      :root {
+        --primary-color: #5a7dff;
+        --primary-color-dark: #4a6ddb;
+        --text-color: #333;
+        --background-light: #d3d3d3;
+        --surface-light: #e7e9f0;
+        --shadow-color: rgba(151, 143, 143, 0.08);
+        /* Dark Mode Variables */
+        --text-color-dark: #e0e6f0;
+        --background-dark: #1f2a40;
+        --surface-dark: #293448;
+        --shadow-color-dark: rgba(0, 0, 0, 0.3);
+      }
+      
+      body {
+        font-family: 'Poppins', sans-serif;
+        margin: 0;
+        background-color: var(--background-light);
+        color: var(--text-color);
+        transition: background-color 0.3s ease,
+                                color 0.3s ease;
+        line-height: 1.6;
+      }
+      
+      /* --- Layout & Form Containers --- */
+      
+      #form-container {
+        max-width: 1000px;
+        margin: auto;
+      }
+      
+      .form-card {
+        background: var(--surface-light);
+        padding: 2rem;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px var(--shadow-color);
+        margin-bottom: 2rem;
+        transition: all 0.3s ease;
+      }
+      
+      .form-group-container {
+        margin-bottom: 2rem;
+        padding: 1.5rem;
+        border: 1px solid var(--primary-color);
+        border-radius: 8px;
+        background-color: var(--surface-light);
+        transition: all 0.3s ease;
+      }
+      
+      .form-group-container.repeatable {
+        border-color: var(--primary-color-dark);
+      }
+      
+      .form-group-container h2 {
+        margin-top: 0;
+        color: var(--primary-color);
+        font-size: 1.5rem;
+        border-bottom: 2px solid var(--primary-color);
+        padding-bottom: 0.5rem;
+        margin-bottom: 1rem;
+      }
+      
+      .form-group-content {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+      }
+      
+      .form-field {
+        display: flex;
+        flex-direction: column;
+        margin-bottom: 1rem;
+      }
+      
+      .form-field.width-1-1 {
+        grid-column: 1 / -1;
+      }
+      
+      label {
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+        color: var(--text-color);
+        transition: color 0.3s ease;
+      }
+      
+      /* --- Form Elements Styling --- */
+      
+      input[type="text"],
+      input[type="number"],
+      input[type="email"],
+      input[type="password"],
+      input[type="date"],
+      textarea,
+      select,
+      input[type="file"] {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        box-sizing: border-box;
+        background-color: var(--surface-light);
+        color: var(--text-color);
+        transition: all 0.3s ease;
+      }
+      
+      input:focus,
+      textarea:focus,
+      select:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(90, 125, 255, 0.2);
+        outline: none;
+      }
+      
+      input[type="checkbox"],
+      input[type="radio"] {
+        margin-right: 0.5rem;
+      }
+      
+      .radio-group label {
+        display: inline-flex;
+        font-weight: normal;
+        align-items: center;
+      }
+      
+      .radio-options {
+        display: flex;
+        gap: 1.5rem;
+        margin-top: 0.5rem;
+      }
+      
+      .button-group {
+        margin-top: 1rem;
+        display: flex;
+        gap: 10px;
+      }
+      
+      .add-group-btn,
+      .remove-group-btn {
+        padding: 0.75rem 1.5rem;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 600;
+        color: white;
+        transition: all 0.2s ease;
+      }
+      
+      .add-group-btn {
+        background-color: var(--primary-color);
+      }
+      
+      .add-group-btn:hover {
+        background-color: var(--primary-color-dark);
+        transform: translateY(-2px);
+      }
+      
+      .remove-group-btn {
+        background-color: var(--primary-color);
+      }
+      
+      .remove-group-btn:hover {
+        background-color: var(--primary-color-dark);
+        transform: translateY(-2px);
+      }
+      
+      /* --- Dark Mode Adjustments --- */
+      
+      body.dark-mode {
+        background-color: var(--background-dark);
+        color: var(--text-color-dark);
+      }
+      
+      body.dark-mode .form-card,
+      body.dark-mode .form-group-container {
+        background-color: var(--surface-dark);
+        box-shadow: 0 4px 12px var(--shadow-color-dark);
+      }
+      
+      body.dark-mode .form-group-container.repeatable {
+        border-color: var(--primary-color);
+      }
+      
+      body.dark-mode label {
+        color: var(--text-color-dark);
+      }
+      
+      body.dark-mode input[type="text"],
+      body.dark-mode input[type="number"],
+      body.dark-mode input[type="email"],
+      body.dark-mode input[type="password"],
+      body.dark-mode input[type="date"],
+      body.dark-mode textarea,
+      body.dark-mode select,
+      body.dark-mode input[type="file"] {
+        background-color: var(--surface-dark);
+        border-color: #4a5c7a;
+        color: var(--text-color-dark);
+      }
+      
+      /* Tambahan: Pastikan radio/checkbox label tetap terlihat */
+      
+      body.dark-mode .radio-group label {
+        color: var(--text-color-dark);
+      }
+      
+      body.dark-mode .special-field-info {
+        color: #ccc;
+      }
+      
+      @media (max-width: 768px) {
+        .form-group-content {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body class="dark-mode">
+    <div id="form-container">
+    </div>
+
+    <script>
+      const formConfig = {
+        _id: {
+          $oid: "68d4f5bd0c8bca35c7b140d5"
+        },
+        name: "Allfields",
+        slug: "allfields",
+        created_at: "2025-09-25T07:56:45+00:00",
+        updated_at: "2025-09-25T07:56:45+00:00",
+        fields: [ {
+          id: "group_repeatable",
+          label: "Grup Berulang",
+          name: "repeatable_group",
+          type: "group",
+          isRepeatable: true,
+          children: [ {
+            id: "text_repeat_1",
+            label: "Nama Item",
+            name: "item_name",
+            type: "text",
+            width: "1/2"
+          }, {
+            id: "number_repeat_1",
+            label: "Jumlah",
+            name: "item_qty",
+            type: "number",
+            width: "1/2"
+          } ]
+        }, {
+          id: "tag6jgxawx",
+          label: "Grup Berkas & Relasi",
+          name: "group_6ppmc",
+          type: "group",
+          width: "1/1",
+          isRepeatable: false,
+          children: [ {
+            id: "mkhosa4ana",
+            label: "Berkas",
+            name: "file_8za1x",
+            type: "file",
+            width: "1/1"
+          }, {
+            id: "j0xum6iy14",
+            label: "Relasi",
+            name: "relation_tjcxf",
+            type: "relation",
+            width: "1/2"
+          }, {
+            id: "0tysv6mlnwb9",
+            label: "Terhitung",
+            name: "calculated_r1xmg",
+            type: "calculated",
+            width: "1/2"
+          }, {
+            id: "vq63yxa3y0d",
+            label: "Isian Otomatis",
+            name: "autofill_mgr6x",
+            type: "autofill",
+            width: "1/1"
+          } ]
+        }, {
+          id: "heqix0iawlf",
+          label: "Grup Pilihan",
+          name: "group_dzt93",
+          type: "group",
+          width: "1/1",
+          isRepeatable: false,
+          children: [ {
+            id: "hwdoyc1lpsc",
+            label: "Pilihan Radio",
+            name: "radio_zg36p",
+            type: "radio",
+            width: "1/2",
+            options: [ "Opsi 1", "Opsi 2" ]
+          }, {
+            id: "u2u65diunld",
+            label: "Pilihan Select",
+            name: "select_kqudg",
+            type: "select",
+            width: "1/2",
+            options: [ "Opsi 1", "Opsi 2" ]
+          }, {
+            id: "jnsl0c0wvq",
+            label: "Kotak Centang",
+            name: "checkbox_j4scm",
+            type: "checkbox",
+            width: "1/2"
+          }, {
+            id: "vi8d48e2ri",
+            label: "Sakelar",
+            name: "switch_7suqe",
+            type: "switch",
+            width: "1/2"
+          } ]
+        }, {
+          id: "x3h81822eb",
+          label: "Grup Input Dasar",
+          name: "group_0thr9",
+          type: "group",
+          width: "1/1",
+          isRepeatable: false,
+          children: [ {
+            id: "gwyuvsisr9e",
+            label: "Teks",
+            name: "text_t22ar",
+            type: "text",
+            width: "1/2"
+          }, {
+            id: "8mjcfhvg9no",
+            label: "Angka",
+            name: "number_5kn1u",
+            type: "number",
+            width: "1/2"
+          }, {
+            id: "6nuwne96qm4",
+            label: "Tanggal",
+            name: "date_f3d44",
+            type: "date",
+            width: "1/2"
+          }, {
+            id: "d05v5994sh4",
+            label: "Email",
+            name: "email_t10tx",
+            type: "email",
+            width: "1/2"
+          }, {
+            id: "982gcwwkqlf",
+            label: "Sandi",
+            name: "password_f5z3u",
+            type: "password",
+            width: "1/2"
+          }, {
+            id: "at06p79q4tp",
+            label: "Area Teks",
+            name: "textarea_dtad5",
+            type: "textarea",
+            width: "1/1"
+          } ]
+        } ]
+      };
+      
+      function renderForm(config) {
+        const formContainer = document.getElementById("form-container");
+        if (!formContainer) {
+          console.error("Elemen form-container tidak ditemukan.");
+          return;
+        }
+        const formHTML = config.fields.map(groupConfig => {
+          if (groupConfig.isRepeatable) {
+            return `
+                                          <div class="form-card">
+                                              <h2>${groupConfig.label}</h2>
+                                              <div id="repeatable-group-${groupConfig.name}" data-group-name="${groupConfig.name}">
+                                                  </div>
+                                              <div class="button-group">
+                                                  <button type="button" class="add-group-btn" onclick="addRepeatableGroup('${groupConfig.name}')">+ Tambah ${groupConfig.label}</button>
+                                              </div>
+                                          </div>
+                                      `;
+          } else {
+            return `
+                                          <div class="form-card">
+                                              ${createGroupHTML(groupConfig)}
+                                          </div>
+                                      `;
+          }
+        }).join("");
+        formContainer.innerHTML = `<form id="dynamic-form">${formHTML}</form>`;
+        config.fields.forEach(groupConfig => {
+          if (groupConfig.isRepeatable) {
+            addRepeatableGroup(groupConfig.name);
+          }
+        });
+      }
+      
+      function createGroupHTML(groupConfig, instanceIndex = 0) {
+        const isRepeatableClass = groupConfig.isRepeatable ? "repeatable" : "";
+        const dataAttribute = groupConfig.isRepeatable ? `data-instance-index="${instanceIndex}"` : "";
+        const fieldsHTML = groupConfig.children.map(fieldConfig => {
+          const widthClass = `width-${fieldConfig.width.replace("/", "-")}`;
+          const fieldName = groupConfig.isRepeatable ? `${groupConfig.name}[${instanceIndex}][${fieldConfig.name}]` : fieldConfig.name;
+          switch (fieldConfig.type) {
+           case "text":
+           case "number":
+           case "email":
+           case "password":
+           case "date":
+           case "file":
+            return `
+                                              <div class="form-field ${widthClass}">
+                                                  <label for="${fieldName}">${fieldConfig.label}</label>
+                                                  <input type="${fieldConfig.type}" id="${fieldName}" name="${fieldName}">
+                                              </div>
+                                          `;
+      
+           case "textarea":
+            return `
+                                              <div class="form-field ${widthClass}">
+                                                  <label for="${fieldName}">${fieldConfig.label}</label>
+                                                  <textarea id="${fieldName}" name="${fieldName}"></textarea>
+                                              </div>
+                                          `;
+      
+           case "select":
+            const optionsHTML = fieldConfig.options.map(optionText => `<option value="${optionText}">${optionText}</option>`).join("");
+            return `
+                                              <div class="form-field ${widthClass}">
+                                                  <label for="${fieldName}">${fieldConfig.label}</label>
+                                                  <select id="${fieldName}" name="${fieldName}">
+                                                      ${optionsHTML}
+                                                  </select>
+                                              </div>
+                                          `;
+      
+           case "radio":
+            const radioOptionsHTML = fieldConfig.options.map(optionText => `
+                                              <div class="radio-group">
+                                                  <input type="radio" id="${fieldName}-${optionText.replace(/\s+/g, "")}" name="${fieldName}" value="${optionText}">
+                                                  <label for="${fieldName}-${optionText.replace(/\s+/g, "")}">${optionText}</label>
+                                              </div>
+                                          `).join("");
+            return `
+                                              <div class="form-field ${widthClass}">
+                                                  <label>${fieldConfig.label}</label>
+                                                  <div class="radio-options">
+                                                      ${radioOptionsHTML}
+                                                  </div>
+                                              </div>
+                                          `;
+      
+           case "checkbox":
+           case "switch":
+            return `
+                                              <div class="form-field ${widthClass}" style="flex-direction: row; align-items: center; gap: 0.5rem;">
+                                                  <label for="${fieldName}">${fieldConfig.label}</label>
+                                                  <input type="checkbox" id="${fieldName}" name="${fieldName}">
+                                              </div>
+                                          `;
+      
+           case "relation":
+           case "calculated":
+           case "autofill":
+            return `
+                                              <div class="form-field ${widthClass}">
+                                                  <p class="special-field-info"><strong>${fieldConfig.label}</strong>: Tipe field "${fieldConfig.type}" memerlukan logika khusus.</p>
+                                              </div>
+                                          `;
+      
+           default:
+            return ``;
+          }
+        }).join("");
+        const removeButtonHTML = groupConfig.isRepeatable ? `
+                                  <div class="button-group">
+                                      <button type="button" class="remove-group-btn" onclick="this.closest('.form-group-container').remove()">Hapus Grup</button>
+                                  </div>
+                              ` : "";
+        return `
+                                  <div class="form-group-container ${isRepeatableClass}" ${dataAttribute}>
+                                      <h2>${groupConfig.label}</h2>
+                                      <div class="form-group-content">
+                                          ${fieldsHTML}
+                                      </div>
+                                      ${removeButtonHTML}
+                                  </div>
+                              `;
+      }
+      
+      function addRepeatableGroup(groupName) {
+        const repeatableContainer = document.getElementById(`repeatable-group-${groupName}`);
+        const groupConfig = formConfig.fields.find(g => g.name === groupName);
+        if (repeatableContainer && groupConfig) {
+          const instanceIndex = repeatableContainer.children.length;
+          const newGroupHTML = createGroupHTML(groupConfig, instanceIndex);
+          repeatableContainer.insertAdjacentHTML("beforeend", newGroupHTML);
+        }
+      }
+      
+      document.addEventListener("DOMContentLoaded", () => {
+        renderForm(formConfig);
+      });
+    </script>
+  </body>
+</html>

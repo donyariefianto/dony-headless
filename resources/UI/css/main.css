@@ -12,6 +12,10 @@
   --background-dark: #1f2a40;
   --surface-dark: #293448;
   --shadow-color-dark: rgba(0, 0, 0, 0.3);
+
+  /* Form-specific variables */
+  --form-border-light: #ddd;
+  --form-border-dark: #4a5c7a;
 }
 
 body {
@@ -22,36 +26,34 @@ body {
   transition:
     background-color 0.3s ease,
     color 0.3s ease;
+  line-height: 1.6;
 }
 
+/* Scrollbar */
 ::-webkit-scrollbar {
-  width: 10px; /* Lebar scrollbar vertikal */
-  height: 10px; /* Tinggi scrollbar horizontal */
-}
-
-/* Scrollbar pada Light Mode (default) */
-::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
   background-color: var(--background-light);
 }
 
-/* Styling thumb (bagian yang bisa digeser) */
 ::-webkit-scrollbar-thumb {
-  background-color: var(--primary-color); /* Warna thumb */
-  border-radius: 10px; /* Sudut melengkung */
-  border: 2px solid var(--background-light); /* Jarak antar thumb dan track */
+  background-color: var(--primary-color);
+  border-radius: 10px;
+  border: 2px solid var(--background-light);
 }
 
-/* Dark Mode */
-body.dark-mode {
-  --text-color: var(--text-color-dark);
-  --background-light: var(--background-dark);
-  --surface-light: var(--surface-dark);
-  --shadow-color: var(--shadow-color-dark);
-}
-
-/* Efek saat thumb di-hover */
 ::-webkit-scrollbar-thumb:hover {
-  background-color: var(--primary-color-dark); /* Warna saat di-hover */
+  background-color: var(--primary-color-dark);
+}
+
+/* Dark Mode Scrollbar */
+body.dark-mode ::-webkit-scrollbar {
+  background-color: var(--background-dark);
+}
+
+body.dark-mode ::-webkit-scrollbar-thumb {
+  background-color: var(--primary-color-dark);
+  border: 2px solid var(--background-dark);
 }
 
 /* Layout */
@@ -60,7 +62,7 @@ body.dark-mode {
   min-height: 100vh;
 }
 
-/* Sidebar */
+/* Sidebar (existing styles) */
 .sidebar {
   width: 250px;
   background-color: var(--surface-light);
@@ -161,7 +163,7 @@ body.dark-mode {
   color: white;
 }
 
-/* Main Content Area */
+/* Main Content Area (existing styles) */
 .main-content {
   flex-grow: 1;
   padding: 30px;
@@ -173,15 +175,14 @@ body.sidebar-collapsed .main-content {
   margin-left: 20px;
 }
 
-/* Login Page */
+/* Login Page (existing styles) */
 .login-container {
   display: flex;
-  /* Perbaikan utama: Menggunakan margin-left: auto untuk mendorong kartu ke kanan */
   justify-content: flex-end;
   align-items: center;
   height: 100vh;
   background: linear-gradient(135deg, #6a82fb 0%, #fc5c7d 100%);
-  padding-right: 5vw; /* Tambahkan sedikit padding di sisi kanan */
+  padding-right: 5vw;
 }
 
 .login-form-card {
@@ -193,7 +194,6 @@ body.sidebar-collapsed .main-content {
   width: 100%;
   max-width: 400px;
   transition: transform 0.3s ease-in-out;
-  /* Perbaikan: Tambahkan margin-left: auto untuk memastikan posisi kanan */
   margin-left: auto;
 }
 
@@ -251,7 +251,7 @@ body.sidebar-collapsed .main-content {
   transform: none;
 }
 
-/* Page Content */
+/* Page Content (existing styles) */
 .page-container {
   background-color: var(--surface-light);
   border-radius: 12px;
@@ -259,7 +259,7 @@ body.sidebar-collapsed .main-content {
   box-shadow: 0 4px 20px var(--shadow-color);
 }
 
-/* Data Entries Page Styles */
+/* Data Entries Page Styles (existing styles) */
 .page-container h1 {
   font-size: 2rem;
   font-weight: 600;
@@ -385,13 +385,13 @@ body.sidebar-collapsed .main-content {
   cursor: not-allowed;
 }
 
-/* Side Panel Styles */
+/* Side Panel Styles (existing styles) */
 .form-panel {
   position: fixed;
   top: 0;
   right: 0;
   width: 100%;
-  max-width: 650px;
+  max-width: 750px;
   height: 100%;
   background-color: var(--surface-light);
   box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
@@ -453,242 +453,247 @@ body.sidebar-collapsed .main-content {
   display: block;
 }
 
-/* Dynamic Form Styles */
-.dynamic-form-container .form-group {
-  margin-bottom: 20px;
+/* --- Dynamic Form Styles (Disesuaikan) --- */
+
+/* Form Wrapper */
+.dynamic-form-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
 }
 
-.dynamic-form-container label {
-  display: block;
-  font-weight: 500;
-  margin: 8px;
+/* Field Container (untuk grid) */
+.field-container {
+  /* Default untuk grid 1/1 */
+  flex: 1 1 100%;
 }
 
-.dynamic-form-container input,
-.dynamic-form-container select {
+.field-container.col-1-2 {
+  flex: 1 1 calc(50% - 10px);
+}
+
+/* Field Styles (Label & Input) */
+.form-field {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 1rem;
+}
+
+label {
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: var(--text-color);
+  transition: color 0.3s ease;
+}
+
+input[type='text'],
+input[type='number'],
+input[type='email'],
+input[type='password'],
+input[type='date'],
+textarea,
+select,
+input[type='file'] {
   width: 100%;
-  padding: 12px;
-  border: 1px solid #ddd;
+  padding: 0.75rem;
+  border: 1px solid var(--form-border-light);
   border-radius: 8px;
   box-sizing: border-box;
-  font-size: 1rem;
+  background-color: var(--surface-light);
+  color: var(--text-color);
+  transition: all 0.3s ease;
 }
 
-.dynamic-form-container h4 {
-  margin-top: 25px;
-  margin-bottom: 15px;
+input:focus,
+textarea:focus,
+select:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(90, 125, 255, 0.2);
+  outline: none;
+}
+
+/* Group Fieldset */
+.form-group {
+  border: 1px solid var(--primary-color);
+  border-radius: 8px;
+  padding: 1rem 1.5rem 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.form-group legend {
+  font-size: 1.25rem;
   font-weight: 600;
-  border-bottom: 1px solid #eee;
-  padding-bottom: 5px;
   color: var(--primary-color);
+  padding: 0 0.5rem;
 }
 
-.dynamic-form-container .submit-btn {
-  width: 100%;
-  padding: 14px;
+/* Repeatable Group Styles */
+.repeatable-group {
+  flex: 1 1 100%;
+}
+
+.repeatable-group h4 {
+  margin-top: 0;
+  color: var(--primary-color-dark);
+}
+
+.repeatable-content {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  border: 1px dashed var(--primary-color-dark);
+  border-radius: 8px;
+  padding: 1.5rem;
+  background-color: var(--surface-light);
+  margin-bottom: 1.5rem;
+}
+
+body.dark-mode .repeatable-content {
+  background-color: #2b3a50;
+  border: 1px dashed var(--form-border-dark);
+}
+
+.repeatable-group .button-group {
+  margin-top: 1.5rem;
+}
+
+/* Radio & Checkbox */
+.form-field-inline {
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+}
+
+.radio-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+}
+
+.radio-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Submit Button */
+.submit-btn {
+  width: auto;
+  padding: 0.75rem 2rem;
   border: none;
   background-color: var(--primary-color);
   color: white;
   border-radius: 8px;
   cursor: pointer;
   font-weight: 600;
-  transition: background-color 0.2s ease;
-}
-
-.dynamic-form-container .submit-btn:hover {
-  background-color: var(--primary-color-dark);
-}
-/* Styling Choices.js baru berdasarkan classNames yang diberikan */
-/* Kontainer utama Choices.js */
-.choices {
-  font-family: 'Poppins', sans-serif;
-  position: relative;
-  margin-bottom: 20px;
   font-size: 1rem;
-  width: 100%;
-}
-
-/* Input container, border, dan padding */
-.choices__inner {
-  background-color: var(--surface-light);
-  border: 1px solid #ddd;
-  padding: 10px 14px;
-  border-radius: 8px;
-  min-height: 44px;
-  display: flex;
-  align-items: center;
-  transition: all 0.3s ease;
-}
-
-/* Dark Mode untuk inner container */
-body.dark-mode .choices__inner {
-  background-color: var(--surface-dark);
-  border-color: #4a5c7a;
-}
-
-/* Input text field yang dikloning */
-.choices__input--cloned {
-  color: var(--text-color-dark);
-  background-color: transparent;
-  border: none;
-  padding: 0;
-  margin: 0;
-  width: 100%;
-}
-
-/* Dark Mode untuk input text */
-body.dark-mode .choices__input--cloned {
-  color: var(--text-color-dark);
-}
-
-/* Dropdown list container */
-.choices__list--dropdown {
-  position: absolute;
-  width: 100%;
-  background-color: var(--surface-light);
-  border: 1px solid var(--primary-color);
-  border-top: none;
-  border-radius: 0 0 8px 8px;
-  box-shadow: 0 8px 15px var(--shadow-color);
-  z-index: 1000;
-  margin-top: -1px;
-}
-
-/* Khusus untuk dropdown Choices.js */
-.choices__list--dropdown {
-  /* ... styling dropdown Anda yang sudah ada ... */
-  overflow-y: auto; /* Memastikan scrollbar muncul saat kontennya melebihi tinggi */
-  max-height: 200px; /* Batasi tinggi dropdown */
-}
-
-.choices__list--dropdown::-webkit-scrollbar {
-  width: 8px; /* Atur lebar scrollbar khusus untuk dropdown */
-}
-
-.choices__list--dropdown::-webkit-scrollbar-thumb {
-  background-color: var(--primary-color);
-  border-radius: 8px;
-  border: 2px solid var(--surface-light);
-}
-
-body.dark-mode .choices__list--dropdown::-webkit-scrollbar-thumb {
-  background-color: var(--primary-color-dark);
-  border: 2px solid var(--surface-dark);
-}
-
-/* Dark Mode untuk dropdown */
-body.dark-mode .choices__list--dropdown {
-  background-color: var(--surface-dark);
-  border-color: var(--primary-color-dark);
-  box-shadow: 0 8px 15px var(--shadow-color-dark);
-}
-
-/* Item di dalam dropdown yang bisa dipilih */
-.choices__item--selectable {
-  padding: 12px 14px;
-  font-size: 1rem;
-  color: var(--text-color);
   transition:
     background-color 0.2s ease,
-    color 0.2s ease;
+    transform 0.2s ease;
+  margin-top: 1.5rem;
 }
 
-/* Dark Mode untuk item yang bisa dipilih */
-body.dark-mode .choices__item--selectable {
-  /* background-color: var(--primary-color-dark); */
-  color: var(--shadow-color-dark);
+.submit-btn:hover {
+  background-color: var(--primary-color-dark);
+  transform: translateY(-2px);
 }
 
-/* Item yang sedang di-highlight (di-hover atau di-fokus) */
-.choices__item--selectable.is-highlighted {
+/* "Add More" Button for repeatable group */
+.add-more-btn {
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--primary-color);
+  background-color: transparent;
+  color: var(--primary-color);
+  border-radius: 8px;
+  cursor: pointer;
+  margin-top: 1rem;
+  transition: all 0.2s ease;
+}
+
+.add-more-btn:hover {
   background-color: var(--primary-color);
-  color: var(--shadow-color-dark);
+  color: white;
 }
 
-/* Teks yang dipilih pada single select */
-.choices__list--single .choices__item {
-  color: var(--text-color);
-  padding: 0;
-  display: flex;
-  align-items: center;
+/* --- Dark Mode Adjustments (Disesuaikan) --- */
+body.dark-mode {
+  --text-color: var(--text-color-dark);
+  --background-light: var(--background-dark);
+  --surface-light: var(--surface-dark);
+  --shadow-color: var(--shadow-color-dark);
+  --form-border-light: var(--form-border-dark);
 }
 
-/* Dark Mode untuk teks single select */
-body.dark-mode .choices__list--single .choices__item {
+body.dark-mode .page-container,
+body.dark-mode .grid-item {
+  background-color: var(--surface-dark);
+}
+
+body.dark-mode .grid-item p {
+  color: #b0b0b0;
+}
+
+body.dark-mode .login-form-card {
+  background-color: var(--surface-dark);
+  box-shadow: 0 10px 30px var(--shadow-color-dark);
+}
+
+body.dark-mode .login-form-card input {
+  background-color: var(--surface-dark);
+  border-color: var(--form-border-dark);
   color: var(--text-color-dark);
 }
 
-/* Placeholder text */
-.choices__placeholder {
-  color: #999;
-}
-
-/* Tag untuk multiple select */
-.choices__list--multiple .choices__item {
-  background-color: var(--primary-color);
-  color: white;
-  border-radius: 20px;
-  padding: 6px 12px;
-  font-size: 0.9rem;
-  margin: 5px 5px 5px 0;
-  border: none;
-}
-
-.choices__list--multiple .choices__item .choices__button {
-  color: white;
-  border-left: 1px solid rgba(255, 255, 255, 0.5);
-}
-
-/* Styling panah dropdown */
-.choices[data-type*='select-one']::after {
-  content: '';
-  height: 0;
-  width: 0;
-  border-style: solid;
-  border-width: 5px 5px 0 5px;
-  border-color: var(--text-color) transparent transparent transparent;
-  position: absolute;
-  right: 18px;
-  top: 50%;
-  transform: translateY(-50%);
-  pointer-events: none;
-  transition: transform 0.3s ease;
-}
-
-/* Dark Mode untuk panah dropdown */
-body.dark-mode .choices[data-type*='select-one']::after {
-  border-color: var(--text-color-dark) transparent transparent transparent;
-}
-
-.choices.is-open::after {
-  transform: translateY(-50%) rotate(180deg);
-}
-
-/* State saat fokus atau terbuka */
-.choices.is-focused .choices__inner,
-.choices.is-open .choices__inner {
-  border-color: var(--primary-color);
+body.dark-mode .login-form-card input:focus {
   box-shadow: 0 0 0 3px rgba(90, 125, 255, 0.2);
 }
 
-/* Dark Mode untuk state fokus/terbuka */
-body.dark-mode .choices.is-focused .choices__inner,
-body.dark-mode .choices.is-open .choices__inner {
-  border-color: var(--primary-color-dark);
-  box-shadow: 0 0 0 3px rgba(74, 109, 219, 0.2);
+body.dark-mode #search-input {
+  background-color: var(--surface-dark);
+  border-color: var(--form-border-dark);
+  color: var(--text-color-dark);
 }
 
-/* Perbaikan border-radius saat terbuka */
-.choices.is-open .choices__inner {
-  border-radius: 8px 8px 0 0;
+body.dark-mode .dynamic-form-container {
+  background-color: var(--surface-dark);
 }
-/* Responsive Design for Mobile */
+
+body.dark-mode .form-group {
+  border-color: var(--primary-color-dark);
+}
+
+body.dark-mode label,
+body.dark-mode .special-field-info,
+body.dark-mode .icon-only-btn,
+body.dark-mode .icon-table-btn {
+  color: var(--text-color-dark);
+}
+
+body.dark-mode .form-group legend,
+body.dark-mode .repeatable-group h4 {
+  color: var(--primary-color);
+  border-bottom-color: var(--primary-color);
+}
+
+body.dark-mode input[type='text'],
+body.dark-mode input[type='number'],
+body.dark-mode input[type='email'],
+body.dark-mode input[type='password'],
+body.dark-mode input[type='date'],
+body.dark-mode textarea,
+body.dark-mode select,
+body.dark-mode input[type='file'] {
+  background-color: var(--surface-dark);
+  border-color: var(--form-border-dark);
+  color: var(--text-color-dark);
+}
+
+/* Responsive Design (existing styles) */
 @media (max-width: 768px) {
   #app {
     flex-direction: column;
   }
 
-  /* Sembunyikan sidebar di tampilan default mobile */
   .sidebar {
     position: fixed;
     top: 0;
@@ -701,7 +706,6 @@ body.dark-mode .choices.is-open .choices__inner {
     z-index: 2000;
   }
 
-  /* Sidebar saat dibuka */
   .sidebar.open {
     transform: translateX(0);
   }
@@ -738,7 +742,6 @@ body.dark-mode .choices.is-open .choices__inner {
     margin-left: 0;
   }
 
-  /* Overlay untuk saat sidebar terbuka */
   .overlay {
     position: fixed;
     top: 0;
@@ -754,7 +757,6 @@ body.dark-mode .choices.is-open .choices__inner {
     display: block;
   }
 
-  /* Tombol untuk membuka sidebar */
   .menu-toggle {
     display: block;
     position: fixed;
@@ -775,7 +777,6 @@ body.dark-mode .choices.is-open .choices__inner {
     background-color: var(--primary-color-dark);
   }
 
-  /* Memastikan sidebar tidak bisa di-collapse di mobile */
   .sidebar.collapsed {
     width: 280px;
     max-width: 90vw;
@@ -787,13 +788,164 @@ body.dark-mode .choices.is-open .choices__inner {
   }
 
   .login-container {
-    /* Kembali ke tengah untuk tampilan mobile */
     justify-content: center;
     padding: 20px;
   }
 
   .login-form-card {
-    /* Hapus margin-left: auto di mobile */
     margin-left: 0;
   }
+
+  .form-group-content {
+    grid-template-columns: 1fr;
+  }
+
+  .field-container,
+  .field-container.col-1-2 {
+    flex: 1 1 100%;
+  }
+
+  .radio-group {
+    flex-direction: column;
+  }
+}
+/* ========================================= */
+/* Choices.js (Relation Field) Styling */
+/* ========================================= */
+
+.choices {
+    /* Wajib: Memberi konteks posisi bagi dropdown absolute di dalamnya */
+    position: relative; 
+    margin-bottom: 0; 
+    font-size: 16px;
+    width: 100%; /* Memastikan Choices mengambil seluruh lebar field-container */
+}
+
+.choices__inner {
+    /* Gaya Dasar Input/Container */
+    display: inline-block;
+    width: 100%;
+    padding: 0.75rem 15px; /* Mengikuti padding input form lainnya */
+    border: 1px solid var(--form-border-light, #ddd);
+    background-color: var(--surface-light);
+    border-radius: 8px;
+    font-size: 1em;
+    min-height: 40px; 
+    transition: all 0.2s ease;
+}
+
+.choices__inner:hover {
+    border-color: var(--primary-color);
+}
+
+.choices__inner.is-focused {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(90, 125, 255, 0.2);
+}
+
+/* Gaya Dropdown */
+.choices__list--dropdown {
+    /* Wajib: Mengatasi clipping dan memastikan dropdown muncul di atas panel */
+    position: absolute;
+    top: 100%; 
+    left: 0;
+    /* Kunci Perbaikan: Pastikan dropdown mengisi lebar container Choices */
+    width: 100%; 
+    right: auto;
+    
+    /* Kunci Perbaikan: Pastikan z-index lebih tinggi dari form-panel (2000) */
+    /* z-index: 2001;  */
+    
+    border: 1px solid var(--form-border-light, #ddd);
+    background-color: var(--surface-light);
+    border-radius: 8px;
+    box-shadow: 0 4px 12px var(--shadow-color);
+    margin-top: 5px;
+}
+
+/* Gaya Pilihan (Options) */
+.choices__item--choice {
+    padding: 10px 15px;
+    color: var(--text-color);
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.choices__item--choice:not(.is-highlighted):not(.is-disabled) {
+    color: var(--text-color);
+}
+
+/* Gaya Pilihan Highlighted (Hover) */
+.choices__item--choice.is-highlighted {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+/* Gaya Item yang Sudah Terpilih (Placeholder) */
+.choices__list--single .choices__item {
+    padding: 0;
+    color: var(--text-color);
+}
+
+/* Gaya Search Input di Dropdown */
+.choices__input {
+    padding: 10px 15px;
+    border: none;
+    border-bottom: 1px solid var(--form-border-light);
+    margin: 0;
+    background-color: var(--surface-light);
+    color: var(--text-color);
+    border-radius: 8px 8px 0 0;
+}
+
+.choices__input:focus {
+    outline: none;
+}
+
+/* Gaya No Results / No Choices Text */
+.choices__list--dropdown .choices__item.is-disabled {
+    padding: 10px 15px;
+    color: var(--text-color);
+    background-color: transparent;
+    opacity: 0.7;
+    cursor: default;
+}
+
+/* ========================================= */
+/* Choices.js Dark Mode Overrides */
+/* ========================================= */
+
+.dark-mode .choices__inner {
+    border-color: var(--form-border-dark);
+    background-color: var(--surface-dark);
+    color: var(--text-color-dark);
+}
+
+.dark-mode .choices__list--dropdown {
+    border-color: var(--form-border-dark);
+    background-color: var(--surface-dark);
+    box-shadow: 0 4px 12px var(--shadow-color-dark);
+}
+
+.dark-mode .choices__item--choice {
+    color: var(--text-color-dark);
+}
+
+.dark-mode .choices__item--choice.is-highlighted {
+    background-color: var(--primary-color-dark); 
+    color: white;
+}
+
+.dark-mode .choices__list--single .choices__item {
+    color: var(--text-color-dark);
+}
+
+.dark-mode .choices__input {
+    border-bottom-color: var(--form-border-dark);
+    background-color: var(--surface-dark);
+    color: var(--text-color-dark);
+}
+
+.dark-mode .choices__item.is-disabled {
+    color: var(--text-color-dark);
 }
