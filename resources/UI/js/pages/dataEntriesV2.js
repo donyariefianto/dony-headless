@@ -209,14 +209,14 @@ const renderDynamicForm = (fields, formBuilderId) => {
   })
 }
 const getWidthClass = (width) => {
-  if (width === '1/2') return 'col-md-6'
-  if (width === '1/1') return 'col-md-12'
-  return 'col-md-12'
+  if (width === '1/2') return 'field-width-half' // Misalnya: .field-width-half { width: 50%; float: left; }
+  if (width === '1/1') return 'field-width-full' // Misalnya: .field-width-full { width: 100%; }
+  return 'field-width-full'
 }
 const renderFieldHtml = (field, namePrefix = '') => {
   const requiredAttr = field.required ? 'required' : ''
   const requiredStar = field.required ? '<span class="required-star">*</span>' : ''
-  const widthClass = getWidthClass(field.width)
+  const widthClass = getWidthClass(field.width) 
   const finalFieldName = namePrefix ? `${namePrefix}.${field.name}` : field.name
   const finalFieldId = `field-${finalFieldName.replace(/[\[\]\.]/g, '_')}`
   const isCalculated = field.calculated || field.type === 'calculated'
@@ -227,45 +227,52 @@ const renderFieldHtml = (field, namePrefix = '') => {
   const disabledAttr = isReadonly ? 'disabled' : ''
 
   let fieldHtml = ''
+
+  // Tentukan ikon info di label
+  const isCalculatedOrAutofill = field.type === 'calculated' || field.type === 'autofill'
+  const infoIconHtml = isCalculatedOrAutofill ? `<i class="fa-solid fa-circle-info field-info-icon" title="Lihat detail kalkulasi/autofill"></i>` : ''
+
+
+  // =========================================================================
+  // KASUS: GROUP
+  // =========================================================================
   if (field.type === 'group') {
     const isRepeatable = field.isRepeatable
     const isRepeatableClass = isRepeatable ? 'is-repeatable-group' : ''
 
     let childPrefix = finalFieldName
     if (isRepeatable) {
-      // Baris pertama harus selalu [0] untuk repeatable group
       childPrefix = `${finalFieldName}[0]`
     }
 
-    // 1. Outer Wrapper (Card/Box untuk SELURUH GRUP)
+    // 1. Outer Wrapper (Grup)
     fieldHtml += `<div class="group-card-wrapper ${widthClass} ${isRepeatableClass}">`
     fieldHtml += `<label class="group-label">${field.label}${requiredStar}</label>`
 
-    // Data attribute penting untuk re-indexing
     fieldHtml += `<div class="group-container" data-group-name="${field.name}">`
 
-    // 2. Wrapper Card untuk ITEM YANG DIULANG (Hanya jika isRepeatable)
+    // 2. Wrapper untuk Baris (Row)
     const rowCardClass = isRepeatable ? 'repeat-item-card' : ''
-
-    // Baris pertama
-    fieldHtml += `<div class="${rowCardClass}">` // <-- START: Card untuk Item yang Diulang
-    fieldHtml += `<div class="group-row form-row">`
-    // REKURSIF: Memanggil renderFieldHtml untuk anak-anak grup
-    fieldHtml += field.children.map((child) => renderFieldHtml(child, childPrefix)).join('')
-
-    // Tambahkan Tombol Hapus Baris
+    
+    fieldHtml += `<div class="${rowCardClass}">` // START: Card untuk Item yang Diulang
+    
+    // Tombol Hapus: DIPINDAHKAN ke pojok kanan atas (.remove-row-top-right)
     if (isRepeatable) {
       fieldHtml += `
-            <div class="remove-row-action" style="visibility: hidden;">
-                <button type="button" class="btn btn-danger btn-sm remove-group-row-btn" title="Hapus Baris">
-                    <i class="fa-solid fa-trash-can"></i>
-                </button>
+            <div class="remove-row-action remove-row-top-right" style="visibility: hidden;">
+              <button type="button" class="btn btn-danger btn-sm remove-group-row-btn" title="Hapus Baris">
+                <i class="fa-solid fa-xmark"></i> 
+              </button>
             </div>
-        `
+      `
     }
 
-    fieldHtml += `</div>` // End .group-row
-    fieldHtml += `</div>` // <-- END: Card untuk Item yang Diulang
+    // Area Field Input: Wrapper dengan class kustom untuk layout horizontal
+    fieldHtml += `<div class="group-row-fields">` 
+    fieldHtml += field.children.map((child) => renderFieldHtml(child, childPrefix)).join('')
+
+    fieldHtml += `</div>` // End .group-row-fields
+    fieldHtml += `</div>` // END: Card untuk Item yang Diulang
 
     if (isRepeatable) {
       fieldHtml += `
@@ -278,11 +285,23 @@ const renderFieldHtml = (field, namePrefix = '') => {
     fieldHtml += `</div>` // End .group-card-wrapper
     return fieldHtml
   }
-  fieldHtml += `<div class="form-group form-group-type-${field.type} ${widthClass}">`
-  fieldHtml += `<label for="${finalFieldId}">${field.label}${requiredStar}</label>`
+  
+  // =========================================================================
+  // KASUS: FIELD NON-GROUP (Semua Field Anak)
+  // =========================================================================
+  
+  fieldHtml += `<div class="form-field-wrapper ${widthClass}">` 
+  fieldHtml += `<div class="form-group form-group-type-${field.type}">` 
+  // Label dan ikon info
+  fieldHtml += `<label for="${finalFieldId}">${field.label}${requiredStar} ${infoIconHtml}</label>` 
 
+  let calculatedFormulaNote = ''
+  let extraClasses = ''
+  let autofillDataAttrs = ''
+  // Variabel baru untuk atribut formula di input
+  let calculatedFormulaAttr = ''
+  
   switch (field.type) {
-    // Tipe Input Standar (Text, Number, Date, Email, Password)
     case 'text':
     case 'number':
     case 'date':
@@ -294,31 +313,33 @@ const renderFieldHtml = (field, namePrefix = '') => {
       if (field.type === 'email') inputType = 'email'
       else if (field.type === 'password') inputType = 'password'
       else if (field.type === 'date') inputType = 'date'
+      else if (field.type === 'number') inputType = 'number'
 
-      // Tetapkan type='text' untuk penanganan nilai yang konsisten
-      if (field.type === 'number' || field.type === 'calculated' || field.type === 'autofill') {
+      if (field.type === 'calculated' || field.type === 'autofill') {
         inputType = 'text'
       }
 
-      let calculatedFormulaNote = ''
-      let extraClasses = ''
-      let autofillDataAttrs = ''
-
-      // --- PENANGANAN FIELD CALCULATED DAN AUTOFILL ---
+      // --- PENANGANAN FIELD CALCULATED DAN AUTOFILL (Fix untuk Engine JS) ---
       if (field.type === 'calculated') {
         const formula = field.calculated?.formula || 'N/A'
-        calculatedFormulaNote = `<small class="form-text text-muted">Field dihitung dengan formula: ${formula}</small>`
+        // FIX KRITIS: Mempertahankan tag <small> agar engine JS tidak rusak
+        const noteContent = `<small class="form-text text-muted">Field dihitung dengan formula: ${formula}</small>`
+        // Membungkus <small> dengan div untuk efek hover
+        calculatedFormulaNote = `<div class="field-note-hover">${noteContent}</div>`
+        
+        // FIX ROBUST: Menambahkan data formula ke input
+        calculatedFormulaAttr = `data-calculated-formula="${formula}"`
+        
       } else if (field.type === 'autofill') {
-        const source = field.autofill?.sourceField || 'N/A' // e.g., 'items.product_id'
+        const source = field.autofill?.sourceField || 'N/A' 
         const key = field.autofill?.sourceKey || 'N/A'
-
-        // KRITIS 1: Tambahkan Class Target
+        const mode = field.autofill?.mode || 'copy-value' 
+        
         extraClasses = 'autofill-target-field'
+        autofillDataAttrs = `data-autofill-source="${source}" data-autofill-key="${key}" data-autofill-mode="${mode}"` 
 
-        // KRITIS 2: Tambahkan Data Attributes yang diperlukan untuk Lookup
-        autofillDataAttrs = `data-autofill-source="${source}" data-autofill-key="${key}"`
-
-        calculatedFormulaNote = `<small class="form-text text-muted">Nilai disalin dari ${source} (Key: ${key})</small>`
+        const noteContent = `<small class="form-text text-muted">Nilai disalin dari ${source} (Key: ${key}, Mode: ${mode})</small>`
+        calculatedFormulaNote = `<div class="field-note-hover">${noteContent}</div>`
       }
 
       // --- RENDERING INPUT AKHIR ---
@@ -329,19 +350,17 @@ const renderFieldHtml = (field, namePrefix = '') => {
           class="form-control ${readonlyClass} ${extraClasses}" 
           value="${field.defaultValue || ''}" 
           ${autofillDataAttrs} 
+          ${calculatedFormulaAttr}
           ${requiredAttr} 
           ${readonlyAttr}
       >`
-      fieldHtml += calculatedFormulaNote
       break
 
+    // ... (cases textarea, select, radio, checkbox, file tetap sama)
     case 'textarea':
       fieldHtml += `<textarea id="${finalFieldId}" name="${finalFieldName}" class="form-control ${readonlyClass}" rows="3" ${requiredAttr} ${readonlyAttr} ${disabledAttr}>${field.defaultValue || ''}</textarea>`
       break
-
-    // ----------------------------------------------------------------------
-    // TIPE: SELECT / RELATION (Menggunakan Choices.js)
-    // ----------------------------------------------------------------------
+      
     case 'relation':
     case 'select':
       const isRelation = field.type === 'relation'
@@ -349,15 +368,12 @@ const renderFieldHtml = (field, namePrefix = '') => {
         ? `data-type="relation" data-table="${field.relation.sourceTable}" data-value-field="${field.relation.valueField}" data-label-field="${field.relation.labelField}"`
         : ''
 
-      // Gunakan class 'choices-select' untuk semua select yang perlu diinisialisasi oleh Choices.js
       const selectClass = 'choices-select'
 
       fieldHtml += `<select id="${finalFieldId}" name="${finalFieldName}" class="form-control ${selectClass} ${readonlyClass}" ${requiredAttr} ${dataAttrs} ${disabledAttr}>`
 
-      // Tambahkan opsi default "Pilih..."
       fieldHtml += `<option value="">Pilih ${field.label}</option>`
 
-      // Handle options hanya untuk select standar (relation akan diisi via AJAX/JS setelah DOM siap)
       if (!isRelation) {
         ;(field.options || []).forEach((option) => {
           const value = typeof option === 'string' ? option : option.value
@@ -367,15 +383,12 @@ const renderFieldHtml = (field, namePrefix = '') => {
       }
       fieldHtml += `</select>`
       break
-    // ----------------------------------------------------------------------
-
-    // TIPE: RADIO
+      
     case 'radio':
       fieldHtml += `<div class="radio-group">`
       ;(field.options || []).forEach((option, index) => {
         const optionValue = typeof option === 'string' ? option : option.value
         const optionLabel = typeof option === 'string' ? option : option.label
-        // ID unik untuk setiap opsi radio agar label berfungsi
         const uniqueId = `radio-${finalFieldId}-${index}`
         const isChecked = optionValue == field.defaultValue
 
@@ -388,7 +401,6 @@ const renderFieldHtml = (field, namePrefix = '') => {
       fieldHtml += `</div>`
       break
 
-    // TIPE: CHECKBOX / SWITCH
     case 'checkbox':
     case 'switch':
       const inputClass =
@@ -396,7 +408,6 @@ const renderFieldHtml = (field, namePrefix = '') => {
       const isChecked =
         field.defaultValue === true || field.defaultValue === 'true' || field.defaultValue === '1'
 
-      // Checkbox menggunakan nilai boolean/string 'true'
       fieldHtml += `
         <div class="form-check form-check-inline">
           <input type="checkbox" id="${finalFieldId}" name="${finalFieldName}" class="${inputClass}" value="true" ${isChecked ? 'checked' : ''} ${disabledAttr}>
@@ -404,7 +415,6 @@ const renderFieldHtml = (field, namePrefix = '') => {
         </div>`
       break
 
-    // TIPE: FILE
     case 'file':
       fieldHtml += `<input type="file" id="${finalFieldId}" name="${finalFieldName}" class="form-control-file" ${requiredAttr}>`
       fieldHtml += `<small class="form-text text-muted">Maks. ukuran file: 5MB</small>`
@@ -413,7 +423,10 @@ const renderFieldHtml = (field, namePrefix = '') => {
     default:
       fieldHtml += `<input type="text" id="${finalFieldId}" name="${finalFieldName}" class="form-control" placeholder="Tipe field '${field.type}' belum didukung" value="${field.defaultValue || ''}">`
   }
-  fieldHtml += `</div>`
+  
+  fieldHtml += calculatedFormulaNote // Tambahkan catatan hover
+  fieldHtml += `</div>` // End .form-group
+  fieldHtml += `</div>` // End .form-field-wrapper (Wrapper widthClass)
   return fieldHtml
 }
 const debounce = (func, delay) => {
@@ -686,78 +699,102 @@ const groupFunctionResolver = (funcName, values) => {
 // ==============================================================================
 
 const handleAddRow = (event) => {
-  const addButton = event.currentTarget
-  const groupName = addButton.dataset.groupName
-  const groupContainer = addButton.closest('.group-container')
-  const formElement = addButton.closest('form')
-  if (!groupContainer || !groupName || !formElement) return
-  const groupConfig = getGroupConfig(groupName)
-  if (!groupConfig || !groupConfig.children) {
-    console.error(`Konfigurasi grup '${groupName}' tidak ditemukan.`)
-    return
-  }
-  const itemCards = groupContainer.querySelectorAll('.repeat-item-card')
-  const newIndex = itemCards.length
-  const childPrefix = `${groupName}[${newIndex}]`
-  const newRowCard = document.createElement('div')
-  newRowCard.className = 'repeat-item-card'
+    const addButton = event.currentTarget
+    const groupName = addButton.dataset.groupName
+    const groupContainer = addButton.closest('.group-container')
+    const formElement = addButton.closest('form')
+    
+    if (!groupContainer || !groupName || !formElement) return
+    
+    const groupConfig = getGroupConfig(groupName) 
+    if (!groupConfig || !groupConfig.children) {
+        console.error(`Konfigurasi grup '${groupName}' tidak ditemukan.`)
+        return
+    }
 
-  let newRowHtml = `<div class="group-row form-row">`
-  newRowHtml += groupConfig.children.map((child) => renderFieldHtml(child, childPrefix)).join('')
-  newRowHtml += `
-        <div class="remove-row-action" style="visibility: visible;">
+    const itemCards = groupContainer.querySelectorAll('.repeat-item-card')
+    const newIndex = itemCards.length
+    const childPrefix = `${groupName}[${newIndex}]`
+    
+    const newRowCard = document.createElement('div')
+    newRowCard.className = 'repeat-item-card'
+
+    // =========================================================================
+    // PERBAIKAN KRITIS PADA STRING HTML (Untuk penempatan Tombol Kanan Atas)
+    // =========================================================================
+    let newRowHtml = `
+        <div class="remove-row-action remove-row-top-right" style="visibility: visible;">
             <button type="button" class="btn btn-danger btn-sm remove-group-row-btn" title="Hapus Baris">
-                <i class="fa-solid fa-trash-can"></i>
+                <i class="fa-solid fa-xmark"></i> 
             </button>
         </div>
-    </div>`
-  newRowCard.innerHTML = newRowHtml
-  groupContainer.insertBefore(newRowCard, addButton)
-  const newRemoveButton = newRowCard.querySelector('.remove-group-row-btn')
-  if (newRemoveButton) {
-    newRemoveButton.addEventListener('click', handleRemoveRow)
-  }
-  reIndexGroupRows(groupContainer)
-  setupRelationSelects()
-  setupRowCalculatedListeners(newRowCard, groupConfig.children, childPrefix)
-  recalculateAllCalculatedFields(formElement)
-  formElement.querySelectorAll(`[data-calc-listener-for*="${groupName}"]`).forEach((calcField) => {
-    const targetFieldName = calcField.name
-    const formula =
-      calcField
-        .closest('.form-group')
-        .querySelector('small.form-text')
-        ?.textContent.match(/formula: (.+)/)?.[1] || ''
+        <div class="group-row-fields">` // START: Area Field Input
+    
+    // Tambahkan field anak yang sudah dirender dengan class lebar (widthClass)
+    newRowHtml += groupConfig.children.map((child) => renderFieldHtml(child, childPrefix)).join('')
+    
+    newRowHtml += `</div>` // Tutup div.group-row-fields
 
-    if (targetFieldName && formula) {
-      updateCalculatedField(formElement, targetFieldName, formula)
+    newRowCard.innerHTML = newRowHtml
+    groupContainer.insertBefore(newRowCard, addButton)
+    
+    // -------------------------------------------------------------------------
+    // INISIALISASI DAN PERHITUNGAN (Sudah Benar)
+    // -------------------------------------------------------------------------
+
+    // 1. Inisialisasi Event Listener
+    const newRemoveButton = newRowCard.querySelector('.remove-group-row-btn')
+    if (newRemoveButton) {
+        newRemoveButton.addEventListener('click', handleRemoveRow)
     }
-  })
+    
+    // 2. Re-index dan Setup
+    reIndexGroupRows(groupContainer)
+    setupRelationSelects()
+    setupRowCalculatedListeners(newRowCard, groupConfig.children, childPrefix) 
+    
+    // 3. Perhitungan Ulang
+    initializeCalculatedFields(newRowCard); 
+    recalculateAllCalculatedFields(formElement)
 }
 const handleRemoveRow = (event) => {
-  const removeButton = event.currentTarget
-  const itemCardToRemove = removeButton.closest('.repeat-item-card')
-  const groupContainer = removeButton.closest('.group-container')
-  const formElement = removeButton.closest('form')
-  const groupName = groupContainer.dataset.groupName
-  if (!itemCardToRemove || !groupContainer || !groupName) return
-  itemCardToRemove.remove()
-  reIndexGroupRows(groupContainer)
-  setupRelationSelects()
-  recalculateAllCalculatedFields(formElement)
-  formElement.querySelectorAll(`[data-calc-listener-for*="${groupName}"]`).forEach((calcField) => {
-    const targetFieldName = calcField.name
-    const formula =
-      calcField
-        .closest('.form-group')
-        .querySelector('small.form-text')
-        .textContent.match(/formula: (.+)/)?.[1] || ''
-
-    if (targetFieldName && formula) {
-      // Kita panggil updateCalculatedField untuk target agregasi
-      updateCalculatedField(formElement, targetFieldName, formula)
+    const removeButton = event.currentTarget
+    const itemCardToRemove = removeButton.closest('.repeat-item-card')
+    const groupContainer = removeButton.closest('.group-container')
+    const formElement = removeButton.closest('form')
+    const groupName = groupContainer?.dataset.groupName // Gunakan optional chaining untuk keamanan
+    
+    // Periksa apakah semua elemen penting ditemukan
+    if (!itemCardToRemove || !groupContainer || !groupName || !formElement) {
+        return
     }
-  })
+
+    // 1. Hapus Baris
+    itemCardToRemove.remove()
+    
+    // 2. Re-index dan Setup
+    // PENTING: Panggil reIndexGroupRows terlebih dahulu agar indeks field lain benar
+    reIndexGroupRows(groupContainer) 
+    
+    // Panggil setupRelationSelects untuk pembersihan/re-inisialisasi choices.js
+    setupRelationSelects()
+    
+    // 3. Perhitungan Ulang Global
+    // Panggil fungsi recalculate global sekali. 
+    // Fungsi ini harus dirancang untuk mencari semua calculated field, termasuk agregasi, 
+    // dan menghitung ulang nilainya.
+    recalculateAllCalculatedFields(formElement) 
+    
+    // Hapus blok kode terakhir yang berulang-ulang dan tidak efisien:
+    /*
+    formElement.querySelectorAll(`[data-calc-listener-for*="${groupName}"]`).forEach((calcField) => {
+        // ... kode perhitungan berulang
+    })
+    */
+    
+    // Catatan: Jika recalculateAllCalculatedFields Anda belum menangani agregasi (SUM/AVG)
+    // dengan benar setelah baris dihapus, Anda harus memperbaiki logika di dalam 
+    // recalculateAllCalculatedFields, bukan menambah loop manual di sini.
 }
 const reIndexGroupRows = (groupContainer) => {
   const itemCards = groupContainer.querySelectorAll('.repeat-item-card')
