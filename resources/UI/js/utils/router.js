@@ -1,5 +1,6 @@
 import { renderDashboard } from '../pages/dashboard.js'
 import { renderDataEntries, setupDataEntries } from '../pages/dataEntries.js'
+import { renderDataEntriesV2, setupDataEntriesV2 } from '../pages/dataEntriesV2.js'
 
 const routes = {
   '': () => {
@@ -12,9 +13,9 @@ const routes = {
     document.getElementById('main-content').innerHTML = renderDataEntries()
     setupDataEntries() // Panggil fungsi setup di sini
   },
-  '#data-entries': () => {
-    document.getElementById('main-content').innerHTML = renderDataEntries()
-    setupDataEntries() // Panggil fungsi setup di sini
+  '#data-entries-v2': () => {
+    document.getElementById('main-content').innerHTML = renderDataEntriesV2()
+    setupDataEntriesV2() // Panggil fungsi setup di sini
   },
 }
 

@@ -29,7 +29,7 @@
         background-color: var(--background-light);
         color: var(--text-color);
         transition: background-color 0.3s ease,
-                                color 0.3s ease;
+                                                                                                                                                                                                        color 0.3s ease;
         line-height: 1.6;
       }
       
@@ -379,21 +379,21 @@
         const formHTML = config.fields.map(groupConfig => {
           if (groupConfig.isRepeatable) {
             return `
-                                          <div class="form-card">
-                                              <h2>${groupConfig.label}</h2>
-                                              <div id="repeatable-group-${groupConfig.name}" data-group-name="${groupConfig.name}">
-                                                  </div>
-                                              <div class="button-group">
-                                                  <button type="button" class="add-group-btn" onclick="addRepeatableGroup('${groupConfig.name}')">+ Tambah ${groupConfig.label}</button>
-                                              </div>
-                                          </div>
-                                      `;
+                                                                                                                                                                                                                  <div class="form-card">
+                                                                                                                                                                                                                      <h2>${groupConfig.label}</h2>
+                                                                                                                                                                                                                      <div id="repeatable-group-${groupConfig.name}" data-group-name="${groupConfig.name}">
+                                                                                                                                                                                                                          </div>
+                                                                                                                                                                                                                      <div class="button-group">
+                                                                                                                                                                                                                          <button type="button" class="add-group-btn" onclick="addRepeatableGroup('${groupConfig.name}')">+ Tambah ${groupConfig.label}</button>
+                                                                                                                                                                                                                      </div>
+                                                                                                                                                                                                                  </div>
+                                                                                                                                                                                                              `;
           } else {
             return `
-                                          <div class="form-card">
-                                              ${createGroupHTML(groupConfig)}
-                                          </div>
-                                      `;
+                                                                                                                                                                                                                  <div class="form-card">
+                                                                                                                                                                                                                      ${createGroupHTML(groupConfig)}
+                                                                                                                                                                                                                  </div>
+                                                                                                                                                                                                              `;
           }
         }).join("");
         formContainer.innerHTML = `<form id="dynamic-form">${formHTML}</form>`;
@@ -418,83 +418,83 @@
            case "date":
            case "file":
             return `
-                                              <div class="form-field ${widthClass}">
-                                                  <label for="${fieldName}">${fieldConfig.label}</label>
-                                                  <input type="${fieldConfig.type}" id="${fieldName}" name="${fieldName}">
-                                              </div>
-                                          `;
+                                                                                                                                                                                                                      <div class="form-field ${widthClass}">
+                                                                                                                                                                                                                          <label for="${fieldName}">${fieldConfig.label}</label>
+                                                                                                                                                                                                                          <input type="${fieldConfig.type}" id="${fieldName}" name="${fieldName}">
+                                                                                                                                                                                                                      </div>
+                                                                                                                                                                                                                  `;
       
            case "textarea":
             return `
-                                              <div class="form-field ${widthClass}">
-                                                  <label for="${fieldName}">${fieldConfig.label}</label>
-                                                  <textarea id="${fieldName}" name="${fieldName}"></textarea>
-                                              </div>
-                                          `;
+                                                                                                                                                                                                                      <div class="form-field ${widthClass}">
+                                                                                                                                                                                                                          <label for="${fieldName}">${fieldConfig.label}</label>
+                                                                                                                                                                                                                          <textarea id="${fieldName}" name="${fieldName}"></textarea>
+                                                                                                                                                                                                                      </div>
+                                                                                                                                                                                                                  `;
       
            case "select":
             const optionsHTML = fieldConfig.options.map(optionText => `<option value="${optionText}">${optionText}</option>`).join("");
             return `
-                                              <div class="form-field ${widthClass}">
-                                                  <label for="${fieldName}">${fieldConfig.label}</label>
-                                                  <select id="${fieldName}" name="${fieldName}">
-                                                      ${optionsHTML}
-                                                  </select>
-                                              </div>
-                                          `;
+                                                                                                                                                                                                                      <div class="form-field ${widthClass}">
+                                                                                                                                                                                                                          <label for="${fieldName}">${fieldConfig.label}</label>
+                                                                                                                                                                                                                          <select id="${fieldName}" name="${fieldName}">
+                                                                                                                                                                                                                              ${optionsHTML}
+                                                                                                                                                                                                                          </select>
+                                                                                                                                                                                                                      </div>
+                                                                                                                                                                                                                  `;
       
            case "radio":
             const radioOptionsHTML = fieldConfig.options.map(optionText => `
-                                              <div class="radio-group">
-                                                  <input type="radio" id="${fieldName}-${optionText.replace(/\s+/g, "")}" name="${fieldName}" value="${optionText}">
-                                                  <label for="${fieldName}-${optionText.replace(/\s+/g, "")}">${optionText}</label>
-                                              </div>
-                                          `).join("");
+                                                                                                                                                                                                                      <div class="radio-group">
+                                                                                                                                                                                                                          <input type="radio" id="${fieldName}-${optionText.replace(/\s+/g, "")}" name="${fieldName}" value="${optionText}">
+                                                                                                                                                                                                                          <label for="${fieldName}-${optionText.replace(/\s+/g, "")}">${optionText}</label>
+                                                                                                                                                                                                                      </div>
+                                                                                                                                                                                                                  `).join("");
             return `
-                                              <div class="form-field ${widthClass}">
-                                                  <label>${fieldConfig.label}</label>
-                                                  <div class="radio-options">
-                                                      ${radioOptionsHTML}
-                                                  </div>
-                                              </div>
-                                          `;
+                                                                                                                                                                                                                      <div class="form-field ${widthClass}">
+                                                                                                                                                                                                                          <label>${fieldConfig.label}</label>
+                                                                                                                                                                                                                          <div class="radio-options">
+                                                                                                                                                                                                                              ${radioOptionsHTML}
+                                                                                                                                                                                                                          </div>
+                                                                                                                                                                                                                      </div>
+                                                                                                                                                                                                                  `;
       
            case "checkbox":
            case "switch":
             return `
-                                              <div class="form-field ${widthClass}" style="flex-direction: row; align-items: center; gap: 0.5rem;">
-                                                  <label for="${fieldName}">${fieldConfig.label}</label>
-                                                  <input type="checkbox" id="${fieldName}" name="${fieldName}">
-                                              </div>
-                                          `;
+                                                                                                                                                                                                                      <div class="form-field ${widthClass}" style="flex-direction: row; align-items: center; gap: 0.5rem;">
+                                                                                                                                                                                                                          <label for="${fieldName}">${fieldConfig.label}</label>
+                                                                                                                                                                                                                          <input type="checkbox" id="${fieldName}" name="${fieldName}">
+                                                                                                                                                                                                                      </div>
+                                                                                                                                                                                                                  `;
       
            case "relation":
            case "calculated":
            case "autofill":
             return `
-                                              <div class="form-field ${widthClass}">
-                                                  <p class="special-field-info"><strong>${fieldConfig.label}</strong>: Tipe field "${fieldConfig.type}" memerlukan logika khusus.</p>
-                                              </div>
-                                          `;
+                                                                                                                                                                                                                      <div class="form-field ${widthClass}">
+                                                                                                                                                                                                                          <p class="special-field-info"><strong>${fieldConfig.label}</strong>: Tipe field "${fieldConfig.type}" memerlukan logika khusus.</p>
+                                                                                                                                                                                                                      </div>
+                                                                                                                                                                                                                  `;
       
            default:
             return ``;
           }
         }).join("");
         const removeButtonHTML = groupConfig.isRepeatable ? `
-                                  <div class="button-group">
-                                      <button type="button" class="remove-group-btn" onclick="this.closest('.form-group-container').remove()">Hapus Grup</button>
-                                  </div>
-                              ` : "";
+                                                                                                                                                                                                          <div class="button-group">
+                                                                                                                                                                                                              <button type="button" class="remove-group-btn" onclick="this.closest('.form-group-container').remove()">Hapus Grup</button>
+                                                                                                                                                                                                          </div>
+                                                                                                                                                                                                      ` : "";
         return `
-                                  <div class="form-group-container ${isRepeatableClass}" ${dataAttribute}>
-                                      <h2>${groupConfig.label}</h2>
-                                      <div class="form-group-content">
-                                          ${fieldsHTML}
-                                      </div>
-                                      ${removeButtonHTML}
-                                  </div>
-                              `;
+                                                                                                                                                                                                          <div class="form-group-container ${isRepeatableClass}" ${dataAttribute}>
+                                                                                                                                                                                                              <h2>${groupConfig.label}</h2>
+                                                                                                                                                                                                              <div class="form-group-content">
+                                                                                                                                                                                                                  ${fieldsHTML}
+                                                                                                                                                                                                              </div>
+                                                                                                                                                                                                              ${removeButtonHTML}
+                                                                                                                                                                                                          </div>
+                                                                                                                                                                                                      `;
       }
       
       function addRepeatableGroup(groupName) {

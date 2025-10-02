@@ -809,143 +809,193 @@ body.dark-mode input[type='file'] {
     flex-direction: column;
   }
 }
-/* ========================================= */
-/* Choices.js (Relation Field) Styling */
-/* ========================================= */
 
+/* Styling Choices.js agar sesuai dengan tema Anda */
+
+/* 1. Kontainer Utama Choices (mengganti box select) */
 .choices {
-    /* Wajib: Memberi konteks posisi bagi dropdown absolute di dalamnya */
-    position: relative; 
-    margin-bottom: 0; 
-    font-size: 16px;
-    width: 100%; /* Memastikan Choices mengambil seluruh lebar field-container */
+  font-family: 'Poppins', sans-serif; /* Mengikuti font body */
+  margin-bottom: 18px; /* Jarak seperti pada input form login Anda */
+  position: relative; /* Penting untuk dropdown */
 }
 
+/* 2. Inner Container (area tampilan pilihan yang dipilih/input) */
 .choices__inner {
-    /* Gaya Dasar Input/Container */
-    display: inline-block;
-    width: 100%;
-    padding: 0.75rem 15px; /* Mengikuti padding input form lainnya */
-    border: 1px solid var(--form-border-light, #ddd);
-    background-color: var(--surface-light);
-    border-radius: 8px;
-    font-size: 1em;
-    min-height: 40px; 
-    transition: all 0.2s ease;
+  background-color: var(--surface-light); /* Background seragam dengan surface/form */
+  border: 1px solid var(--form-border-light); /* Border default */
+  border-radius: 8px; /* Border radius seragam */
+  padding: 8px 15px; /* Sesuaikan padding agar terlihat proporsional */
+  min-height: 44px; /* Tinggi minimum agar seragam */
+  transition: all 0.3s ease;
 }
 
-.choices__inner:hover {
-    border-color: var(--primary-color);
+/* 3. Dark Mode Inner Container */
+body.dark-mode .choices__inner {
+  background-color: var(--surface-dark);
+  border-color: var(--form-border-dark);
 }
 
-.choices__inner.is-focused {
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 2px rgba(90, 125, 255, 0.2);
+/* 4. Fokus pada Choices */
+.choices.is-focused .choices__inner,
+.choices.is-open .choices__inner {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(90, 125, 255, 0.2); /* Efek fokus dari input form */
+  outline: none;
 }
 
-/* Gaya Dropdown */
+/* 5. Item yang Dipilih (untuk multi-select) */
+.choices__list--multiple .choices__item {
+  background-color: var(--primary-color);
+  color: white;
+  border-radius: 4px; /* Border radius lebih kecil untuk item */
+  padding: 4px 10px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  border: 1px solid var(--primary-color);
+}
+
+/* Tombol Hapus pada Item */
+.choices__list--multiple .choices__item .choices__button {
+  border-left: 1px solid var(--primary-color-dark); /* Garis pemisah */
+  color: white;
+  opacity: 0.8;
+}
+
+.choices__list--multiple .choices__item .choices__button:hover {
+  opacity: 1;
+}
+
+/* 6. Placeholder Text */
+.choices__placeholder {
+  color: var(--text-color); /* Warna teks placeholder */
+  opacity: 0.6;
+}
+
+/* 7. Dropdown */
 .choices__list--dropdown {
-    /* Wajib: Mengatasi clipping dan memastikan dropdown muncul di atas panel */
-    position: absolute;
-    top: 100%; 
-    left: 0;
-    /* Kunci Perbaikan: Pastikan dropdown mengisi lebar container Choices */
-    width: 100%; 
-    right: auto;
-    
-    /* Kunci Perbaikan: Pastikan z-index lebih tinggi dari form-panel (2000) */
-    /* z-index: 2001;  */
-    
-    border: 1px solid var(--form-border-light, #ddd);
-    background-color: var(--surface-light);
-    border-radius: 8px;
-    box-shadow: 0 4px 12px var(--shadow-color);
-    margin-top: 5px;
+  background-color: var(--surface-light);
+  border: 1px solid var(--form-border-light);
+  border-radius: 8px;
+  box-shadow: 0 4px 10px var(--shadow-color); /* Shadow seragam */
+  z-index: 1010; /* Pastikan di atas elemen lain */
 }
 
-/* Gaya Pilihan (Options) */
-.choices__item--choice {
-    padding: 10px 15px;
-    color: var(--text-color);
-    cursor: pointer;
-    transition: background-color 0.2s ease;
+/* Dark Mode Dropdown */
+body.dark-mode .choices__list--dropdown {
+  background-color: var(--surface-dark);
+  border-color: var(--form-border-dark);
+  box-shadow: 0 4px 10px var(--shadow-color-dark);
 }
 
-.choices__item--choice:not(.is-highlighted):not(.is-disabled) {
-    color: var(--text-color);
+/* 8. Pilihan dalam Dropdown */
+.choices__list--dropdown .choices__item {
+  padding: 10px 15px;
+  color: var(--text-color);
+  transition: background-color 0.2s ease;
 }
 
-/* Gaya Pilihan Highlighted (Hover) */
-.choices__item--choice.is-highlighted {
-    background-color: var(--primary-color);
-    color: white;
+.choices__list--dropdown .choices__item--selectable:hover,
+.choices__list--dropdown .choices__item.is-highlighted {
+  background-color: rgba(var(--primary-color-rgb, 90, 125, 255), 0.1); /* Warna hover ringan */
+  color: var(--primary-color);
 }
 
-/* Gaya Item yang Sudah Terpilih (Placeholder) */
-.choices__list--single .choices__item {
-    padding: 0;
-    color: var(--text-color);
+/* 9. Pilihan yang Terpilih/Aktif di Dropdown */
+.choices__list--dropdown .choices__item.is-selected {
+  background-color: var(--primary-color); /* Pilihan yang sudah dipilih (dalam multi-select) */
+  color: white;
 }
 
-/* Gaya Search Input di Dropdown */
+/* Input Pencarian di Dropdown */
 .choices__input {
-    padding: 10px 15px;
-    border: none;
-    border-bottom: 1px solid var(--form-border-light);
-    margin: 0;
-    background-color: var(--surface-light);
-    color: var(--text-color);
-    border-radius: 8px 8px 0 0;
+  background-color: var(--background-light); /* Background input */
+  border-bottom: 1px solid var(--form-border-light);
+  color: var(--text-color);
+  padding: 10px 15px;
+  margin: 0;
 }
 
-.choices__input:focus {
-    outline: none;
-}
-
-/* Gaya No Results / No Choices Text */
-.choices__list--dropdown .choices__item.is-disabled {
-    padding: 10px 15px;
-    color: var(--text-color);
-    background-color: transparent;
-    opacity: 0.7;
-    cursor: default;
+/* Dark Mode Input Pencarian */
+body.dark-mode .choices__input {
+  background-color: var(--background-dark);
+  border-bottom-color: var(--form-border-dark);
 }
 
 /* ========================================= */
-/* Choices.js Dark Mode Overrides */
+/* Styling Khusus: Formulir Data Entry V2    */
+/* Selector Utama: #dynamic-data-entry-form  */
 /* ========================================= */
 
-.dark-mode .choices__inner {
-    border-color: var(--form-border-dark);
-    background-color: var(--surface-dark);
-    color: var(--text-color-dark);
+/* 1. Reset Tampilan Input Standar */
+#dynamic-data-entry-form .form-group {
+  padding: 0;
+  border: none;
+  box-shadow: none;
+  background-color: transparent;
+  margin-bottom: 15px;
 }
 
-.dark-mode .choices__list--dropdown {
-    border-color: var(--form-border-dark);
-    background-color: var(--surface-dark);
-    box-shadow: 0 4px 12px var(--shadow-color-dark);
+/* 2. Styling Card Luar untuk SELURUH GRUP (group-card-wrapper) */
+#dynamic-data-entry-form .group-card-wrapper {
+  background-color: var(--surface-light);
+  border: 1px solid var(--form-border-light);
+  border-radius: 8px;
+  padding: 15px; /* Padding card luar dikurangi */
+  margin-bottom: 25px;
+  box-shadow: 0 2px 5px var(--shadow-color);
 }
 
-.dark-mode .choices__item--choice {
-    color: var(--text-color-dark);
+/* Dark Mode Card Luar */
+body.dark-mode #dynamic-data-entry-form .group-card-wrapper {
+  background-color: var(--surface-dark);
+  border-color: var(--form-border-dark);
+  box-shadow: 0 2px 5px var(--shadow-color-dark);
 }
 
-.dark-mode .choices__item--choice.is-highlighted {
-    background-color: var(--primary-color-dark); 
-    color: white;
+/* 3. Styling Label Grup */
+#dynamic-data-entry-form .group-card-wrapper .group-label {
+  font-size: 1.1em;
+  font-weight: 600;
+  margin-bottom: 15px;
+  display: block;
+  border-bottom: 1px solid var(--form-border-light);
+  padding-bottom: 8px;
 }
 
-.dark-mode .choices__list--single .choices__item {
-    color: var(--text-color-dark);
+/* 4. Styling Card Internal untuk ITEM YANG DIULANG (repeat-item-card) */
+#dynamic-data-entry-form .repeat-item-card {
+  /* Tampilan Card untuk setiap baris */
+  background-color: var(--background-light); /* Latar belakang item card */
+  border: 1px solid var(--form-border-light);
+  border-radius: 6px;
+  padding: 15px;
+  margin-bottom: 15px; /* Jarak antar item yang diulang */
 }
 
-.dark-mode .choices__input {
-    border-bottom-color: var(--form-border-dark);
-    background-color: var(--surface-dark);
-    color: var(--text-color-dark);
+/* Dark Mode Card Internal */
+body.dark-mode #dynamic-data-entry-form .repeat-item-card {
+  background-color: var(--background-dark);
+  border-color: var(--form-border-dark);
 }
 
-.dark-mode .choices__item.is-disabled {
-    color: var(--text-color-dark);
+/* 5. Layout Row di dalam Item Card */
+#dynamic-data-entry-form .repeat-item-card .group-row.form-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  margin-bottom: 0; /* Jarak antar field dikontrol oleh margin-bottom .form-group */
+  padding-bottom: 0;
+  border-bottom: none; /* Hilangkan garis pemisah baris */
+}
+
+/* 6. Posisi Tombol Hapus */
+#dynamic-data-entry-form .group-card-wrapper .remove-row-action {
+  margin-left: 10px;
+  /* Posisikan tombol hapus agar sejajar dengan input */
+  margin-bottom: 15px;
+}
+
+/* 7. Posisi Tombol Tambah Baris */
+#dynamic-data-entry-form .group-card-wrapper .add-group-row-btn {
+  margin-top: 5px;
 }

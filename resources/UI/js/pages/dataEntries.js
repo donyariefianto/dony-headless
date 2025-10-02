@@ -384,66 +384,85 @@ export const setupDataEntries = () => {
     }
   }
 
+  // File: dataEntries.js
+
   const initializeAutofill = (container, formConfig) => {
-    // Dapatkan semua elemen select yang memiliki atribut data-autofill-fields
     const selectElements = container.querySelectorAll('.choices-select[data-autofill-fields]')
 
+    console.log(selectElements)
     selectElements.forEach((element) => {
       // Tambahkan event listener untuk event 'change' Choices.js
       element.addEventListener('change', (event) => {
         const selectedValue = event.detail.value
         const autofillFieldsString = element.dataset.autofillFields
+        const table_target = element.dataset.tabletarget
+        const uniquerowid = element.dataset.uniquerowid
 
-        // Jika tidak ada nilai yang dipilih atau string autofill kosong, keluar
-        if (!selectedValue || !autofillFieldsString) return
-        const endpoint = element.dataset.name,
-          table_target = element.dataset.tabletarget,
-          uniquerowid = element.dataset.uniquerowid
-        if (!endpoint) {
-          console.error('Endpoint tidak ditemukan untuk autofill.')
-          return
-        }
-
-        // Uraikan string "api_key:form_field,api_key:form_field"
         const autofillMappings = autofillFieldsString
           .split(',')
           .map((mapping) => {
             const parts = mapping.split(':')
-            if (parts.length !== 2) return null
             return { target: parts[0].trim(), source: parts[1].trim() }
           })
           .filter(Boolean)
 
-        if (autofillMappings.length === 0) return
-
-        // Ambil data detail dari API
-        fetch(`/api/${endpoint}/${selectedValue}`)
-          .then((response) => {
-            if (!response.ok) {
-              throw new Error(`Server returned status: ${response.status}`)
+        // 1. Logika untuk membersihkan field target jika tidak ada nilai yang dipilih
+        if (!selectedValue) {
+          autofillMappings.forEach((mapping) => {
+            let targetSelector
+            if (table_target && uniquerowid) {
+              targetSelector = `[name="${table_target}[]_${mapping.target}_${uniquerowid}"]`
+            } else {
+              targetSelector = `[name="${mapping.target}"]`
             }
-            return response.json()
+            const targetElement = document.querySelector(targetSelector)
+            if (targetElement) {
+              targetElement.value = ''
+            }
           })
-          .then((data) => {
-            // Isi field-field yang ditargetkan dengan data dari API
-            autofillMappings.forEach((mapping) => {
-              const targetElement = document.querySelector(
-                `[name="${table_target}[]_${mapping.target}_${uniquerowid}"]`
-              )
-              if (targetElement && data.data[mapping.source] !== undefined) {
-                targetElement.value = data.data[mapping.source]
-              } else {
-                console.warn(
-                  `Field form '${mapping.target}' atau data API '${mapping.source}' tidak ditemukan.`
-                )
-              }
-            })
-            updateAllCalculatedFields(formConfig)
-          })
-          .catch((error) => {
-            console.error('Gagal mengambil data autofill:', error)
-            // Tambahkan penanganan error di sini jika perlu
-          })
+          updateAllCalculatedFields(formConfig)
+          return
+        }
+
+        // 2. --- BAGIAN KRITIS: AMBIL DATA LANGSUNG DARI MAP LOKAL ---
+
+        // Dapatkan seluruh objek data yang tersimpan di Map
+        const fullItemData = element.autofillDataMap.get(selectedValue)
+
+        if (!fullItemData) {
+          console.warn(
+            `Data lengkap untuk nilai '${selectedValue}' tidak ditemukan di cache lokal.`
+          )
+          return
+        }
+
+        // Isi field-field yang ditargetkan dengan data dari Map lokal
+        autofillMappings.forEach((mapping) => {
+          let targetSelector
+
+          if (table_target && uniquerowid) {
+            // Subform: [name="table_name[]_field_name_row_id"]
+            targetSelector = `[name="${table_target}[]_${mapping.target}_${uniquerowid}"]`
+          } else {
+            // Main Form: [name="field_name"]
+            targetSelector = `[name="${mapping.target}"]`
+          }
+
+          const targetElement = document.querySelector(targetSelector)
+
+          // mapping.source adalah key di objek data (misal: 'price', 'stock')
+          if (targetElement && fullItemData[mapping.source] !== undefined) {
+            targetElement.value = fullItemData[mapping.source]
+          } else {
+            console.warn(
+              `Field form '${mapping.target}' atau data key API '${mapping.source}' tidak ditemukan.`
+            )
+          }
+        })
+
+        updateAllCalculatedFields(formConfig)
+
+        // 3. --- Panggilan fetch yang lama Dihapus ---
       })
     })
   }
@@ -461,45 +480,43 @@ export const setupDataEntries = () => {
       }
       element.classList.add('choices-select--initialized')
       const choices = new Choices(element, {
+        removeItemButton: true,
         searchEnabled: true,
         searchChoices: false,
         noResultsText: 'Tidak ada hasil yang ditemukan', // Pesan jika tidak ada hasil pencarian
         noChoicesText: 'Pilihan tidak di temukan', // Pesan ketika tidak ada pilihan sama sekali
-
+        removeItems: true,
+        removeItemButtonAlignLeft: true,
+        duplicateItemsAllowed: false,
+        searchFields: ['label', 'value'],
         loadingText: 'Loading...',
         itemSelectText: 'Press to select',
         uniqueItemText: 'Only unique values can be added',
         customAddItemText: 'Only values matching specific conditions can be added',
         classNames: {
-          containerOuter: ['choices'],
-          containerInner: ['choices__inner'],
-          input: ['choices__input'],
-          inputCloned: ['choices__input--cloned'],
-          list: ['choices__list'],
-          listItems: ['choices__list--multiple'],
-          listSingle: ['choices__list--single'],
-          listDropdown: ['choices__list--dropdown'],
-          item: ['choices__item'],
-          itemSelectable: ['choices__item--selectable'],
-          itemDisabled: ['choices__item--disabled'],
-          itemChoice: ['choices__item--choice'],
-          description: ['choices__description'],
-          placeholder: ['choices__placeholder'],
-          group: ['choices__group'],
-          groupHeading: ['choices__heading'],
-          button: ['choices__button'],
-          activeState: ['is-active'],
-          focusState: ['is-focused'],
-          openState: ['is-open'],
-          disabledState: ['is-disabled'],
-          highlightedState: ['is-highlighted'],
-          selectedState: ['is-selected'],
-          flippedState: ['is-flipped'],
-          loadingState: ['is-loading'],
-          notice: ['choices__notice'],
-          addChoice: ['choices__item--selectable', 'add-choice'],
-          noResults: ['has-no-results'],
-          noChoices: ['has-no-choices'],
+          containerOuter: 'choices',
+          containerInner: 'choices__inner',
+          input: 'choices__input',
+          inputCloned: 'choices__input--cloned',
+          list: 'choices__list',
+          listItems: 'choices__list--multiple',
+          listSingle: 'choices__list--single',
+          listDropdown: 'choices__list--dropdown',
+          item: 'choices__item',
+          itemSelectable: 'choices__item--selectable',
+          itemDisabled: 'choices__item--disabled',
+          itemOption: 'choices__item--choice',
+          group: 'choices__group',
+          groupHeading: 'choices__heading',
+          button: 'choices__button',
+          activeState: 'is-active',
+          focusState: 'is-focused',
+          openState: 'is-open',
+          disabledState: 'is-disabled',
+          highlightedState: 'is-highlighted',
+          hiddenState: 'is-hidden',
+          flippedState: 'is-flipped',
+          selectedState: 'is-highlighted',
         },
       })
 
@@ -525,7 +542,6 @@ export const setupDataEntries = () => {
               label: item[label],
             }
           })
-
           const replace = page === 1
           choices.setChoices(options, 'value', 'label', replace)
 
@@ -542,7 +558,6 @@ export const setupDataEntries = () => {
           isLoading = false
         }
       }
-
       // Muat data halaman pertama
       fetchData(
         currentPage,
@@ -551,7 +566,6 @@ export const setupDataEntries = () => {
         element.getAttribute('form-value'),
         element.getAttribute('form-label')
       )
-
       element.addEventListener('search', (event) => {
         currentSearchTerm = event.detail.value
         currentPage = 1
@@ -559,7 +573,7 @@ export const setupDataEntries = () => {
         fetchData(
           currentPage,
           currentSearchTerm,
-          element.name,
+          element.dataset.name,
           element.getAttribute('form-value'),
           element.getAttribute('form-label')
         )
@@ -860,9 +874,7 @@ export const setupDataEntries = () => {
             const autofillFields = subField.options.relation.autofill_fields
               ? subField.options.relation.autofill_fields
               : ''
-            subFieldHtml += `
-                            <select id="${subField.name}" data-uniquerowid="${uniqueRowId}" data-tabletarget="${tableName}" data-name="${subField.name}" data-autofill-fields="${autofillFields}" form-value="${subField.options.relation.value_column}" form-label="${subField.options.relation.label_column}" class="choices-select" name="${tableName}[]_${subField.name}_${uniqueRowId}" ${subField.required ? 'required' : ''}>
-                            </select>`
+            subFieldHtml += `<select id="${subField.name}" data-uniquerowid="${uniqueRowId}" data-tabletarget="${tableName}" data-name="${subField.name}" data-autofill-fields="${autofillFields}" form-value="${subField.options.relation.value_column}" form-label="${subField.options.relation.label_column}" class="choices-select" name="${tableName}[]_${subField.name}_${uniqueRowId}" ${subField.required ? 'required' : ''}></select>`
           } else {
             subFieldHtml += `<select name="${tableName}[]_${subField.name}_${uniqueRowId}"></select>`
           }

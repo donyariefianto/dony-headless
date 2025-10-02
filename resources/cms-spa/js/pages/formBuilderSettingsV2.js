@@ -254,7 +254,7 @@ function buildSchema(container) {
       obj.autofill = {
         sourceField: d.sourceField || '',
         mode: d.autofillMode || 'copy-label',
-        mapRules: JSON.parse(d.mapRules || '[]'),
+        sourceKey: d.mapRules,
       }
     }
     arr.push(obj)
@@ -321,8 +321,8 @@ function createFieldData(type) {
   }
   if (type === 'autofill') {
     base.sourceField = ''
-    base.autofillMode = 'copy-label' // copy-label | copy-value | map
-    base.mapRules = JSON.stringify([]) // [[fromValue, toText], ...]
+    base.autofillMode = 'copy-label' // copy-label | copy-value | custom-value
+    base.mapRules = ''
     base.readonly = true
   }
   return base
@@ -503,13 +503,11 @@ function renderProps(el, canvas) {
         <select id="pAutoMode">
           <option value="copy-label" ${d.autofillMode === 'copy-label' ? 'selected' : ''}>Copy label option</option>
           <option value="copy-value" ${d.autofillMode === 'copy-value' ? 'selected' : ''}>Copy value</option>
-          <option value="map" ${d.autofillMode === 'map' ? 'selected' : ''}>Mapping rules</option>
+          <option value="custom-value" ${d.autofillMode === 'custom-value' ? 'selected' : ''}>Custom value</option>
         </select>
       </div>
-      <div class="form-group-formbuilder"><label>Mapping Rules (satu per baris, format: nilai =&gt; hasil)</label>
-        <textarea id="pMapRules" row-fomrbuilders="4">${JSON.parse(d.mapRules || '[]')
-          .map(([a, b]) => `${a} => ${b}`)
-          .join('')}</textarea>
+      <div class="form-group-formbuilder"><label>Custom value</label>
+        <input id="pMapRules" row-fomrbuilders="4">${d.mapRules}</input>
       </div>
       <small class="muted">Contoh rules: <code>VIP =&gt; Pelanggan Prioritas</code></small>
     </div>`
@@ -605,18 +603,8 @@ function renderProps(el, canvas) {
     $('#pSourceField').onchange = (e) => (d.sourceField = e.target.value)
     $('#pAutoMode').onchange = (e) => (d.autofillMode = e.target.value)
     $('#pMapRules').oninput = (e) => {
-      const lines = e.target.value
-        .split('+')
-        .map((l) => l.trim())
-        .filter(Boolean)
-      const pairs = []
-      lines.forEach((line) => {
-        const m = line.split('=>')
-        if (m.length >= 2) {
-          pairs.push([m[0].trim(), m.slice(1).join('=>').trim()])
-        }
-      })
-      d.mapRules = JSON.stringify(pairs)
+      const value_custonm = e.target.value
+      d.mapRules = value_custonm
     }
   }
   $('#pDelete').onclick = () => {

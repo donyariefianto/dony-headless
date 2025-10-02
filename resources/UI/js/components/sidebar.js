@@ -15,6 +15,7 @@ export const renderSidebar = () => {
             <ul class="nav-links">
                 <li><a href="#dashboard" class="nav-link"><i class="fa-solid fa-gauge icon"></i><span>Dashboard</span></a></li>
                 <li><a href="#data-entries" class="nav-link"><i class="fa-solid fa-database icon"></i><span>Data Entries</span></a></li>
+                <li><a href="#data-entries-v2" class="nav-link"><i class="fa-solid fa-database icon"></i><span>Data Entries V2</span></a></li>
             </ul>
             <div class="sidebar-footer">
                 <button class="toggle-btn" title="Toggle Sidebar">${isCollapse ? leftIcon : rightIcon}</button>
