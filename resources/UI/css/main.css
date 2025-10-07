@@ -1001,55 +1001,57 @@ body.dark-mode #dynamic-data-entry-form .repeat-item-card {
 }
 /* Pastikan ini ada di stylesheet Anda */
 .repeat-item-card {
-    position: relative; /* KRITIS: Agar tombol absolute berfungsi dengan benar */
-    border: 1px solid #ddd;
-    padding: 15px; /* Tambahkan padding agar field tidak tertimpa tombol */
-    margin-bottom: 15px;
+  position: relative; /* KRITIS: Agar tombol absolute berfungsi dengan benar */
+  border: 1px solid #ddd;
+  padding: 15px; /* Tambahkan padding agar field tidak tertimpa tombol */
+  margin-bottom: 15px;
 }
 
 .remove-row-top-right {
-    position: absolute;
-    top: -10px; 
-    right: -10px; 
-    z-index: 10;
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  z-index: 10;
 }
 
 /* Dan style layout horizontal */
 .group-row-fields {
-    display: flex;
-    flex-wrap: wrap; 
-    gap: 8px; 
-    align-items: flex-start;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: flex-start;
 }
 
-.field-width-half { 
-    width: calc(50% - 4px); /* Sesuaikan dengan gap */
-    box-sizing: border-box;
+.field-width-half {
+  width: calc(50% - 4px); /* Sesuaikan dengan gap */
+  box-sizing: border-box;
 }
 .field-width-full {
-    width: 100%;
-    box-sizing: border-box;
+  width: 100%;
+  box-sizing: border-box;
 }
 .remove-row-top-right button:hover {
-    /* Agar terlihat responsif saat disentuh */
-    opacity: 0.9; 
+  /* Agar terlihat responsif saat disentuh */
+  opacity: 0.9;
 }
 .remove-row-top-right button {
-    /* Atur dimensi agar tombol menjadi persegi */
-    width: 30px; 
-    height: 30px; 
-    padding: 0; /* Hapus padding default Bootstrap */
-    
-    /* KRITIS: Radius 50% untuk membuat bentuk lingkaran */
-    border-radius: 50%; 
-    
-    /* Gunakan Flexbox untuk memusatkan ikon silang di tengah tombol */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    
-    /* Tambahkan transisi agar lebih halus (Opsional) */
-    transition: background-color 0.2s, border-color 0.2s;
+  /* Atur dimensi agar tombol menjadi persegi */
+  width: 30px;
+  height: 30px;
+  padding: 0; /* Hapus padding default Bootstrap */
+
+  /* KRITIS: Radius 50% untuk membuat bentuk lingkaran */
+  border-radius: 50%;
+
+  /* Gunakan Flexbox untuk memusatkan ikon silang di tengah tombol */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  /* Tambahkan transisi agar lebih halus (Opsional) */
+  transition:
+    background-color 0.2s,
+    border-color 0.2s;
 }
 /* =========================================
    CATATAN FIELD HOVER (calculated/autofill)
@@ -1057,29 +1059,31 @@ body.dark-mode #dynamic-data-entry-form .repeat-item-card {
 
 /* 1. Sembunyikan catatan secara default */
 .field-note-hover {
-    /* Gunakan opacity daripada display: none agar transisi bisa berfungsi */
-    opacity: 0;
-    max-height: 0; /* Penting untuk mengabaikan ruang vertikal */
-    overflow: hidden;
-    transition: opacity 0.3s ease-in-out, max-height 0.3s ease-in-out;
-    padding-top: 0;
+  /* Gunakan opacity daripada display: none agar transisi bisa berfungsi */
+  opacity: 0;
+  max-height: 0; /* Penting untuk mengabaikan ruang vertikal */
+  overflow: hidden;
+  transition:
+    opacity 0.3s ease-in-out,
+    max-height 0.3s ease-in-out;
+  padding-top: 0;
 }
 
 /* 2. Style Ikon Informasi (Opsional) */
 .field-info-icon {
-    margin-left: 5px;
-    color: #6c757d; /* Warna abu-abu */
-    cursor: help; /* Kursor membantu menunjukkan ada informasi tersembunyi */
+  margin-left: 5px;
+  color: #6c757d; /* Warna abu-abu */
+  cursor: help; /* Kursor membantu menunjukkan ada informasi tersembunyi */
 }
 
 /* 3. Tampilkan saat hover pada form-group */
 .form-group:hover .field-note-hover {
-    opacity: 1; /* Tampilkan catatan */
-    max-height: 50px; /* Beri ketinggian maksimal agar terlihat */
-    padding-top: 5px;
+  opacity: 1; /* Tampilkan catatan */
+  max-height: 50px; /* Beri ketinggian maksimal agar terlihat */
+  padding-top: 5px;
 }
 
 /* Opsional: Ubah warna ikon saat hover untuk indikasi visual */
 .form-group:hover .field-info-icon {
-    color: #007bff; /* Warna biru atau warna aksen Anda */
+  color: #007bff; /* Warna biru atau warna aksen Anda */
 }

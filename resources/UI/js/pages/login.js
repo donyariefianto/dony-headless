@@ -37,22 +37,22 @@ export const renderLogin = () => {
     const password = e.target.password.value
 
     try {
-      const response = await fetch('https://dummyjson.com/auth/login', {
+      const requestOptions = {
         method: 'POST',
+        redirect: 'follow',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           username: username,
           password: password,
         }),
-      })
+      }
 
+      const response = await fetch('http://localhost:3333/api/login', requestOptions)
       if (!response.ok) {
-        // const errorData = await response.json();
-        // throw new Error(errorData.message || 'Login failed');
+        throw new Error('Login failed')
       }
 
       const data = await response.json()
-
       localStorage.setItem('isLoggedIn', 'true')
       localStorage.setItem('userToken', data.token)
 

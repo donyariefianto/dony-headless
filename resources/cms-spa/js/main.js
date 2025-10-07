@@ -206,8 +206,6 @@ document.addEventListener('DOMContentLoaded', () => {
   loadContent('dashboard')
   // --- Sidebar Toggle Logic ---
   sidebarToggleBtn.addEventListener('click', () => {
-    console.log('sini')
-
     sidebar.classList.toggle('collapsed')
     document.body.classList.toggle('sidebar-collapsed-body')
   })

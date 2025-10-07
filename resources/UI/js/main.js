@@ -7,17 +7,33 @@ import { loadTheme } from './components/theme.js'
 loadTheme()
 
 // Fungsi untuk memeriksa status login dari localStorage
-const checkLoginStatus = () => {
-  return localStorage.getItem('isLoggedIn') === 'true'
+const checkLoginStatus = async () => {
+  try {
+    let url = '/api/profile'
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('userToken')}`,
+      },
+      body: JSON.stringify({}),
+    })
+    if (!response.ok) {
+      return false
+    }
+    return true
+  } catch (error) {
+    return false
+  }
 }
 
-const initApp = () => {
+const initApp = async () => {
   const appContainer = document.getElementById('app')
 
   // Hapus konten yang ada sebelum merender yang baru
   appContainer.innerHTML = ''
-
-  if (checkLoginStatus()) {
+  let status = await checkLoginStatus()
+  if (status) {
     renderApp()
   } else {
     renderLogin()

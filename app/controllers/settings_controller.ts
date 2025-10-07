@@ -696,6 +696,18 @@ export default class SettingsController {
       return response.internalServerError({ message: err.message })
     }
   }
+  async saveDataDynamicForm({ request, response, params }: HttpContext) {
+    try {
+      let body = request.all()
+      console.log(params)
+
+      console.log(body)
+
+      return response.noContent()
+    } catch (err) {
+      return response.internalServerError({ message: err.message })
+    }
+  }
   async UIConfigs({ request, response }) {
     let { page, limit } = request.all()
     page = page ? parseInt(page) : 1
