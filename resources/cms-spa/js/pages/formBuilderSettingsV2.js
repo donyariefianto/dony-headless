@@ -146,19 +146,24 @@ function attachFormGeneratorEventListeners() {
   btnExport.addEventListener('click', async () => {
     const currentTheme = localStorage.getItem('theme')
     let config_swal = {
-      title: 'Submit your formbuilder name',
-      input: 'text',
+      title: 'Fill in the blank to Continue ',
+      html:
+        'Formbuilder Name: <input id="swal-input1" class="swal2-input"><br>' +
+        'Main Collection: <input id="swal-input2" class="swal2-input">',
       inputAttributes: {
         autocapitalize: 'on',
       },
       showCancelButton: true,
       confirmButtonText: 'Save',
       showLoaderOnConfirm: true,
-      preConfirm: async (name) => {
+      preConfirm: async () => {
         try {
-          if (!name) {
-            Swal.showValidationMessage(`
-              Request failed: formbuilder name is required`)
+          const name = document.getElementById('swal-input1').value
+          const main_collection = document.getElementById('swal-input2').value
+          if (!name || !main_collection) {
+            return Swal.showValidationMessage(
+              `Request failed: formbuilder name or main collection is required`
+            )
           }
           let schema = buildSchema(canvas),
             url_data = `${BASE_API_URL}/configuration/formbuilder/create`
@@ -170,7 +175,8 @@ function attachFormGeneratorEventListeners() {
             body: JSON.stringify({
               data: {
                 name: name.charAt(0).toUpperCase() + name.substr(1).toLowerCase(),
-                slug: name,
+                slug: toLowercaseWithUnderscores(name),
+                main_collection: main_collection,
                 fields: schema,
               },
             }),
@@ -203,7 +209,11 @@ function attachFormGeneratorEventListeners() {
     }
   })
 }
-
+function toLowercaseWithUnderscores(text) {
+  let lowercaseText = text.toLowerCase()
+  let result = lowercaseText.replace(/ /g, '_')
+  return result
+}
 function buildSchema(container) {
   const arr = []
   $$('.field', container).forEach((el) => {
@@ -212,6 +222,7 @@ function buildSchema(container) {
     const obj = {
       id: d.id,
       label: d.label || '',
+      slug: toLowercaseWithUnderscores(d.label) || '',
       name: d.name || '',
       type: d.type,
       width: d.width || '1/1',

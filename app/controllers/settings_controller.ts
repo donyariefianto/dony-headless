@@ -156,7 +156,7 @@ export default class SettingsController {
     }
   }
   async updateCollectionConfig({ request, response }: HttpContext) {
-    let { id, query } = request.all()
+    let { id, collectionConfigData } = request.all()
     if (!id) {
       return response.badRequest({
         status: false,
@@ -166,7 +166,7 @@ export default class SettingsController {
       })
     }
     try {
-      let data = await MongoDBModels.UpdateOne(id, query, settings_collections)
+      let data = await MongoDBModels.UpdateOne(id, collectionConfigData, settings_collections)
 
       return response.ok({
         status: true,
@@ -696,12 +696,38 @@ export default class SettingsController {
       return response.internalServerError({ message: err.message })
     }
   }
+  async getDataDynamicForm({ request, response, params }: HttpContext) {
+    let id = params.id
+    let body = request.all()
+    let data = await MongoDBModels.FindOne({ _id: new ObjectId(id) }, '_FormBuilder')
+    console.log(data)
+  }
   async saveDataDynamicForm({ request, response, params }: HttpContext) {
     try {
+      let list_data = []
+      let id = params.id
       let body = request.all()
-      console.log(params)
+      let config_form = await MongoDBModels.FindOne({ _id: new ObjectId(id) }, '_FormBuilder')
+      let CLEAN_DATA = {},TARGET_COLLECTION = config_form.main_collection
+      let config_main_table = await ConfigCollection(TARGET_COLLECTION)
+      const rawData = groupFieldsByCollection(config_form.fields, body, TARGET_COLLECTION)
+      const processedData = processDynamicData(config_form, body);
+    
+      console.log("--- HASIL AKHIR PROSES DINAMIS ---");
+      console.log(processedData);
 
-      console.log(body)
+      // Anda dapat mengaksesnya secara dinamis:
+      // const mainCollectionName = config_form.main_collection;
+      // console.log(`\nData Induk (${mainCollectionName}):`);
+      // console.log(processedData[mainCollectionName]);
+      
+      // Iterasi untuk semua koleksi anak
+      // for (const key in processedData) {
+      //     if (key !== mainCollectionName) {
+      //         console.log(`\nData Anak Dinamis (${key}):`);
+      //         console.log(processedData[key]);
+      //     }
+      // }
 
       return response.noContent()
     } catch (err) {
@@ -883,4 +909,138 @@ export default class SettingsController {
   async UISinglePageApplication({ view }) {
     return view.render('spa', { base_url: env.get('APP_URL') })
   }
+}
+
+function groupFieldsByCollection(configFields, rawData, mainCollectionSlug) {
+        const finalResult = []
+
+        // 1. Siapkan koleksi utama
+        const mainCollection = {
+          collection: mainCollectionSlug,
+          fields: [],
+        }
+
+        // 2. Iterasi melalui field konfigurasi
+        configFields.forEach((field) => {
+          const fieldName = field.name
+          const fieldSlug = field.slug
+          const rawValue = rawData[fieldName]
+
+          // Siapkan objek field ringkas
+          const compactField = {
+            slug: fieldSlug,
+            key: fieldName,
+            value: rawValue !== undefined ? rawValue : field.defaultValue || null,
+          }
+
+          if (field.type !== 'group') {
+            // 3. Jika BUKAN Group: Tambahkan ke koleksi utama (transaksi)
+            mainCollection.fields.push(compactField)
+          } else if (field.type === 'group' && field.children && Array.isArray(rawValue)) {
+            // 4. Jika TIPE Group: Proses item group (anak) sebagai koleksi terpisah
+
+            const childCollectionSlug = field.collection // e.g., 'detail_transaksi'
+            const groupChildrenConfig = field.children
+
+            // Iterasi data anak (rawValue)
+            rawValue.forEach((childDataItem) => {
+              const childCollectionFields = []
+
+              // Map field anak
+              groupChildrenConfig.forEach((childField) => {
+                const childKey = childField.name
+
+                childCollectionFields.push({
+                  slug: childField.slug,
+                  key: childKey,
+                  value: childDataItem[childKey],
+                })
+              })
+
+              // Tambahkan koleksi anak ini ke array hasil top-level
+              finalResult.push({
+                collection: childCollectionSlug, // detail_transaksi
+                fields: childCollectionFields,
+              })
+            })
+
+            // 5. Opsi: Tambahkan field group parent ke main collection (sebagai penanda hubungan)
+            //    Nilai disetel null/array kosong agar tidak menduplikasi data anak.
+            compactField.value = null
+            mainCollection.fields.push(compactField)
+          }
+        })
+
+        // 6. Tambahkan koleksi utama di awal array hasil
+        finalResult.unshift(mainCollection)
+
+        return finalResult
+}
+async function ConfigCollection(collections) {
+  return await MongoDBModels.FindOne({ _id: `${collections}_config` }, settings_collections)
+}
+
+function processFieldsRecursively(configFields, rawDataChunk) {
+    const currentData = {}; // Data untuk koleksi level ini (e.g., transaksi atau detail_transaksi)
+    const nestedCollections = {}; // Koleksi anak (e.g., detail_transaksi, log_diskon)
+
+    configFields.forEach(configField => {
+        const rawValue = rawDataChunk[configField.name];
+
+        if (configField.type === 'group' && configField.isRepeatable && configField.collection && Array.isArray(rawValue)) {
+            // --- KASUS 1: MULTI-CHILD (Group yang Berulang & Menargetkan Koleksi) ---
+            // Contoh: Item Transaksi (detail_transaksi)
+            
+            const childCollectionName = configField.collection; // e.g., "detail_transaksi"
+            const childDataArray = [];
+
+            // Proses setiap item dalam array rawValue secara rekursif
+            rawValue.forEach(rawChildItem => {
+                const childResult = processFieldsRecursively(configField.children, rawChildItem);
+                
+                // Tambahkan data child yang sudah diproses
+                childDataArray.push(childResult.data);
+                
+                // Gabungkan koleksi nested dari child (misalnya log_diskon)
+                Object.assign(nestedCollections, childResult.nestedCollections);
+            });
+
+            // Simpan data child array ke objek nestedCollections global
+            nestedCollections[childCollectionName] = (nestedCollections[childCollectionName] || []).concat(childDataArray);
+            
+            // Di data induk, field group ini diabaikan (akan diisi dengan Foreign Key/ID relasi nanti)
+            currentData[configField.slug] = null; 
+
+        } else if (configField.type === 'group' && !configField.isRepeatable) {
+            // --- KASUS 2: SINGLE-CHILD (Group Embedded, tidak Berulang) ---
+            // Jika ada data, proses children secara rekursif
+            if (rawValue && typeof rawValue === 'object') {
+                const embeddedResult = processFieldsRecursively(configField.children, rawValue);
+                currentData[configField.slug] = embeddedResult.data;
+                // Pastikan koleksi nested dari group embedded juga ikut tergabung
+                Object.assign(nestedCollections, embeddedResult.nestedCollections);
+            } else {
+                currentData[configField.slug] = null;
+            }
+
+        } else if (rawValue !== undefined) {
+            // --- KASUS 3: FIELD NORMAL (relation, date, number, string, etc.) ---
+            currentData[configField.slug] = rawValue;
+        }
+    });
+
+    return { data: currentData, nestedCollections };
+}
+function processDynamicData(formConfig, rawData) {
+    // Memanggil fungsi rekursif dari level root (koleksi utama)
+    const result = processFieldsRecursively(formConfig.fields, rawData);
+    
+    // Siapkan objek hasil akhir
+    const mainCollectionName = formConfig.main_collection; // "transaksi"
+    const finalData = { [mainCollectionName]: result.data };
+    
+    // Gabungkan koleksi anak (detail_transaksi, log_diskon, dll.)
+    Object.assign(finalData, result.nestedCollections);
+
+    return finalData;
 }

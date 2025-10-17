@@ -78,6 +78,9 @@ router
     router
       .post('/dynamics-form/:id', '#controllers/settings_controller.saveDataDynamicForm')
       .use(middleware.authentication())
+    router
+      .get('/dynamics-form/:id', '#controllers/settings_controller.getDataDynamicForm')
+      .use(middleware.authentication())
     router.get('/configs', '#controllers/settings_controller.UIConfigs')
     router.get('/ui-configs', '#controllers/settings_controller.UIConfigs')
     // DYNAMIC ROUTER

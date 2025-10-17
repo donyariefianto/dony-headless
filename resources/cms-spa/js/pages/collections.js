@@ -744,21 +744,22 @@ export function loadCollectionsPage(container) {
 
         let method = 'POST'
         let url = `${BASE_API_URL}/configuration/collection/create`
-
+        let body_request = {}
         if (isEditMode) {
           method = 'PUT'
-          url = `${BASE_API_URL}/configuration/collection/update/${name}`
+          url = `${BASE_API_URL}/configuration/collection/update/`
+          body_request.id = `${name}_config`
         } else {
           payload.name = name
         }
-
+        body_request.collectionConfigData = payload
         try {
           const response = await fetch(url, {
             method: method,
             headers: {
               'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ collectionConfigData: payload }),
+            body: JSON.stringify(body_request),
           })
 
           if (!response.ok) {

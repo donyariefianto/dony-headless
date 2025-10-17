@@ -521,12 +521,12 @@ const isNonRepeatableGroup = (groupName) => {
 const saveFormData = async (formBuilderId, formElement) => {
   const saveButton = document.getElementById('save-data-btn')
   const data = serializeFormData(formElement)
+
   const url = `/api/dynamics-form/${formBuilderId}` // URL BARU SESUAI PERMINTAAN
 
-  // 1. Tampilkan loading dan disable tombol
   saveButton.disabled = true
   saveButton.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Menyimpan...`
-
+  const currentTheme = JSON.parse(localStorage.getItem('darkMode'))
   try {
     const response = await fetch(url, {
       method: 'POST',
@@ -548,16 +548,16 @@ const saveFormData = async (formBuilderId, formElement) => {
       }
       throw new Error(`Gagal menyimpan (Status ${response.status}): ${errorDetail}`)
     }
-
-    // 2. Tampilkan SweetAlert Sukses
-    Swal.fire({
+    let config_swal = {
       icon: 'success',
       title: 'Berhasil Disimpan!',
       text: 'Data form Anda telah berhasil dikirim dan disimpan.',
       confirmButtonText: 'OK',
-    })
-
-    // Opsional: Reset form atau tutup panel
+    }
+    if (currentTheme) {
+      config_swal.theme = 'dark'
+    }
+    Swal.fire(config_swal)
     formElement.reset()
     closeFormPanel()
   } catch (error) {
